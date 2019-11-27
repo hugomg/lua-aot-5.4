@@ -1,5 +1,6 @@
 src/lua
 src/luac
+src/luaot
 
 *.a
 *.o

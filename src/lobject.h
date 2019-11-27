@@ -493,7 +493,7 @@ typedef struct AbsLineInfo {
 /*
 ** AOT implementation
 */ 
-typedef void (*aot_compiled_function) (lua_State *L, struct CallInfo *ci);
+typedef void (*AotCompiledFunction) (lua_State *L, struct CallInfo *ci);
 
 /*
 ** Function Prototypes
@@ -522,7 +522,7 @@ typedef struct Proto {
   TString  *source;  /* used for debug information */
   GCObject *gclist;
 
-  aot_compiled_function aot_implementation;
+  AotCompiledFunction aot_implementation;
 } Proto;
 
 /* }================================================================== */
