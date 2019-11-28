@@ -1241,7 +1241,33 @@ void create_function(Proto *p)
             //case OP_TFORPREP
             //case OP_TFORCALL
             //case OP_TFORLOOP
-            //case OP_SETLIST
+            case OP_SETLIST: {
+                println("        int n = GETARG_B(i);");
+                println("        unsigned int last = GETARG_C(i);");
+                println("        Table *h = hvalue(s2v(ra));");
+                println("        if (n == 0)");
+                println("          n = cast_int(L->top - ra) - 1;  /* get up to the top */");
+                println("        else");
+                println("          L->top = ci->top;  /* correct top in case of emergency GC */");
+                println("        last += n;");
+                println("        int has_extra_arg = TESTARG_k(i);"); // (!)
+                println("        if (has_extra_arg) {");
+                println("          last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", p->code[pc+1]);
+                                   // (!)
+                println("        }");
+                println("        if (last > luaH_realasize(h))  /* needs more space? */");
+                println("          luaH_resizearray(L, h, last);  /* preallocate it at once */");
+                println("        for (; n > 0; n--) {");
+                println("          TValue *val = s2v(ra + n);");
+                println("          setobj2t(L, &h->array[last - 1], val);");
+                println("          last--;");
+                println("          luaC_barrierback(L, obj2gco(h), val);");
+                println("        }");
+                println("        if (has_extra_arg) {");  // (!)
+                println("          goto LUA_AOT_SKIP1;"); // (!)
+                println("        }");                     // (!)
+                break;
+            }
             case OP_CLOSURE: {
                 println("    Proto *p = cl->p->p[GETARG_Bx(i)];");
                 println("    halfProtect(pushclosure(L, p, cl->upvals, base, ra));");
