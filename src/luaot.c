@@ -805,7 +805,7 @@ void create_function(Proto *p)
                 println("        idx = intop(+, idx, step);  /* add step to index */");
                 println("        chgivalue(s2v(ra), idx);  /* update internal index */");
                 println("        setivalue(s2v(ra + 3), idx);  /* and control variable */");
-                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); // (!)
+                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr)));
                 println("      }");
                 println("    }");
                 println("    else {  /* floating loop */");
@@ -817,7 +817,7 @@ void create_function(Proto *p)
                 println("                              : luai_numle(limit, idx)) {");
                 println("        chgfltvalue(s2v(ra), idx);  /* update internal index */");
                 println("        setfltvalue(s2v(ra + 3), idx);  /* and control variable */");
-                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); // (!)
+                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr)));
                 println("      }");
                 println("    }");
                 println("    updatetrap(ci);  /* allows a signal to break the loop */");
@@ -836,7 +836,7 @@ void create_function(Proto *p)
                 println("        luaG_runerror(L, \"'for' step is zero\");");
                 println("      setivalue(s2v(ra + 3), init);  /* control variable */");
                 println("      if (forlimit(L, init, plimit, &limit, step))");
-                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1)); // (!)
+                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1));
                 println("      else {  /* prepare loop counter */");
                 println("        lua_Unsigned count;");
                 println("        if (step > 0) {  /* ascending loop? */");
@@ -866,7 +866,7 @@ void create_function(Proto *p)
                 println("        luaG_runerror(L, \"'for' step is zero\");");
                 println("      if (luai_numlt(0, step) ? luai_numlt(limit, init)");
                 println("                               : luai_numlt(init, limit))");
-                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1)); // (!)
+                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1));
                 println("      else {");
                 println("        /* make sure internal values are all float */");
                 println("        setfltvalue(plimit, limit);");
