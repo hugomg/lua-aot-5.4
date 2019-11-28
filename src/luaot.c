@@ -814,7 +814,16 @@ void create_function(Proto *p)
                 println("      Protect(luaT_trybinTM(L, rb, rb, ra, TM_UNM));");
                 break;
             }
-            // case OP_BNOT
+            case OP_BNOT: {
+                println("    TValue *rb = vRB(i);");
+                println("    lua_Integer ib;");
+                println("    if (tointegerns(rb, &ib)) {");
+                println("      setivalue(s2v(ra), intop(^, ~l_castS2U(0), ib));");
+                println("    }");
+                println("    else");
+                println("      Protect(luaT_trybinTM(L, rb, rb, ra, TM_BNOT));");
+                break;
+            }
             // case OP_NOT
             // case OP_LEN
             // case OP_CONCAT
