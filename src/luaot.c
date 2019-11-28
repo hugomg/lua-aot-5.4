@@ -759,7 +759,19 @@ void create_function(Proto *p)
                 println("    goto LUA_AOT_SKIP1;"); // (!)
                 break;
             }
-            // case OP_SELF
+            case OP_SELF: {
+                println("    const TValue *slot;");
+                println("    TValue *rb = vRB(i);");
+                println("    TValue *rc = RKC(i);");
+                println("    TString *key = tsvalue(rc);  /* key must be a string */");
+                println("    setobj2s(L, ra + 1, rb);");
+                println("    if (luaV_fastget(L, rb, key, slot, luaH_getstr)) {");
+                println("      setobj2s(L, ra, slot);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
+                break;
+            }
             case OP_ADDI: {
                 println("    op_arithI(L, l_addi, luai_numadd, TM_ADD, GETARG_k(i));");
                 break;
