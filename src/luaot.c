@@ -701,10 +701,64 @@ void create_function(Proto *p)
                 break;
             }
             // case OP_SETTABUP
-            // case OP_SETTABLE
-            // case OP_SETI
-            // case OP_SETFIELD
-            // case OP_NEWTABLE
+            case OP_SETTABLE: {
+                println("    const TValue *slot;");
+                println("    TValue *rb = vRB(i);  /* key (table is in 'ra') */");
+                println("    TValue *rc = RKC(i);  /* value */");
+                println("    lua_Unsigned n;");
+                println("    if (ttisinteger(rb)  /* fast track for integers? */");
+                println("        ? (cast_void(n = ivalue(rb)), luaV_fastgeti(L, s2v(ra), n, slot))");
+                println("        : luaV_fastget(L, s2v(ra), rb, slot, luaH_get)) {");
+                println("      luaV_finishfastset(L, s2v(ra), slot, rc);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));");
+                break;
+            }
+            case OP_SETI: {
+                println("    const TValue *slot;");
+                println("    int c = GETARG_B(i);");
+                println("    TValue *rc = RKC(i);");
+                println("    if (luaV_fastgeti(L, s2v(ra), c, slot)) {");
+                println("      luaV_finishfastset(L, s2v(ra), slot, rc);");
+                println("    }");
+                println("    else {");
+                println("      TValue key;");
+                println("      setivalue(&key, c);");
+                println("      Protect(luaV_finishset(L, s2v(ra), &key, rc, slot));");
+                println("    }");
+                break;
+            }
+            case OP_SETFIELD: {
+                println("    const TValue *slot;");
+                println("    TValue *rb = KB(i);");
+                println("    TValue *rc = RKC(i);");
+                println("    TString *key = tsvalue(rb);  /* key must be a string */");
+                println("    if (luaV_fastget(L, s2v(ra), key, slot, luaH_getshortstr)) {");
+                println("      luaV_finishfastset(L, s2v(ra), slot, rc);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));");
+                break;
+            }
+            case OP_NEWTABLE: {
+                println("    int b = GETARG_B(i);  /* log2(hash size) + 1 */");
+                println("    int c = GETARG_C(i);  /* array size */");
+                println("    Table *t;");
+                println("    if (b > 0)");
+                println("      b = 1 << (b - 1);  /* size is 2^(b - 1) */");
+                println("    if (TESTARG_k(i))");
+                println("      c += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", p->code[pc+1]);
+                println("    /* skip extra argument */"); // (!)
+                println("    L->top = ra + 1;  /* correct top in case of emergency GC */");
+                println("    t = luaH_new(L);  /* memory allocation */");
+                println("    sethvalue2s(L, ra, t);");
+                println("    if (b != 0 || c != 0)");
+                println("      luaH_resize(L, t, c, b);  /* idem */");
+                println("    checkGC(L, ra + 1);");
+                println("    goto LUA_AOT_SKIP1;"); // (!)
+                break;
+            }
             // case OP_SELF
             case OP_ADDI: {
                 println("    op_arithI(L, l_addi, luai_numadd, TM_ADD, GETARG_k(i));");
