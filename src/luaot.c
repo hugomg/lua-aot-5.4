@@ -618,7 +618,9 @@ void create_function(Proto *p)
         println("    (void) ra;");
 
         switch (op) {
-            // cass OP_MOVE:
+            case OP_MOVE:
+                println("    setobjs2s(L, ra, RB(i));");
+                break;
             case OP_LOADI: {
                 println("    lua_Integer b = GETARG_sBx(i);");
                 println("    setivalue(s2v(ra), b);");
