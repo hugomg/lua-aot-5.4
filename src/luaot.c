@@ -748,8 +748,88 @@ void create_function(Proto *p)
                 println("    return;");
                 break;
             }
-            //case OP_FORLOOP
-            //case OP_FORPREP
+            case OP_FORLOOP: {
+                println("    if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */");
+                println("      lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));");
+                println("      if (count > 0) {  /* still more iterations? */");
+                println("        lua_Integer step = ivalue(s2v(ra + 2));");
+                println("        lua_Integer idx = ivalue(s2v(ra));  /* internal index */");
+                println("        chgivalue(s2v(ra + 1), count - 1);  /* update counter */");
+                println("        idx = intop(+, idx, step);  /* add step to index */");
+                println("        chgivalue(s2v(ra), idx);  /* update internal index */");
+                println("        setivalue(s2v(ra + 3), idx);  /* and control variable */");
+                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); // (!)
+                println("      }");
+                println("    }");
+                println("    else {  /* floating loop */");
+                println("      lua_Number step = fltvalue(s2v(ra + 2));");
+                println("      lua_Number limit = fltvalue(s2v(ra + 1));");
+                println("      lua_Number idx = fltvalue(s2v(ra));");
+                println("      idx = luai_numadd(L, idx, step);  /* increment index */");
+                println("      if (luai_numlt(0, step) ? luai_numle(idx, limit)");
+                println("                              : luai_numle(limit, idx)) {");
+                println("        chgfltvalue(s2v(ra), idx);  /* update internal index */");
+                println("        setfltvalue(s2v(ra + 3), idx);  /* and control variable */");
+                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); // (!)
+                println("      }");
+                println("    }");
+                println("    updatetrap(ci);  /* allows a signal to break the loop */");
+                break;
+            }
+            case OP_FORPREP: {
+                println("    TValue *pinit = s2v(ra);");
+                println("    TValue *plimit = s2v(ra + 1);");
+                println("    TValue *pstep = s2v(ra + 2);");
+                println("    savestate(L, ci);  /* in case of errors */");
+                println("    if (ttisinteger(pinit) && ttisinteger(pstep)) { /* integer loop? */");
+                println("      lua_Integer init = ivalue(pinit);");
+                println("      lua_Integer step = ivalue(pstep);");
+                println("      lua_Integer limit;");
+                println("      if (step == 0)");
+                println("        luaG_runerror(L, \"'for' step is zero\");");
+                println("      setivalue(s2v(ra + 3), init);  /* control variable */");
+                println("      if (forlimit(L, init, plimit, &limit, step))");
+                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1)); // (!)
+                println("      else {  /* prepare loop counter */");
+                println("        lua_Unsigned count;");
+                println("        if (step > 0) {  /* ascending loop? */");
+                println("          count = l_castS2U(limit) - l_castS2U(init);");
+                println("          if (step != 1)  /* avoid division in the too common case */");
+                println("            count /= l_castS2U(step);");
+                println("        }");
+                println("        else {  /* step < 0; descending loop */");
+                println("          count = l_castS2U(init) - l_castS2U(limit);");
+                println("          /* 'step+1' avoids negating 'mininteger' */");
+                println("          count /= l_castS2U(-(step + 1)) + 1u;");
+                println("        }");
+                println("        /* store the counter in place of the limit (which won't be");
+                println("           needed anymore */");
+                println("        setivalue(plimit, l_castU2S(count));");
+                println("      }");
+                println("    }");
+                println("    else {  /* try making all values floats */");
+                println("      lua_Number init; lua_Number limit; lua_Number step;");
+                println("      if (unlikely(!tonumber(plimit, &limit)))");
+                println("        luaG_forerror(L, plimit, \"limit\");");
+                println("      if (unlikely(!tonumber(pstep, &step)))");
+                println("        luaG_forerror(L, pstep, \"step\");");
+                println("      if (unlikely(!tonumber(pinit, &init)))");
+                println("        luaG_forerror(L, pinit, \"initial value\");");
+                println("      if (step == 0)");
+                println("        luaG_runerror(L, \"'for' step is zero\");");
+                println("      if (luai_numlt(0, step) ? luai_numlt(limit, init)");
+                println("                               : luai_numlt(init, limit))");
+                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1)); // (!)
+                println("      else {");
+                println("        /* make sure internal values are all float */");
+                println("        setfltvalue(plimit, limit);");
+                println("        setfltvalue(pstep, step);");
+                println("        setfltvalue(s2v(ra), init);  /* internal index */");
+                println("        setfltvalue(s2v(ra + 3), init);  /* control variable */");
+                println("      }");
+                println("    }");
+                break;
+            }
             //case OP_TFORPREP
             //case OP_TFORCALL
             //case OP_TFORLOOP
