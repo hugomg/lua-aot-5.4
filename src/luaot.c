@@ -830,8 +830,17 @@ void create_function(Proto *p)
                 println("    setbvalue(s2v(ra), nrb);");
                 break;
             }
-            // case OP_LEN
-            // case OP_CONCAT
+            case OP_LEN: {
+                println("    Protect(luaV_objlen(L, ra, vRB(i)));");
+                break;
+            }
+            case OP_CONCAT: {
+                println("    int n = GETARG_B(i);  /* number of elements to concatenate */");
+                println("    L->top = ra + n;  /* mark the end of concat operands */");
+                println("    ProtectNT(luaV_concat(L, n));");
+                println("    checkGC(L, L->top); /* 'luaV_concat' ensures correct top */");
+                break;
+            }
             // case OP_CLOSE
             // case OP_TBC
             // case OP_JMP
