@@ -100,12 +100,12 @@ int main(int argc, char **argv)
     println("#include \"luaot_footer.c\"");
 }
 
-
 #define UPVALNAME(x) ((f->upvalues[x].name) ? getstr(f->upvalues[x].name) : "-")
 #define VOID(p) ((const void*)(p))
 #define eventname(i) (getstr(tmname[i]))
 
-static void PrintString(const TString* ts)
+static
+void PrintString(const TString* ts)
 {
     // Adapted from the PrintString function of luac.c 
     const char* s = getstr(ts);
