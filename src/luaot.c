@@ -705,8 +705,26 @@ void create_function(Proto *p)
                 println("    op_bitwiseK(L, l_bxor);");
                 break;
             }
-            // case OP_SHRI
-            // case OP_SHLI
+            case OP_SHRI: {
+                println("    TValue *rb = vRB(i);");
+                println("    int ic = GETARG_sC(i);");
+                println("    lua_Integer ib;");
+                println("    if (tointegerns(rb, &ib)) {");
+                println("       setivalue(s2v(ra), luaV_shiftl(ib, -ic));");
+                println("       goto LUA_AOT_SKIP1;"); // (!)
+                println("    }");
+                break;
+            }
+            case OP_SHLI: {
+                println("    TValue *rb = vRB(i);");
+                println("    int ic = GETARG_sC(i);");
+                println("    lua_Integer ib;");
+                println("    if (tointegerns(rb, &ib)) {");
+                println("       setivalue(s2v(ra), luaV_shiftl(ic, ib));");
+                println("       goto LUA_AOT_SKIP1;"); // (!)
+                println("    }");
+                break;
+            }
             case OP_ADD: {
                 println("    op_arith(L, l_addi, luai_numadd);");
                 break;
@@ -732,8 +750,14 @@ void create_function(Proto *p)
             // case OP_BAND
             // case OP_BOR
             // case OP_BXOR
-            // case OP_SHR
-            // case OP_SHL
+            case OP_SHR: {
+                println("    op_bitwise(L, luaV_shiftr);");
+                break;
+            }
+            case OP_SHL: {
+                println("    op_bitwise(L, luaV_shiftl);");
+                break;
+            }
             case OP_MMBIN: {
                 println("    Instruction pi = 0x%08x; /* original arith. expression */", p->code[pc-1]);
                 println("    TValue *rb = vRB(i);");
@@ -782,7 +806,6 @@ void create_function(Proto *p)
             // case OP_TESTSET
             // case OP_CALL
             // case OP_TAILCAL
-            // case OP_RETURN
             case OP_RETURN: {
                 println("    int n = GETARG_B(i) - 1;  /* number of results */");
                 println("    int nparams1 = GETARG_C(i);");
