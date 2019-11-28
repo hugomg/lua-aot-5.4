@@ -566,34 +566,39 @@ void create_function(Proto *p)
     println("  LClosure *cl;");
     println("  TValue *k;");
     println("  StkId base;");
-    println("  const Instruction *pc;");
+    println("  const Instruction *saved_pc;");
     println("  int trap;");
     println("  ");
     println(" tailcall:");
     println("  trap = L->hookmask;");
     println("  cl = clLvalue(s2v(ci->func));");
     println("  k = cl->p->k;");
-    println("  pc = ci->u.l.savedpc;");
+    println("  saved_pc = ci->u.l.savedpc;  /*no explicit program counter*/ " );
     println("  if (trap) {");
     println("    if (cl->p->is_vararg)");
     println("      trap = 0;  /* hooks will start after VARARGPREP instruction */");
-    println("    else if (pc == cl->p->code)  /* first instruction (not resuming)? */");
+    println("    else if (saved_pc == cl->p->code) /*first instruction (not resuming)?*/");
     println("      luaD_hookcall(L, ci);");
     println("    ci->u.l.trap = 1;  /* there may be other hooks */");
     println("  }");
     println("  base = ci->func + 1;");
     println("  /* main loop of interpreter */");
-    println(" ");
     println("  Instruction *function_code = cl->p->code;");
-    println("  Instruction i;  /* instruction being executed */");
-    println("  StkId ra;  /* instruction's A register */");
+    println(" ");
 
-   
     for (int pc = 0; pc < p->sizecode; pc++) {
         Instruction instr = p->code[pc];
         OpCode op = GET_OPCODE(instr);
 
         print_opcode_comment(p, pc);
+
+
+        // While an instruction is executing, the program counter typically
+        // points towards the next instruction. There are some corner cases
+        // where the program counter getss adjusted mid-instruction, but I
+        // am not breaking anything because of those...
+        println("  #undef  LUA_AOT_PC");
+        println("  #define LUA_AOT_PC (function_code + %d)", pc+1);
 
         int next = pc + 1;
         println("  #undef  LUA_AOT_NEXT_JUMP");
@@ -608,7 +613,9 @@ void create_function(Proto *p)
         }
 
         println("  label_%02d : {", pc);
-        println("    aot_vmfetch(%d, 0x%08x);", pc, instr);
+        println("    Instruction i = 0x%08x;", instr);
+        println("    StkId ra = RA(i);");
+        println("    (void) ra;");
 
         switch (op) {
             case OP_LOADI: {
@@ -688,7 +695,7 @@ void create_function(Proto *p)
                 println("    updatetrap(ci);");
                 println("    if (trap) {");
                 println("      luaD_hookcall(L, ci);");
-                println("      L->oldpc = pc + 1;  /* next opcode will be seen as a \"new\" line */");
+                println("      L->oldpc = LUA_AOT_PC + 1;  /* next opcode will be seen as a \"new\" line */");
                 println("    }");
                 break;
             }

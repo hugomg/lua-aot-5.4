@@ -109,24 +109,20 @@
 #define docondjump()	if (cond != GETARG_k(i)) goto LUA_AOT_SKIP1; else donextjump(ci);
 
 //
-// We might want to test what happens if we do not save the pc.
-// This would allow the C compiler to throw away that variable in most cases.
+// The program counter is now known statically at each program point.
 //
 
-// #undef  savepc
-// #define savepc(L)	/* no-op */
+#undef  savepc
+#define savepc(L)	(ci->u.l.savedpc = LUA_AOT_PC)
+
 
 //
 // Our modified "bytecode fetch". Since instr and index are compile time constants,
 // the C compiler should be able to optimize the code in many cases.
 //
 
-#define aot_vmfetch(index, instr) { \
+#define aot_check_trap() { \
   if (trap) {  /* stack reallocation or hooks? */ \
-    trap = luaG_traceexec(L, pc);  /* handle hooks */ \
+    trap = luaG_traceexec(L, LUA_AOT_PC - 1);  /* handle hooks */ \
     updatebase(ci);  /* correct stack */ \
-  } \
-  i = instr; \
-  pc = function_code + index + 1; \
-  ra = RA(i); \
-}
+  }
