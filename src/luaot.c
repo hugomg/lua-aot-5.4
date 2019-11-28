@@ -870,7 +870,16 @@ void create_function(Proto *p)
                 println("    docondjump();");
                 break;
             }
-            // case OP_TESTSET
+            case OP_TESTSET: {
+                println("    TValue *rb = vRB(i);");
+                println("    if (l_isfalse(rb) == GETARG_k(i))");
+                println("      goto LUA_AOT_SKIP1;"); // (!)
+                println("    else {");
+                println("      setobj2s(L, ra, rb);");
+                println("      donextjump(ci);");
+                println("    }");
+                break;
+            }
             // case OP_CALL
             // case OP_TAILCAL
             case OP_RETURN: {
