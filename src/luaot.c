@@ -637,8 +637,18 @@ void create_function(Proto *p)
                 break;
             }
             // case OP_LOADKX
-            // case OP_LOADBOOL
-            // case OP_LOADNIL
+            case OP_LOADBOOL: {
+                println("    setbvalue(s2v(ra), GETARG_B(i));");
+                println("    if (GETARG_C(i)) goto LUA_AOT_SKIP1;  /* skip next instruction (if C) */");
+                break;
+            }
+            case OP_LOADNIL: {
+                println("    int b = GETARG_B(i);");
+                println("    do {");
+                println("      setnilvalue(s2v(ra++));");
+                println("    } while (b--);");
+                break;
+            }
             // case OP_GETUPVAL
             // case SETUPVAL
             // case OP_GETTABUP
