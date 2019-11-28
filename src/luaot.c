@@ -824,7 +824,12 @@ void create_function(Proto *p)
                 println("      Protect(luaT_trybinTM(L, rb, rb, ra, TM_BNOT));");
                 break;
             }
-            // case OP_NOT
+            case OP_NOT: {
+                println("    TValue *rb = vRB(i);");
+                println("    int nrb = l_isfalse(rb);  /* next assignment may change this value */");
+                println("    setbvalue(s2v(ra), nrb);");
+                break;
+            }
             // case OP_LEN
             // case OP_CONCAT
             // case OP_CLOSE
