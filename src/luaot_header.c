@@ -115,13 +115,12 @@
 #undef  savepc
 #define savepc(L)	(ci->u.l.savedpc = LUA_AOT_PC)
 
-
 //
-// Our modified "bytecode fetch". Since instr and index are compile time constants,
-// the C compiler should be able to optimize the code in many cases.
+// Our modified version of vmfetch(). Since instr and index are compile time
+// constants, the C compiler should be able to optimize the code in many cases.
 //
 
-#define aot_check_trap() { \
+#define aot_check_trap() \
   if (trap) {  /* stack reallocation or hooks? */ \
     trap = luaG_traceexec(L, LUA_AOT_PC - 1);  /* handle hooks */ \
     updatebase(ci);  /* correct stack */ \

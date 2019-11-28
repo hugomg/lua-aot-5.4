@@ -621,6 +621,7 @@ void create_function(Proto *p)
         }
 
         println("  label_%02d : {", pc);
+        println("    aot_check_trap();");
         println("    Instruction i = 0x%08x;", instr);
         println("    StkId ra = RA(i);");
         println("    (void) ra;");
