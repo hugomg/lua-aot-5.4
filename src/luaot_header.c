@@ -120,8 +120,16 @@
 // constants, the C compiler should be able to optimize the code in many cases.
 //
 
-#define aot_check_trap() \
+#undef  vmfetch
+#define aot_vmfetch(instr)	{ \
   if (trap) {  /* stack reallocation or hooks? */ \
     trap = luaG_traceexec(L, LUA_AOT_PC - 1);  /* handle hooks */ \
     updatebase(ci);  /* correct stack */ \
-  }
+  } \
+  i = instr; \
+  ra = RA(i); /* WARNING: any stack reallocation invalidates 'ra' */ \
+}
+
+#undef  vmdispatch
+#undef  vmcase
+#undef  vmbreak

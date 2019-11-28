@@ -592,6 +592,12 @@ void create_function(Proto *p)
     println("  base = ci->func + 1;");
     println("  /* main loop of interpreter */");
     println("  Instruction *function_code = cl->p->code;");
+    println("  Instruction i;");
+    println("  StkId ra;");
+    println("  (void) function_code;");
+    println("  (void) i;");
+    println("  (void) ra;");
+
     println(" ");
 
     for (int pc = 0; pc < p->sizecode; pc++) {
@@ -621,10 +627,7 @@ void create_function(Proto *p)
         }
 
         println("  label_%02d : {", pc);
-        println("    aot_check_trap();");
-        println("    Instruction i = 0x%08x;", instr);
-        println("    StkId ra = RA(i);");
-        println("    (void) ra;");
+        println("    aot_vmfetch(0x%08x);", instr);
 
         switch (op) {
             case OP_MOVE:
