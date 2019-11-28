@@ -626,8 +626,16 @@ void create_function(Proto *p)
                 println("    setivalue(s2v(ra), b);");
                 break;
             }
-            // case OP_LOADF
-            // case OP_LOADK
+            case OP_LOADF: {
+                println("    int b = GETARG_sBx(i);");
+                println("    setfltvalue(s2v(ra), cast_num(b));");
+                break;
+            }
+            case OP_LOADK: {
+                println("    TValue *rb = k + GETARG_Bx(i);");
+                println("    setobj2s(L, ra, rb);");
+                break;
+            }
             // case OP_LOADKX
             // case OP_LOADBOOL
             // case OP_LOADNIL
