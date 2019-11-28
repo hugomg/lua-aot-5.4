@@ -685,11 +685,26 @@ void create_function(Proto *p)
                 println("    op_arithfK(L, luai_numpow);");
                 break;
             }
-            // case OP_DIVK
-            // case OP_IDIVK
-            // case OP_BANDK
-            // case OP_BORK
-            // case OP_BXORK
+            case OP_DIVK: {
+                println("    op_arithfK(L, luai_numdiv);");
+                break;
+            }
+            case OP_IDIVK: {
+                println("    op_arithK(L, luaV_idiv, luai_numidiv, 0);");
+                break;
+            }
+            case OP_BANDK: {
+                println("    op_bitwiseK(L, l_band);");
+                break;
+            }
+            case OP_BORK: {
+                println("    op_bitwiseK(L, l_bor);");
+                break;
+            }
+            case OP_BXORK: {
+                println("    op_bitwiseK(L, l_bxor);");
+                break;
+            }
             // case OP_SHRI
             // case OP_SHLI
             case OP_ADD: {
