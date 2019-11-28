@@ -661,12 +661,30 @@ void create_function(Proto *p)
             // case OP_SETFIELD
             // case OP_NEWTABLE
             // case OP_SELF
-            // case OP_ADDI
-            // case OP_ADDK
-            // case OP_SUBK
-            // case OP_MULK
-            // case OP_MODK
-            // case OP_POWK
+            case OP_ADDI: {
+                println("    op_arithI(L, l_addi, luai_numadd, TM_ADD, GETARG_k(i));");
+                break;
+            }
+            case OP_ADDK: {
+                println("    op_arithK(L, l_addi, luai_numadd, GETARG_k(i));");
+                break;
+            }
+            case OP_SUBK: {
+                println("    op_arithK(L, l_subi, luai_numsub, 0);");
+                break;
+            }
+            case OP_MULK: {
+                println("    op_arithK(L, l_muli, luai_nummul, GETARG_k(i));");
+                break;
+            }
+            case OP_MODK: {
+                println("    op_arithK(L, luaV_mod, luaV_modf, 0);");
+                break;
+            }
+            case OP_POWK: {
+                println("    op_arithfK(L, luai_numpow);");
+                break;
+            }
             // case OP_DIVK
             // case OP_IDIVK
             // case OP_BANDK
