@@ -618,11 +618,79 @@ void create_function(Proto *p)
         println("    (void) ra;");
 
         switch (op) {
+            // cass OP_MOVE:
             case OP_LOADI: {
                 println("    lua_Integer b = GETARG_sBx(i);");
                 println("    setivalue(s2v(ra), b);");
                 break;
             }
+            // case OP_LOADF
+            // case OP_LOADK
+            // case OP_LOADKX
+            // case OP_LOADBOOL
+            // case OP_LOADNIL
+            // case OP_GETUPVAL
+            // case SETUPVAL
+            // case OP_GETTABUP
+            // case OP_GETTABLE
+            // case OP_GETI
+            // case OP_GETFIELD
+            // case OP_SETTABUP
+            // case OP_SETTABLE
+            // case OP_SETI
+            // case OP_SETFIELD
+            // case OP_NEWTABLE
+            // case OP_SELF
+            // case OP_ADDI
+            // case OP_ADDK
+            // case OP_SUBK
+            // case OP_MULK
+            // case OP_MODK
+            // case OP_POWK
+            // case OP_DIVK
+            // case OP_IDIVK
+            // case OP_BANDK
+            // case OP_BORK
+            // case OP_BXORK
+            // case OP_SHRI
+            // case OP_SHLI
+            // case OP_ADD
+            // case OP_SUB
+            // case OP_MUL
+            // case OP_MOD
+            // case OP_POW
+            // case OP_DIV
+            // case OP_IDIV
+            // case OP_BAND
+            // case OP_BOR
+            // case OP_BXOR
+            // case OP_SHR
+            // case OP_SHL
+            // case OP_MMBIN
+            // case OP_MMBINI
+            // case OP_MMBINK
+            // case OP_UNM
+            // case OP_BNOT
+            // case OP_NOT
+            // case OP_LEN
+            // case OP_CONCAT
+            // case OP_CLOSE
+            // case OP_TBC
+            // case OP_JMP
+            // case OP_EQ
+            // case OP_LT
+            // case OP_LE
+            // case OP_EQK
+            // case OP_EQI
+            // case OP_LTI
+            // case OP_LEI
+            // case OP_GTI
+            // case OP_GEI
+            // case OP_TEST
+            // case OP_TESTSET
+            // case OP_CALL
+            // case OP_TAILCAL
+            // case OP_RETURN
             case OP_RETURN: {
                 println("    int n = GETARG_B(i) - 1;  /* number of results */");
                 println("    int nparams1 = GETARG_C(i);");
@@ -678,7 +746,12 @@ void create_function(Proto *p)
                 println("    return;");
                 break;
             }
-
+            //case OP_FORLOOP
+            //case OP_FORPREP
+            //case OP_TFORPREP
+            //case OP_TFORCALL
+            //case OP_TFORLOOP
+            //case OP_SETLIST
             case OP_CLOSURE: {
                 println("    Proto *p = cl->p->p[GETARG_Bx(i)];");
                 println("    halfProtect(pushclosure(L, p, cl->upvals, base, ra));");
