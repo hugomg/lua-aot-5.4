@@ -660,9 +660,46 @@ void create_function(Proto *p)
             // case OP_GETUPVAL
             // case OP_SETUPVAL
             // case OP_GETTABUP
-            // case OP_GETTABLE
-            // case OP_GETI
-            // case OP_GETFIELD
+            case OP_GETTABLE: {
+                println("    const TValue *slot;");
+                println("    TValue *rb = vRB(i);");
+                println("    TValue *rc = vRC(i);");
+                println("    lua_Unsigned n;");
+                println("    if (ttisinteger(rc)  /* fast track for integers? */");
+                println("        ? (cast_void(n = ivalue(rc)), luaV_fastgeti(L, rb, n, slot))");
+                println("        : luaV_fastget(L, rb, rc, slot, luaH_get)) {");
+                println("      setobj2s(L, ra, slot);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
+                break;
+            }
+            case OP_GETI: {
+                println("    const TValue *slot;");
+                println("    TValue *rb = vRB(i);");
+                println("    int c = GETARG_C(i);");
+                println("    if (luaV_fastgeti(L, rb, c, slot)) {");
+                println("      setobj2s(L, ra, slot);");
+                println("    }");
+                println("    else {");
+                println("      TValue key;");
+                println("      setivalue(&key, c);");
+                println("      Protect(luaV_finishget(L, rb, &key, ra, slot));");
+                println("    }");
+                break;
+            }
+            case OP_GETFIELD: {
+                println("    const TValue *slot;");
+                println("    TValue *rb = vRB(i);");
+                println("    TValue *rc = KC(i);");
+                println("    TString *key = tsvalue(rc);  /* key must be a string */");
+                println("    if (luaV_fastget(L, rb, key, slot, luaH_getshortstr)) {");
+                println("      setobj2s(L, ra, slot);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
+                break;
+            }
             // case OP_SETTABUP
             // case OP_SETTABLE
             // case OP_SETI
