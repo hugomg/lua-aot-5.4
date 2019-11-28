@@ -656,11 +656,26 @@ void create_function(Proto *p)
             // case OP_BXORK
             // case OP_SHRI
             // case OP_SHLI
-            // case OP_ADD
-            // case OP_SUB
-            // case OP_MUL
-            // case OP_MOD
-            // case OP_POW
+            case OP_ADD: {
+                println("    op_arith(L, l_addi, luai_numadd);");
+                break;
+            }
+            case OP_SUB: {
+                println("    op_arith(L, l_subi, luai_numsub);");
+                break;
+            }
+            case OP_MUL: {
+                println("    op_arith(L, l_muli, luai_nummul);");
+                break;
+            }
+            case OP_MOD: {
+                println("    op_arith(L, luaV_mod, luaV_modf);");
+                break;
+            }
+            case OP_POW: {
+                println("    op_arithf(L, luai_numpow);");
+                break;
+            }
             // case OP_DIV
             // case OP_IDIV
             // case OP_BAND
