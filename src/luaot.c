@@ -856,15 +856,56 @@ void create_function(Proto *p)
                 println("    goto label_%02d;", jump_target(p, pc));
                 break;
             }
-            // case OP_EQ
-            // case OP_LT
-            // case OP_LE
-            // case OP_EQK
-            // case OP_EQI
-            // case OP_LTI
-            // case OP_LEI
-            // case OP_GTI
-            // case OP_GEI
+            case OP_EQ: {
+                println("    int cond;");
+                println("    TValue *rb = vRB(i);");
+                println("    Protect(cond = luaV_equalobj(L, s2v(ra), rb));");
+                println("    docondjump();");
+                break;
+            }
+            case OP_LT: {
+                println("    op_order(L, l_lti, LTnum, lessthanothers);");
+                break;
+            }
+            case OP_LE: {
+                println("    op_order(L, l_lei, LEnum, lessequalothers);");
+                break;
+            }
+            case OP_EQK: {
+                println("    TValue *rb = KB(i);");
+                println("    /* basic types do not use '__eq'; we can use raw equality */");
+                println("    int cond = luaV_equalobj(NULL, s2v(ra), rb);");
+                println("    docondjump();");
+                break;
+            }
+            case OP_EQI: {
+                println("    int cond;");
+                println("    int im = GETARG_sB(i);");
+                println("    if (ttisinteger(s2v(ra)))");
+                println("      cond = (ivalue(s2v(ra)) == im);");
+                println("    else if (ttisfloat(s2v(ra)))");
+                println("      cond = luai_numeq(fltvalue(s2v(ra)), cast_num(im));");
+                println("    else");
+                println("      cond = 0;  /* other types cannot be equal to a number */");
+                println("    docondjump();");
+                break;
+            }
+            case OP_LTI: {
+                println("    op_orderI(L, l_lti, luai_numlt, 0, TM_LT);");
+                break;
+            }
+            case OP_LEI: {
+                println("    op_orderI(L, l_lei, luai_numle, 0, TM_LE);");
+                break;
+            }
+            case OP_GTI: {
+                println("    op_orderI(L, l_gti, luai_numgt, 1, TM_LT);");
+                break;
+            }
+            case OP_GEI: {
+                println("    op_orderI(L, l_gei, luai_numge, 1, TM_LE);");
+                break;
+            }
             case OP_TEST: {
                 println("    int cond = !l_isfalse(s2v(ra));");
                 println("    docondjump();");
