@@ -548,6 +548,14 @@ void print_opcode_comment(Proto *f, int pc)
 }
 
 static
+int jump_target(Proto *p, int pc)
+{
+    Instruction instr = p->code[pc];
+    if (GET_OPCODE(instr) != OP_JMP) { fatal_error("instruction is not a jump"); }
+    return (pc+1) + GETARG_sJ(instr);
+}
+
+static
 void create_function(Proto *p)
 {
     int func_id = nfunctions++;
@@ -603,7 +611,7 @@ void create_function(Proto *p)
         int next = pc + 1;
         println("  #undef  LUA_AOT_NEXT_JUMP");
         if (next < p->sizecode && GET_OPCODE(p->code[next]) == OP_JMP) {
-            println("  #define LUA_AOT_NEXT_JUMP label_todo");
+            println("  #define LUA_AOT_NEXT_JUMP label_%02d", jump_target(p, next));
         }
 
         int skip1 = pc + 2;
@@ -843,7 +851,11 @@ void create_function(Proto *p)
             }
             // case OP_CLOSE
             // case OP_TBC
-            // case OP_JMP
+            case OP_JMP: {
+                println("    updatetrap(ci);");
+                println("    goto label_%02d;", jump_target(p, pc));
+                break;
+            }
             // case OP_EQ
             // case OP_LT
             // case OP_LE
@@ -853,7 +865,11 @@ void create_function(Proto *p)
             // case OP_LEI
             // case OP_GTI
             // case OP_GEI
-            // case OP_TEST
+            case OP_TEST: {
+                println("    int cond = !l_isfalse(s2v(ra));");
+                println("    docondjump();");
+                break;
+            }
             // case OP_TESTSET
             // case OP_CALL
             // case OP_TAILCAL

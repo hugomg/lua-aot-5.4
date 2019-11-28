@@ -103,7 +103,7 @@
 #undef dojump
 
 #undef  donextjump
-#define donextjump(ci)	{ goto LUA_AOT_NEXTJUMP; }
+#define donextjump(ci)	{ updatetrap(ci); goto LUA_AOT_NEXT_JUMP; }
 
 #undef  docondjump
 #define docondjump()	if (cond != GETARG_k(i)) goto LUA_AOT_SKIP1; else donextjump(ci);
