@@ -650,7 +650,7 @@ void create_function(Proto *p)
                 break;
             }
             // case OP_GETUPVAL
-            // case SETUPVAL
+            // case OP_SETUPVAL
             // case OP_GETTABUP
             // case OP_GETTABLE
             // case OP_GETI
@@ -800,7 +800,20 @@ void create_function(Proto *p)
                 println("    Protect(luaT_trybinassocTM(L, s2v(ra), imm, flip, result, tm));");
                 break;
             }
-            // case OP_UNM
+            case OP_UNM: {
+                println("    TValue *rb = vRB(i);");
+                println("    lua_Number nb;");
+                println("    if (ttisinteger(rb)) {");
+                println("      lua_Integer ib = ivalue(rb);");
+                println("      setivalue(s2v(ra), intop(-, 0, ib));");
+                println("    }");
+                println("    else if (tonumberns(rb, nb)) {");
+                println("      setfltvalue(s2v(ra), luai_numunm(L, nb));");
+                println("    }");
+                println("    else");
+                println("      Protect(luaT_trybinTM(L, rb, rb, ra, TM_UNM));");
+                break;
+            }
             // case OP_BNOT
             // case OP_NOT
             // case OP_LEN
