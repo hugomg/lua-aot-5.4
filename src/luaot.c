@@ -745,11 +745,26 @@ void create_function(Proto *p)
                 println("    op_arithf(L, luai_numpow);");
                 break;
             }
-            // case OP_DIV
-            // case OP_IDIV
-            // case OP_BAND
-            // case OP_BOR
-            // case OP_BXOR
+            case OP_DIV: {  /* float division (always with floats: */
+                println("    op_arithf(L, luai_numdiv);");
+                break;
+            }
+            case OP_IDIV: {  /* floor division */
+                println("    op_arith(L, luaV_idiv, luai_numidiv);");
+                break;
+            }
+            case OP_BAND: {
+                println("    op_bitwise(L, l_band);");
+                break;
+            }
+            case OP_BOR: {
+                println("    op_bitwise(L, l_bor);");
+                break;
+            }
+            case OP_BXOR: {
+                println("    op_bitwise(L, l_bxor);");
+                break;
+            }
             case OP_SHR: {
                 println("    op_bitwise(L, luaV_shiftr);");
                 break;
