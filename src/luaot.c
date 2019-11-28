@@ -691,9 +691,33 @@ void create_function(Proto *p)
             // case OP_BXOR
             // case OP_SHR
             // case OP_SHL
-            // case OP_MMBIN
-            // case OP_MMBINI
-            // case OP_MMBINK
+            case OP_MMBIN: {
+                println("    Instruction pi = 0x%08x; /* original arith. expression */", p->code[pc-1]);
+                println("    TValue *rb = vRB(i);");
+                println("    TMS tm = (TMS)GETARG_C(i);");
+                println("    StkId result = RA(pi);");
+                println("    lua_assert(OP_ADD <= GET_OPCODE(pi) && GET_OPCODE(pi) <= OP_SHR);");
+                println("    Protect(luaT_trybinTM(L, s2v(ra), rb, result, tm));");
+                break;
+            }
+            case OP_MMBINI: {
+                println("    Instruction pi = 0x%0x;  /* original arith. expression */", p->code[pc-1]);
+                println("    int imm = GETARG_sB(i);");
+                println("    TMS tm = (TMS)GETARG_C(i);");
+                println("    int flip = GETARG_k(i);");
+                println("    StkId result = RA(pi);");
+                println("    Protect(luaT_trybiniTM(L, s2v(ra), imm, flip, result, tm));");
+                break;
+            }
+            case OP_MMBINK: {
+                println("    Instruction pi = 0x%08x;  /* original arith. expression */", p->code[pc-1]);
+                println("    TValue *imm = KB(i);");
+                println("    TMS tm = (TMS)GETARG_C(i);");
+                println("    int flip = GETARG_k(i);");
+                println("    StkId result = RA(pi);");
+                println("    Protect(luaT_trybinassocTM(L, s2v(ra), imm, flip, result, tm));");
+                break;
+            }
             // case OP_UNM
             // case OP_BNOT
             // case OP_NOT
