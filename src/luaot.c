@@ -21,8 +21,8 @@
 
 static const char *program_name    = "luaot";
 static const char *input_filename  = NULL;
-static const char *module_name     = NULL;
 static const char *output_filename = NULL;
+static const char *module_name     = NULL;
 static FILE * output_file = NULL;
 static int nfunctions = 0;
 static TString **tmname;
@@ -30,7 +30,7 @@ static TString **tmname;
 static
 void usage_error()
 {
-    fprintf(stderr, "usage: %s input.lua modname output.c\n", program_name);
+    fprintf(stderr, "usage: %s input.lua output.c\n", program_name);
     exit(1);
 }
 
@@ -62,18 +62,20 @@ void println(const char *fmt, ...)
     fprintf(output_file, "\n");
 }
 
+static const char *get_module_name(const char *);
 static void print_functions();
 static void print_source_code();
 
 int main(int argc, char **argv)
 {
-    // Process input options
-    
-    if (argc < 4) { usage_error(); }
     program_name = argv[0];
+
+    // Process input options
+    if (argc != 3) { usage_error(); }
     input_filename = argv[1];
-    module_name = argv[2];
-    output_filename = argv[3];
+    output_filename = argv[2];
+
+    module_name = get_module_name(output_filename);
 
     // Read the input
 
@@ -85,7 +87,7 @@ int main(int argc, char **argv)
     tmname = G(L)->tmname;
 
     // Generate the file
-    
+
     output_file = fopen(output_filename, "w");
     if (output_file == NULL) { fatal_error(strerror(errno)); }
 
@@ -100,6 +102,41 @@ int main(int argc, char **argv)
     println("#include \"luaot_footer.c\"");
 }
 
+/* Deduce the Lua module name given the file name
+ * For example:  ./foo/bar/frobnator.c -> frobinator
+ */
+static
+const char *get_module_name(const char *filename)
+{
+    const char *start = filename;
+    for (const char *p = filename; *p != 0; p++) {
+        if (*p == '/') {
+            start = p+1;
+        }
+    }
+
+    const char *sep = NULL;
+    for (const char *p = start; *p != 0; p++) {
+        if (*p == '.') {
+            sep = p;
+            break;
+        }
+    }
+
+    if (0 != strcmp(sep+1, "c")) {
+        fatal_error("output file is not of a \"c\" file");
+    }
+
+    size_t name_size = sep - start;
+    char *module_name = malloc(name_size + 1);
+    for (size_t i = 0; i < name_size; i++) {
+        module_name[i] = start[i];
+    }
+    module_name[name_size] = '\0';
+
+    return module_name;
+}
+
 #define UPVALNAME(x) ((f->upvalues[x].name) ? getstr(f->upvalues[x].name) : "-")
 #define VOID(p) ((const void*)(p))
 #define eventname(i) (getstr(tmname[i]))
@@ -107,7 +144,7 @@ int main(int argc, char **argv)
 static
 void PrintString(const TString* ts)
 {
-    // Adapted from the PrintString function of luac.c 
+    // Adapted from the PrintString function of luac.c
     const char* s = getstr(ts);
     size_t i,n = tsslen(ts);
     print("\"");
@@ -205,7 +242,7 @@ void print_opcode_comment(Proto *f, int pc)
     int line=luaG_getfuncline(f,pc);
 
     #define COMMENT	"\t; "
-    
+
     print("  //");
     print(" %d\t", pc+1);
     if (line > 0) {
@@ -706,19 +743,19 @@ void print_source_code()
     //
     // There is a C99 limit to how long a string literal can be, so instead of
     // using a string literal we use a large char array instead.
-    
+
     FILE *infile = fopen(input_filename, "r");
     if (!infile) { fatal_error("could not open input file a second time"); }
 
     println("static const char LUA_AOT_MODULE_SOURCE_CODE[] = {");
-    
+
     int c;
     int col = 0;
     do {
         if (col == 0) {
             print("  ");
         }
-   
+
         c = fgetc(infile);
         if (c == EOF) {
             print("%3d", 0);
