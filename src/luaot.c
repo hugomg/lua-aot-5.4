@@ -1042,7 +1042,42 @@ void create_function(Proto *p)
                 println("    ProtectNT(luaD_call(L, ra, nresults));");
                 break;
             }
-            // case OP_TAILCAL
+            case OP_TAILCALL: {
+                println("    int b = GETARG_B(i);  /* number of arguments + 1 (function) */");
+                println("    int nparams1 = GETARG_C(i);");
+                println("    /* delat is virtual 'func' - real 'func' (vararg functions) */");
+                println("    int delta = (nparams1) ? ci->u.l.nextraargs + nparams1 : 0;");
+                println("    if (b != 0)");
+                println("      L->top = ra + b;");
+                println("    else  /* previous instruction set top */");
+                println("      b = cast_int(L->top - ra);");
+                println("    savepc(ci);  /* some calls here can raise errors */");
+                println("    if (TESTARG_k(i)) {");
+                println("      /* close upvalues from current call; the compiler ensures");
+                println("         that there are no to-be-closed variables here, so this");
+                println("         call cannot change the stack */");
+                println("      luaF_close(L, base, NOCLOSINGMETH);");
+                println("      lua_assert(base == ci->func + 1);");
+                println("    }");
+                println("    if (!ttisfunction(s2v(ra))) {  /* not a function? */");
+                println("      luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */");
+                println("      b++;  /* there is now one extra argument */");
+                println("    }");
+                println("    if (!ttisLclosure(s2v(ra))) {  /* C function? */");
+                println("      luaD_call(L, ra, LUA_MULTRET);  /* call it */");
+                println("      updatetrap(ci);");
+                println("      updatestack(ci);  /* stack may have been relocated */");
+                println("      ci->func -= delta;");
+                println("      luaD_poscall(L, ci, cast_int(L->top - ra));");
+                println("      return;");
+                println("    }");
+                println("    else {  /* Lua tail call */");
+                println("      ci->func -= delta;");
+                println("      luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
+                println("      goto tailcall;");
+                println("    }");
+                break;
+            }
             case OP_RETURN: {
                 println("    int n = GETARG_B(i) - 1;  /* number of results */");
                 println("    int nparams1 = GETARG_C(i);");
