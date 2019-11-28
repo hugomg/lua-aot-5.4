@@ -668,7 +668,18 @@ void create_function(Proto *p)
                 println("    luaC_barrier(L, uv, s2v(ra));");
                 break;
             }
-            // case OP_GETTABUP
+            case OP_GETTABUP: {
+                println("    const TValue *slot;");
+                println("    TValue *upval = cl->upvals[GETARG_B(i)]->v;");
+                println("    TValue *rc = KC(i);");
+                println("    TString *key = tsvalue(rc);  /* key must be a string */");
+                println("    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {");
+                println("      setobj2s(L, ra, slot);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishget(L, upval, rc, ra, slot));");
+                break;
+            }
             case OP_GETTABLE: {
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
@@ -709,7 +720,19 @@ void create_function(Proto *p)
                 println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
                 break;
             }
-            // case OP_SETTABUP
+            case OP_SETTABUP: {
+                println("    const TValue *slot;");
+                println("    TValue *upval = cl->upvals[GETARG_A(i)]->v;");
+                println("    TValue *rb = KB(i);");
+                println("    TValue *rc = RKC(i);");
+                println("    TString *key = tsvalue(rb);  /* key must be a string */");
+                println("    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {");
+                println("      luaV_finishfastset(L, upval, slot, rc);");
+                println("    }");
+                println("    else");
+                println("      Protect(luaV_finishset(L, upval, rb, rc, slot));");
+                break;
+            }
             case OP_SETTABLE: {
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);  /* key (table is in 'ra') */");
