@@ -657,8 +657,17 @@ void create_function(Proto *p)
                 println("    } while (b--);");
                 break;
             }
-            // case OP_GETUPVAL
-            // case OP_SETUPVAL
+            case OP_GETUPVAL: {
+                println("    int b = GETARG_B(i);");
+                println("    setobj2s(L, ra, cl->upvals[b]->v);");
+                break;
+            }
+            case OP_SETUPVAL: {
+                println("    UpVal *uv = cl->upvals[GETARG_B(i)];");
+                println("    setobj(L, uv->v, s2v(ra));");
+                println("    luaC_barrier(L, uv, s2v(ra));");
+                break;
+            }
             // case OP_GETTABUP
             case OP_GETTABLE: {
                 println("    const TValue *slot;");
@@ -1024,7 +1033,15 @@ void create_function(Proto *p)
                 println("    }");
                 break;
             }
-            // case OP_CALL
+            case OP_CALL: {
+                println("    int b = GETARG_B(i);");
+                println("    int nresults = GETARG_C(i) - 1;");
+                println("    if (b != 0)  /* fixed number of arguments? */");
+                println("      L->top = ra + b;  /* top signals number of arguments */");
+                println("    /* else previous instruction set top */");
+                println("    ProtectNT(luaD_call(L, ra, nresults));");
+                break;
+            }
             // case OP_TAILCAL
             case OP_RETURN: {
                 println("    int n = GETARG_B(i) - 1;  /* number of results */");
