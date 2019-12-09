@@ -537,7 +537,7 @@ void print_opcode_comment(Proto *f, int pc)
             break;
         case OP_EXTRAARG:
             print("%d",ax);
-            print(COMMENT); PrintConstant(f,ax);
+            //print(COMMENT); PrintConstant(f,ax);
             break;
         default:
             print("%d %d %d",a,b,c);
