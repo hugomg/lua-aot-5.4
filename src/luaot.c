@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 }
 
 /* Deduce the Lua module name given the file name
- * For example:  ./foo/bar/frobnator.c -> frobinator
+ * For example:  ./foo/bar/baz.c -> baz
  */
 static
 const char *get_module_name(const char *filename)
@@ -1337,12 +1337,13 @@ static
 void print_source_code()
 {
     // Since the code we are generating is lifted from lvm.c, we need it to use
-    // Lua functions instead of C functions. And to create the C functions, we
-    // have to `load` them from source code or bytecode. To keep it simple, we
-    // load it from source code.
+    // Lua functions instead of C functions. And to create the Lua functions,
+    // we have to `load` them from source code.
     //
-    // There is a C99 limit to how long a string literal can be, so instead of
-    // using a string literal we use a large char array instead.
+    // The most readable approach would be to bundle this Lua source code as a
+    // big C string literal. However, C compilers have limits on how big a
+    // string literal can be, so instead of using a string literal, we use a
+    // plain char array instead.
 
     FILE *infile = fopen(input_filename, "r");
     if (!infile) { fatal_error("could not open input file a second time"); }
