@@ -103,36 +103,44 @@ int main(int argc, char **argv)
 }
 
 /* Deduce the Lua module name given the file name
- * For example:  ./foo/bar/baz.c -> baz
+ * For example:  ./foo/bar/baz.c -> foo_bar_baz
  */
 static
 const char *get_module_name(const char *filename)
 {
-    const char *start = filename;
-    for (const char *p = filename; *p != 0; p++) {
-        if (*p == '/') {
-            start = p+1;
+    size_t n = strlen(filename);
+
+    int has_extension = 0;
+    size_t sep = 0;
+    for (size_t i = 0; i < n; i++) {
+        if (filename[i] == '.') {
+            has_extension = 1;
+            sep = i;
         }
     }
 
-    const char *sep = NULL;
-    for (const char *p = start; *p != 0; p++) {
-        if (*p == '.') {
-            sep = p;
-            break;
+    if (!has_extension || 0 != strcmp(filename + sep, ".c")) {
+        fatal_error("output file does not have a \".c\" extension");
+    }
+
+    char *module_name = malloc(sep+1);
+    for (size_t i = 0; i < sep; i++) {
+        int c = filename[i];
+        if (c == '/' || c == '.') {
+            module_name[i] = '_';
+        } else {
+            module_name[i] = c;
         }
     }
+    module_name[sep] = '\0';
 
-    if (0 != strcmp(sep+1, "c")) {
-        fatal_error("output file is not of a \"c\" file");
-    }
 
-    size_t name_size = sep - start;
-    char *module_name = malloc(name_size + 1);
-    for (size_t i = 0; i < name_size; i++) {
-        module_name[i] = start[i];
+    for (size_t i = 0; i < sep; i++) {
+        int c = module_name[i];
+        if (!isalnum(c) && c != '_') {
+            fatal_error("output module name contains invalid characters");
+        }
     }
-    module_name[name_size] = '\0';
 
     return module_name;
 }
