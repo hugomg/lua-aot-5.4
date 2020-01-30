@@ -1,3 +1,5 @@
+# Lua-AOT 5.4
+
 This is a modified version of Lua 5.4.0 (beta) that allows Lua functions to be compiled ahead-of-time to more efficient code. It also includes a compiler called `luaot` that converts a Lua module to an equivalent one written in C.
 
 The luaot compiler is a simplistic compiler that compiles Lua bytecode to C. 
@@ -6,6 +8,14 @@ The main optimizations are that Lua jumps are converted into C gotos, and that t
 Additionally, the C compiler will be able to optimize some kinds of things, specially constant folding and dead-code elimination for the opcodes that include immediate parameters.
 
 The performance gains depend on the kind of program being run. For numerical benchmarks it can be twice as fast as regular Lua. But overall, it isn't super impressive, and is not as fast as LuaJIT or Pallene.
+
+#Usage
+
+
+    ./src/luaot test.lua testcompiled.c
+    gcc -shared -fPIC -O2 -I./src testcompiled.c -o testcompiled.so
+    ./src/lua -l testcompiled
+
 
 For installation instructions, license details, and
 further information about Lua, see doc/readme.html.
