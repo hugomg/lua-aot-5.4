@@ -4,7 +4,7 @@
 # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
 
 # Your platform. See PLATS for possible values.
-PLAT= none
+PLAT= guess
 
 CC= gcc -std=gnu99
 CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_3 $(SYSCFLAGS) $(MYCFLAGS)
@@ -14,6 +14,7 @@ LIBS= -lm $(SYSLIBS) $(MYLIBS)
 AR= ar rcu
 RANLIB= ranlib
 RM= rm -f
+UNAME= uname
 
 SYSCFLAGS=
 SYSLDFLAGS=
@@ -24,9 +25,12 @@ MYLDFLAGS=
 MYLIBS=
 MYOBJS=
 
+# Special flags for compiler modules; -Os reduces code size.
+CMCFLAGS= 
+
 # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
 
-PLATS= aix bsd c89 freebsd generic guess linux linux-readline macosx mingw posix solaris
+PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
 
 LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o
@@ -39,11 +43,8 @@ LUA_O=	lua.o
 LUAC_T=	luac
 LUAC_O=	luac.o
 
-LUAOT_T = luaot
-LUAOT_O = luaot.o
-
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(LUAOT_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(LUAOT_T)
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -65,8 +66,8 @@ $(LUA_T): $(LUA_O) $(LUA_A)
 $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
 
-$(LUAOT_T): $(LUAOT_O) $(LUA_A)
-	$(CC) -o $@ $(LDFLAGS) $(LUAOT_O) $(LUA_A) $(LIBS)
+test:
+	./$(LUA_T) -v
 
 clean:
 	$(RM) $(ALL_T) $(ALL_O)
@@ -83,17 +84,19 @@ echo:
 	@echo "AR= $(AR)"
 	@echo "RANLIB= $(RANLIB)"
 	@echo "RM= $(RM)"
+	@echo "UNAME= $(UNAME)"
 
-# Convenience targets for popular platforms
+# Convenience targets for popular platforms.
 ALL= all
 
-none:
-	@echo "Please do 'make PLATFORM' where PLATFORM is one of these:"
+help:
+	@echo "Do 'make PLATFORM' where PLATFORM is one of these:"
 	@echo "   $(PLATS)"
+	@echo "See doc/readme.html for complete instructions."
 
 guess:
-	@echo Guessing `uname`
-	@$(MAKE) `uname`
+	@echo Guessing `$(UNAME)`
+	@$(MAKE) `$(UNAME)`
 
 AIX aix:
 	$(MAKE) $(ALL) CC="xlc" CFLAGS="-O2 -DLUA_USE_POSIX -DLUA_USE_DLOPEN" SYSLIBS="-ldl" SYSLDFLAGS="-brtl -bexpall"
@@ -105,6 +108,8 @@ c89:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_C89" CC="gcc -std=c89"
 	@echo ''
 	@echo '*** C89 does not guarantee 64-bit integers for Lua.'
+	@echo '*** Make sure to compile all external Lua libraries'
+	@echo '*** with LUA_USE_C89 to ensure consistency'
 	@echo ''
 
 FreeBSD NetBSD OpenBSD freebsd:
@@ -135,17 +140,18 @@ posix:
 SunOS solaris:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN -D_REENTRANT" SYSLIBS="-ldl"
 
-# list targets that do not create files (but not all makes understand .PHONY)
-.PHONY: all $(PLATS) default o a clean depend echo none
+# Targets that do not create files (not all makes understand .PHONY).
+.PHONY: all $(PLATS) help test clean default o a depend echo
 
+# Compiler modules may use special flags.
 llex.o:
-	$(CC) $(CFLAGS) -Os -c llex.c
+	$(CC) $(CFLAGS) $(CMCFLAGS) -c llex.c
 
 lparser.o:
-	$(CC) $(CFLAGS) -Os -c lparser.c
+	$(CC) $(CFLAGS) $(CMCFLAGS) -c lparser.c
 
 lcode.o:
-	$(CC) $(CFLAGS) -Os -c lcode.c
+	$(CC) $(CFLAGS) $(CMCFLAGS) -c lcode.c
 
 # DO NOT DELETE
 
@@ -212,6 +218,5 @@ lvm.o: lvm.c lprefix.h lua.h luaconf.h ldebug.h lstate.h lobject.h \
  ltable.h lvm.h ljumptab.h
 lzio.o: lzio.c lprefix.h lua.h luaconf.h llimits.h lmem.h lstate.h \
  lobject.h ltm.h lzio.h
-luaot.o: lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
 
 # (end of Makefile)

@@ -46,6 +46,15 @@ typedef enum {
 
 
 /*
+** Mask with 1 in all fast-access methods. A 1 in any of these bits
+** in the flag of a (meta)table means the metatable does not have the
+** corresponding metamethod field. (Bit 7 of the flag is used for
+** 'isrealasize'.)
+*/
+#define maskflags	(~(~0u << (TM_EQ + 1)))
+
+
+/*
 ** Test whether there is no tagmethod.
 ** (Because tagmethods use raw accesses, the result may be an "empty" nil.)
 */
@@ -59,7 +68,7 @@ typedef enum {
 
 #define ttypename(x)	luaT_typenames_[(x) + 1]
 
-LUAI_DDEC(const char *const luaT_typenames_[LUA_TOTALTAGS];)
+LUAI_DDEC(const char *const luaT_typenames_[LUA_TOTALTYPES];)
 
 
 LUAI_FUNC const char *luaT_objtypename (lua_State *L, const TValue *o);

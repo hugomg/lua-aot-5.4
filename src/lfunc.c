@@ -24,20 +24,20 @@
 
 
 
-CClosure *luaF_newCclosure (lua_State *L, int n) {
-  GCObject *o = luaC_newobj(L, LUA_TCCL, sizeCclosure(n));
+CClosure *luaF_newCclosure (lua_State *L, int nupvals) {
+  GCObject *o = luaC_newobj(L, LUA_VCCL, sizeCclosure(nupvals));
   CClosure *c = gco2ccl(o);
-  c->nupvalues = cast_byte(n);
+  c->nupvalues = cast_byte(nupvals);
   return c;
 }
 
 
-LClosure *luaF_newLclosure (lua_State *L, int n) {
-  GCObject *o = luaC_newobj(L, LUA_TLCL, sizeLclosure(n));
+LClosure *luaF_newLclosure (lua_State *L, int nupvals) {
+  GCObject *o = luaC_newobj(L, LUA_VLCL, sizeLclosure(nupvals));
   LClosure *c = gco2lcl(o);
   c->p = NULL;
-  c->nupvalues = cast_byte(n);
-  while (n--) c->upvals[n] = NULL;
+  c->nupvalues = cast_byte(nupvals);
+  while (nupvals--) c->upvals[nupvals] = NULL;
   return c;
 }
 
@@ -48,12 +48,12 @@ LClosure *luaF_newLclosure (lua_State *L, int n) {
 void luaF_initupvals (lua_State *L, LClosure *cl) {
   int i;
   for (i = 0; i < cl->nupvalues; i++) {
-    GCObject *o = luaC_newobj(L, LUA_TUPVAL, sizeof(UpVal));
+    GCObject *o = luaC_newobj(L, LUA_VUPVAL, sizeof(UpVal));
     UpVal *uv = gco2upv(o);
     uv->v = &uv->u.value;  /* make it closed */
     setnilvalue(uv->v);
     cl->upvals[i] = uv;
-    luaC_objbarrier(L, cl, o);
+    luaC_objbarrier(L, cl, uv);
   }
 }
 
@@ -63,7 +63,7 @@ void luaF_initupvals (lua_State *L, LClosure *cl) {
 ** open upvalues of 'L' after entry 'prev'.
 **/
 static UpVal *newupval (lua_State *L, int tbc, StkId level, UpVal **prev) {
-  GCObject *o = luaC_newobj(L, LUA_TUPVAL, sizeof(UpVal));
+  GCObject *o = luaC_newobj(L, LUA_VUPVAL, sizeof(UpVal));
   UpVal *uv = gco2upv(o);
   UpVal *next = *prev;
   uv->v = s2v(level);  /* current value lives in the stack */
@@ -100,115 +100,83 @@ UpVal *luaF_findupval (lua_State *L, StkId level) {
 }
 
 
-static void callclose (lua_State *L, void *ud) {
-  UNUSED(ud);
-  luaD_callnoyield(L, L->top - 3, 0);
-}
-
-
 /*
-** Prepare closing method plus its arguments for object 'obj' with
-** error message 'err'. (This function assumes EXTRA_STACK.)
+** Call closing method for object 'obj' with error message 'err'. The
+** boolean 'yy' controls whether the call is yieldable.
+** (This function assumes EXTRA_STACK.)
 */
-static int prepclosingmethod (lua_State *L, TValue *obj, TValue *err) {
+static void callclosemethod (lua_State *L, TValue *obj, TValue *err, int yy) {
   StkId top = L->top;
   const TValue *tm = luaT_gettmbyobj(L, obj, TM_CLOSE);
-  if (ttisnil(tm))  /* no metamethod? */
-    return 0;  /* nothing to call */
   setobj2s(L, top, tm);  /* will call metamethod... */
   setobj2s(L, top + 1, obj);  /* with 'self' as the 1st argument */
   setobj2s(L, top + 2, err);  /* and error msg. as 2nd argument */
   L->top = top + 3;  /* add function and arguments */
-  return 1;
+  if (yy)
+    luaD_call(L, top, 0);
+  else
+    luaD_callnoyield(L, top, 0);
 }
 
 
 /*
-** Raise an error with message 'msg', inserting the name of the
-** local variable at position 'level' in the stack.
+** Check whether object at given level has a close metamethod and raise
+** an error if not.
 */
-static void varerror (lua_State *L, StkId level, const char *msg) {
-  int idx = cast_int(level - L->ci->func);
-  const char *vname = luaG_findlocal(L, L->ci, idx, NULL);
-  if (vname == NULL) vname = "?";
-  luaG_runerror(L, msg, vname);
+static void checkclosemth (lua_State *L, StkId level) {
+  const TValue *tm = luaT_gettmbyobj(L, s2v(level), TM_CLOSE);
+  if (ttisnil(tm)) {  /* no metamethod? */
+    int idx = cast_int(level - L->ci->func);  /* variable index */
+    const char *vname = luaG_findlocal(L, L->ci, idx, NULL);
+    if (vname == NULL) vname = "?";
+    luaG_runerror(L, "variable '%s' got a non-closable value", vname);
+  }
 }
 
 
 /*
-** Prepare and call a closing method. If status is OK, code is still
-** inside the original protected call, and so any error will be handled
-** there. Otherwise, a previous error already activated the original
-** protected call, and so the call to the closing method must be
-** protected here. (A status == CLOSEPROTECT behaves like a previous
-** error, to also run the closing method in protected mode).
-** If status is OK, the call to the closing method will be pushed
-** at the top of the stack. Otherwise, values are pushed after
-** the 'level' of the upvalue being closed, as everything after
-** that won't be used again.
+** Prepare and call a closing method.
+** If status is CLOSEKTOP, the call to the closing method will be pushed
+** at the top of the stack. Otherwise, values can be pushed right after
+** the 'level' of the upvalue being closed, as everything after that
+** won't be used again.
 */
-static int callclosemth (lua_State *L, StkId level, int status) {
+static void prepcallclosemth (lua_State *L, StkId level, int status, int yy) {
   TValue *uv = s2v(level);  /* value being closed */
-  if (likely(status == LUA_OK)) {
-    if (prepclosingmethod(L, uv, &G(L)->nilvalue))  /* something to call? */
-      callclose(L, NULL);  /* call closing method */
-    else if (!l_isfalse(uv))  /* non-closable non-false value? */
-      varerror(L, level, "attempt to close non-closable variable '%s'");
+  TValue *errobj;
+  if (status == CLOSEKTOP)
+    errobj = &G(L)->nilvalue;  /* error object is nil */
+  else {  /* 'luaD_seterrorobj' will set top to level + 2 */
+    errobj = s2v(level + 1);  /* error object goes after 'uv' */
+    luaD_seterrorobj(L, status, level + 1);  /* set error object */
   }
-  else {  /* must close the object in protected mode */
-    ptrdiff_t oldtop;
-    level++;  /* space for error message */
-    oldtop = savestack(L, level + 1);  /* top will be after that */
-    luaD_seterrorobj(L, status, level);  /* set error message */
-    if (prepclosingmethod(L, uv, s2v(level))) {  /* something to call? */
-      int newstatus = luaD_pcall(L, callclose, NULL, oldtop, 0);
-      if (newstatus != LUA_OK && status == CLOSEPROTECT)  /* first error? */
-        status = newstatus;  /* this will be the new error */
-      else {
-        if (newstatus != LUA_OK)  /* supressed error? */
-          luaE_warnerror(L, "__close metamethod");
-        /* leave original error (or nil) on top */
-        L->top = restorestack(L, oldtop);
-      }
-    }
-    /* else no metamethod; ignore this case and keep original error */
-  }
-  return status;
+  callclosemethod(L, uv, errobj, yy);
 }
 
 
 /*
-** Try to create a to-be-closed upvalue
-** (can raise a memory-allocation error)
+** Maximum value for deltas in 'tbclist', dependent on the type
+** of delta. (This macro assumes that an 'L' is in scope where it
+** is used.)
 */
-static void trynewtbcupval (lua_State *L, void *ud) {
-  newupval(L, 1, cast(StkId, ud), &L->openupval);
-}
+#define MAXDELTA  \
+	((256ul << ((sizeof(L->stack->tbclist.delta) - 1) * 8)) - 1)
 
 
 /*
-** Create a to-be-closed upvalue. If there is a memory error
-** when creating the upvalue, the closing method must be called here,
-** as there is no upvalue to call it later.
+** Insert a variable in the list of to-be-closed variables.
 */
 void luaF_newtbcupval (lua_State *L, StkId level) {
-  TValue *obj = s2v(level);
-  lua_assert(L->openupval == NULL || uplevel(L->openupval) < level);
-  if (!l_isfalse(obj)) {  /* false doesn't need to be closed */
-    int status;
-    const TValue *tm = luaT_gettmbyobj(L, obj, TM_CLOSE);
-    if (ttisnil(tm))  /* no metamethod? */
-      varerror(L, level, "variable '%s' got a non-closable value");
-    status = luaD_rawrunprotected(L, trynewtbcupval, level);
-    if (unlikely(status != LUA_OK)) {  /* memory error creating upvalue? */
-      lua_assert(status == LUA_ERRMEM);
-      luaD_seterrorobj(L, LUA_ERRMEM, level + 1);  /* save error message */
-      /* next call must succeed, as object is closable */
-      prepclosingmethod(L, s2v(level), s2v(level + 1));
-      callclose(L, NULL);  /* call closing method */
-      luaD_throw(L, LUA_ERRMEM);  /* throw memory error */
-    }
+  lua_assert(level > L->tbclist);
+  if (l_isfalse(s2v(level)))
+    return;  /* false doesn't need to be closed */
+  checkclosemth(L, level);  /* value must have a close method */
+  while (cast_uint(level - L->tbclist) > MAXDELTA) {
+    L->tbclist += MAXDELTA;  /* create a dummy node at maximum delta */
+    L->tbclist->tbclist.delta = 0;
   }
+  level->tbclist.delta = cast(unsigned short, level - L->tbclist);
+  L->tbclist = level;
 }
 
 
@@ -220,30 +188,57 @@ void luaF_unlinkupval (UpVal *uv) {
 }
 
 
-int luaF_close (lua_State *L, StkId level, int status) {
+/*
+** Close all upvalues up to the given stack level.
+*/
+void luaF_closeupval (lua_State *L, StkId level) {
   UpVal *uv;
-  while ((uv = L->openupval) != NULL && uplevel(uv) >= level) {
+  StkId upl;  /* stack index pointed by 'uv' */
+  while ((uv = L->openupval) != NULL && (upl = uplevel(uv)) >= level) {
     TValue *slot = &uv->u.value;  /* new position for value */
     lua_assert(uplevel(uv) < L->top);
-    if (uv->tbc && status != NOCLOSINGMETH) {
-      /* must run closing method, which may change the stack */
-      ptrdiff_t levelrel = savestack(L, level);
-      status = callclosemth(L, uplevel(uv), status);
-      level = restorestack(L, levelrel);
-    }
-    luaF_unlinkupval(uv);
+    luaF_unlinkupval(uv);  /* remove upvalue from 'openupval' list */
     setobj(L, slot, uv->v);  /* move value to upvalue slot */
     uv->v = slot;  /* now current value lives here */
-    if (!iswhite(uv))
-      gray2black(uv);  /* closed upvalues cannot be gray */
-    luaC_barrier(L, uv, slot);
+    if (!iswhite(uv)) {  /* neither white nor dead? */
+      nw2black(uv);  /* closed upvalues cannot be gray */
+      luaC_barrier(L, uv, slot);
+    }
   }
-  return status;
+}
+
+
+/*
+** Remove firt element from the tbclist plus its dummy nodes.
+*/
+static void poptbclist (lua_State *L) {
+  StkId tbc = L->tbclist;
+  lua_assert(tbc->tbclist.delta > 0);  /* first element cannot be dummy */
+  tbc -= tbc->tbclist.delta;
+  while (tbc > L->stack && tbc->tbclist.delta == 0)
+    tbc -= MAXDELTA;  /* remove dummy nodes */
+  L->tbclist = tbc;
+}
+
+
+/*
+** Close all upvalues and to-be-closed variables up to the given stack
+** level.
+*/
+void luaF_close (lua_State *L, StkId level, int status, int yy) {
+  ptrdiff_t levelrel = savestack(L, level);
+  luaF_closeupval(L, level);  /* first, close the upvalues */
+  while (L->tbclist >= level) {  /* traverse tbc's down to that level */
+    StkId tbc = L->tbclist;  /* get variable index */
+    poptbclist(L);  /* remove it from list */
+    prepcallclosemth(L, tbc, status, yy);  /* close variable */
+    level = restorestack(L, levelrel);
+  }
 }
 
 
 Proto *luaF_newproto (lua_State *L) {
-  GCObject *o = luaC_newobj(L, LUA_TPROTO, sizeof(Proto));
+  GCObject *o = luaC_newobj(L, LUA_VPROTO, sizeof(Proto));
   Proto *f = gco2p(o);
   f->k = NULL;
   f->sizek = 0;
@@ -265,7 +260,6 @@ Proto *luaF_newproto (lua_State *L) {
   f->linedefined = 0;
   f->lastlinedefined = 0;
   f->source = NULL;
-  f->aot_implementation = NULL;
   return f;
 }
 
