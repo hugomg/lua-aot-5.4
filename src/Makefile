@@ -43,8 +43,11 @@ LUA_O=	lua.o
 LUAC_T=	luac
 LUAC_O=	luac.o
 
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
+AOT_T=	luaot
+AOT_O=	luaot.o
+
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -65,6 +68,9 @@ $(LUA_T): $(LUA_O) $(LUA_A)
 
 $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
+
+$(AOT_T): $(AOT_O) $(LUA_A)
+	$(CC) -o $@ $(LDFLAGS) $(AOT_O) $(LUA_A) $(LIBS)
 
 test:
 	./$(LUA_T) -v
