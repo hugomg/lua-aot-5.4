@@ -340,6 +340,7 @@ static void PrintCode(const Proto* f)
  {
   Instruction i=code[pc];
   OpCode o=GET_OPCODE(i);
+#if 0
   int a=GETARG_A(i);
   int b=GETARG_B(i);
   int c=GETARG_C(i);
@@ -349,6 +350,17 @@ static void PrintCode(const Proto* f)
   int sc=GETARG_sC(i);
   int sbx=GETARG_sBx(i);
   int isk=GETARG_k(i);
+#else
+#define a   GETARG_A(i)
+#define b   GETARG_B(i)
+#define c   GETARG_C(i)
+#define ax  GETARG_Ax(i)
+#define bx  GETARG_Bx(i)
+#define sb  GETARG_sB(i)
+#define sc  GETARG_sC(i)
+#define sbx GETARG_sBx(i)
+#define isk GETARG_k(i)
+#endif
   int line=luaG_getfuncline(f,pc);
   printf("\t%d\t",pc+1);
   if (line>0) printf("[%d]\t",line); else printf("[-]\t");
