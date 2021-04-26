@@ -2,6 +2,10 @@
  * Lua bytecode-to-C compiler
  */
 
+// This luac-derived code is incompatible with lua_assert because it calls the
+// GETARG macros even for opcodes where it is not appropriate to do so.
+#undef LUAI_ASSERT
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -18,6 +22,13 @@
 #include "lopnames.h"
 #include "lstate.h"
 #include "lundump.h"
+
+//
+// Command-line arguments and main function
+// ----------------------------------------
+//
+// This part should not depend much on the Lua version
+//
 
 static const char *program_name    = "luaot";
 static const char *input_filename  = NULL;
@@ -62,6 +73,13 @@ void println(const char *fmt, ...)
     fprintf(output_file, "\n");
 }
 
+static
+void printnl()
+{
+    // This separate function avoids Wformat-zero-length warnings with println
+    fprintf(output_file, "\n");
+}
+
 static const char *get_module_name(const char *);
 static void print_functions();
 static void print_source_code();
@@ -92,19 +110,18 @@ int main(int argc, char **argv)
     if (output_file == NULL) { fatal_error(strerror(errno)); }
 
     println("#include \"luaot_header.c\"");
-    println(" ");
+    printnl();
     print_functions(proto);
-    println(" ");
+    printnl();
     print_source_code();
-    println(" ");
-    println("#define LUA_AOT_LUAOPEN_NAME luaopen_%s", module_name);
-    println(" ");
+    printnl();
+    println("#define LUAOT_LUAOPEN_NAME luaopen_%s", module_name);
+    printnl();
     println("#include \"luaot_footer.c\"");
 }
 
-/* Deduce the Lua module name given the file name
- * For example:  ./foo/bar/baz.c -> foo_bar_baz
- */
+// Deduce the Lua module name given the file name
+// Example:  ./foo/bar/baz.c -> foo_bar_baz
 static
 const char *get_module_name(const char *filename)
 {
@@ -145,6 +162,13 @@ const char *get_module_name(const char *filename)
     return module_name;
 }
 
+//
+// Printing bytecode information
+// -----------------------------
+//
+// These functions are copied from luac.c (and reindented)
+//
+
 #define UPVALNAME(x) ((f->upvalues[x].name) ? getstr(f->upvalues[x].name) : "-")
 #define VOID(p) ((const void*)(p))
 #define eventname(i) (getstr(tmname[i]))
@@ -152,7 +176,6 @@ const char *get_module_name(const char *filename)
 static
 void PrintString(const TString* ts)
 {
-    // Adapted from the PrintString function of luac.c
     const char* s = getstr(ts);
     size_t i,n = tsslen(ts);
     print("\"");
@@ -198,19 +221,52 @@ void PrintString(const TString* ts)
     print("\"");
 }
 
+#if 0
+static
+void PrintType(const Proto* f, int i)
+{
+    const TValue* o=&f->k[i];
+    switch (ttypetag(o)) {
+        case LUA_VNIL:
+            printf("N");
+            break;
+        case LUA_VFALSE:
+        case LUA_VTRUE:
+            printf("B");
+            break;
+        case LUA_VNUMFLT:
+            printf("F");
+            break;
+        case LUA_VNUMINT:
+            printf("I");
+            break;
+        case LUA_VSHRSTR:
+        case LUA_VLNGSTR:
+            printf("S");
+            break;
+        default: /* cannot happen */
+            printf("?%d",ttypetag(o));
+            break;
+    }
+    printf("\t");
+}
+#endif
+
 static
 void PrintConstant(const Proto* f, int i)
 {
-    // Adapted from the PrintConstant function of luac.c
     const TValue* o=&f->k[i];
     switch (ttypetag(o)) {
-        case LUA_TNIL:
+        case LUA_VNIL:
             print("nil");
             break;
-        case LUA_TBOOLEAN:
-            print(bvalue(o) ? "true" : "false");
+        case LUA_VFALSE:
+            printf("false");
             break;
-        case LUA_TNUMFLT:
+        case LUA_VTRUE:
+            printf("true");
+            break;
+        case LUA_VNUMFLT:
             {
                 char buff[100];
                 sprintf(buff,LUA_NUMBER_FMT,fltvalue(o));
@@ -218,25 +274,30 @@ void PrintConstant(const Proto* f, int i)
                 if (buff[strspn(buff,"-0123456789")]=='\0') print(".0");
                 break;
             }
-        case LUA_TNUMINT:
-            print(LUA_INTEGER_FMT,ivalue(o));
+        case LUA_VNUMINT:
+            print(LUA_INTEGER_FMT, ivalue(o));
             break;
-        case LUA_TSHRSTR:
-        case LUA_TLNGSTR:
+        case LUA_VSHRSTR:
+        case LUA_VLNGSTR:
             PrintString(tsvalue(o));
             break;
-        default:
-            /* cannot happen */
+        default: /* cannot happen */
             print("?%d",ttypetag(o));
             break;
     }
 }
 
+#define COMMENT		"\t; "
+#define EXTRAARG	GETARG_Ax(code[pc+1])
+#define EXTRAARGC	(EXTRAARG*(MAXARG_C+1))
+#define ISK		(isk ? "k" : "")
+
 static
-void print_opcode_comment(Proto *f, int pc)
+void luaot_PrintOpcodeComment(Proto *f, int pc)
 {
     // Adapted from the PrintCode function of luac.c
-    const Instruction i = f->code[pc];
+    const Instruction *code = f->code;
+    const Instruction i = code[pc];
     OpCode o = GET_OPCODE(i);
     int a=GETARG_A(i);
     int b=GETARG_B(i);
@@ -248,8 +309,6 @@ void print_opcode_comment(Proto *f, int pc)
     int sbx=GETARG_sBx(i);
     int isk=GETARG_k(i);
     int line=luaG_getfuncline(f,pc);
-
-    #define COMMENT	"\t; "
 
     print("  //");
     print(" %d\t", pc+1);
@@ -275,10 +334,16 @@ void print_opcode_comment(Proto *f, int pc)
             break;
         case OP_LOADKX:
             print("%d",a);
+            print(COMMENT); PrintConstant(f,EXTRAARG);
             break;
-        case OP_LOADBOOL:
-            print("%d %d %d",a,b,c);
-            if (c) print(COMMENT "to %d",pc+2);
+        case OP_LOADFALSE:
+            print("%d",a);
+            break;
+        case OP_LFALSESKIP:
+            print("%d",a);
+            break;
+        case OP_LOADTRUE:
+            print("%d",a);
             break;
         case OP_LOADNIL:
             print("%d %d",a,b);
@@ -308,36 +373,37 @@ void print_opcode_comment(Proto *f, int pc)
             print(COMMENT); PrintConstant(f,c);
             break;
         case OP_SETTABUP:
-            print("%d %d %d%s",a,b,c, isk ? "k" : "");
+            print("%d %d %d%s",a,b,c,ISK);
             print(COMMENT "%s",UPVALNAME(a));
             print(" "); PrintConstant(f,b);
             if (isk) { print(" "); PrintConstant(f,c); }
             break;
         case OP_SETTABLE:
-            print("%d %d %d%s",a,b,c, isk ? "k" : "");
+            print("%d %d %d%s",a,b,c,ISK);
             if (isk) { print(COMMENT); PrintConstant(f,c); }
             break;
         case OP_SETI:
-            print("%d %d %d%s",a,b,c, isk ? "k" : "");
+            print("%d %d %d%s",a,b,c,ISK);
             if (isk) { print(COMMENT); PrintConstant(f,c); }
             break;
         case OP_SETFIELD:
-            print("%d %d %d%s",a,b,c, isk ? "k" : "");
+            print("%d %d %d%s",a,b,c,ISK);
             print(COMMENT); PrintConstant(f,b);
             if (isk) { print(" "); PrintConstant(f,c); }
             break;
         case OP_NEWTABLE:
             print("%d %d %d",a,b,c);
+            print(COMMENT "%d",c+EXTRAARGC);
             break;
         case OP_SELF:
-            print("%d %d %d%s",a,b,c, isk ? "k" : "");
+            print("%d %d %d%s",a,b,c,ISK);
             if (isk) { print(COMMENT); PrintConstant(f,c); }
             break;
         case OP_ADDI:
-            print("%d %d %d %s",a,b,sc,isk ? "F" : "");
+            print("%d %d %d",a,b,sc);
             break;
         case OP_ADDK:
-            print("%d %d %d %s",a,b,c,isk ? "F" : "");
+            print("%d %d %d",a,b,c);
             print(COMMENT); PrintConstant(f,c);
             break;
         case OP_SUBK:
@@ -345,7 +411,7 @@ void print_opcode_comment(Proto *f, int pc)
             print(COMMENT); PrintConstant(f,c);
             break;
         case OP_MULK:
-            print("%d %d %d %s",a,b,c,isk ? "F" : "");
+            print("%d %d %d",a,b,c);
             print(COMMENT); PrintConstant(f,c);
             break;
         case OP_MODK:
@@ -423,12 +489,14 @@ void print_opcode_comment(Proto *f, int pc)
             print(COMMENT "%s",eventname(c));
             break;
         case OP_MMBINI:
-            print("%d %d %d",a,sb,c);
+            print("%d %d %d %d",a,sb,c,isk);
             print(COMMENT "%s",eventname(c));
+            if (isk) print(" flip");
             break;
         case OP_MMBINK:
-            print("%d %d %d",a,b,c);
+            print("%d %d %d %d",a,b,c,isk);
             print(COMMENT "%s ",eventname(c)); PrintConstant(f,b);
+            if (isk) print(" flip");
             break;
         case OP_UNM:
             print("%d %d",a,b);
@@ -545,102 +613,118 @@ void print_opcode_comment(Proto *f, int pc)
             break;
         case OP_EXTRAARG:
             print("%d",ax);
-            //print(COMMENT); PrintConstant(f,ax);
             break;
+#if 0
         default:
             print("%d %d %d",a,b,c);
             print(COMMENT "not handled");
             break;
+#endif
     }
     print("\n");
 }
 
+
+//
+// The compiler part of the compiler
+// ---------------------------------
+// Based on lvm.c with the following changes:
+//   - Jumps become `goto`
+//   - Constants are put into macros (LUAOT_PC, LUAOT_NEXT_JUMP, etc)
+//
+
 static
-int jump_target(Proto *p, int pc)
+int jump_target(Proto *f, int pc)
 {
-    Instruction instr = p->code[pc];
+    Instruction instr = f->code[pc];
     if (GET_OPCODE(instr) != OP_JMP) { fatal_error("instruction is not a jump"); }
     return (pc+1) + GETARG_sJ(instr);
 }
 
 static
-void create_function(Proto *p)
+void create_function(Proto *f)
 {
     int func_id = nfunctions++;
 
-    println("// source = %s", getstr(p->source));
-    if (p->linedefined == 0) {
+    println("// source = %s", getstr(f->source));
+    if (f->linedefined == 0) {
         println("// main function");
     } else {
-        println("// lines: %d - %d", p->linedefined, p->lastlinedefined);
+        println("// lines: %d - %d", f->linedefined, f->lastlinedefined);
     }
 
     println("static");
     println("void magic_implementation_%02d(lua_State *L, CallInfo *ci)", func_id);
     println("{");
-
     println("  LClosure *cl;");
     println("  TValue *k;");
     println("  StkId base;");
-    println("  const Instruction *saved_pc;");
+    println("  const Instruction *pc;");
     println("  int trap;");
-    println("  ");
-    println(" tailcall:");
+    printnl();
     println("  trap = L->hookmask;");
     println("  cl = clLvalue(s2v(ci->func));");
     println("  k = cl->p->k;");
-    println("  saved_pc = ci->u.l.savedpc;  /*no explicit program counter*/ " );
-    println("  if (trap) {");
-    println("    if (cl->p->is_vararg)");
-    println("      trap = 0;  /* hooks will start after VARARGPREP instruction */");
-    println("    else if (saved_pc == cl->p->code) /*first instruction (not resuming)?*/");
-    println("      luaD_hookcall(L, ci);");
-    println("    ci->u.l.trap = 1;  /* there may be other hooks */");
+    println("  pc = ci->u.l.savedpc;");
+    println("  if (l_unlikely(trap)) {");
+    println("    if (pc == cl->p->code) {  /* first instruction (not resuming)? */");
+    println("      if (cl->p->is_vararg)");
+    println("        trap = 0;  /* hooks will start after VARARGPREP instruction */");
+    println("      else  /* check 'call' hook */");
+    println("        luaD_hookcall(L, ci);");
+    println("    }");
+    println("    ci->u.l.trap = 1;  /* assume trap is on, for now */");
     println("  }");
     println("  base = ci->func + 1;");
     println("  /* main loop of interpreter */");
-    println("  Instruction *function_code = cl->p->code;");
+    println("  Instruction *code = cl->p->code;"); // (!!!)
     println("  Instruction i;");
     println("  StkId ra;");
-    println("  (void) function_code;");
-    println("  (void) i;");
-    println("  (void) ra;");
+    printnl();
 
-    println(" ");
+    // If we are resuming a coroutine, the savedpc can be something else
+    println("  if (pc != code) {");
+    println("    switch (pc - code) {");
+    for (int pc = 0; pc < f->sizecode; pc++) {
+        println("      case %d: goto label_%02d;", pc, pc);
+    }
+    println("    }");
+    println("  }");
+    printnl();
 
-    for (int pc = 0; pc < p->sizecode; pc++) {
-        Instruction instr = p->code[pc];
+    for (int pc = 0; pc < f->sizecode; pc++) {
+        Instruction instr = f->code[pc];
         OpCode op = GET_OPCODE(instr);
 
-        print_opcode_comment(p, pc);
-
+        luaot_PrintOpcodeComment(f, pc);
 
         // While an instruction is executing, the program counter typically
         // points towards the next instruction. There are some corner cases
         // where the program counter getss adjusted mid-instruction, but I
         // am not breaking anything because of those...
-        println("  #undef  LUA_AOT_PC");
-        println("  #define LUA_AOT_PC (function_code + %d)", pc+1);
+        println("  #undef  LUAOT_PC");
+        println("  #define LUAOT_PC (code + %d)", pc+1);
 
         int next = pc + 1;
-        println("  #undef  LUA_AOT_NEXT_JUMP");
-        if (next < p->sizecode && GET_OPCODE(p->code[next]) == OP_JMP) {
-            println("  #define LUA_AOT_NEXT_JUMP label_%02d", jump_target(p, next));
+        println("  #undef  LUAOT_NEXT_JUMP");
+        if (next < f->sizecode && GET_OPCODE(f->code[next]) == OP_JMP) {
+            println("  #define LUAOT_NEXT_JUMP label_%02d", jump_target(f, next));
         }
 
         int skip1 = pc + 2;
-        println("  #undef  LUA_AOT_SKIP1");
-        if (skip1 < p->sizecode) {
-            println("  #define LUA_AOT_SKIP1 label_%02d", skip1);
+        println("  #undef  LUAOT_SKIP1");
+        if (skip1 < f->sizecode) {
+            println("  #define LUAOT_SKIP1 label_%02d", skip1);
         }
 
-        println("  label_%02d : {", pc);
+        println("  label_%02d: {", pc);
         println("    aot_vmfetch(0x%08x);", instr);
 
         switch (op) {
-            case OP_MOVE:
+            case OP_MOVE: {
                 println("    setobjs2s(L, ra, RB(i));");
                 break;
+            }
             case OP_LOADI: {
                 println("    lua_Integer b = GETARG_sBx(i);");
                 println("    setivalue(s2v(ra), b);");
@@ -656,10 +740,24 @@ void create_function(Proto *p)
                 println("    setobj2s(L, ra, rb);");
                 break;
             }
-            // case OP_LOADKX
-            case OP_LOADBOOL: {
-                println("    setbvalue(s2v(ra), GETARG_B(i));");
-                println("    if (GETARG_C(i)) goto LUA_AOT_SKIP1;  /* skip next instruction (if C) */");
+            case OP_LOADKX: {
+                println("    TValue *rb;");
+                println("    rb = k + GETARG_Ax(0x%08x);", f->code[pc+1]);
+                println("    setobj2s(L, ra, rb);");
+                println("    goto LUAOT_SKIP1;"); //(!)
+                break;
+            }
+            case OP_LOADFALSE: {
+                println("    setbfvalue(s2v(ra));");
+                break;
+            }
+            case OP_LFALSESKIP: {
+                println("    setbfvalue(s2v(ra));");
+                println("    goto LUAOT_SKIP1;"); //(!)
+                break;
+            }
+            case OP_LOADTRUE: {
+                println("    setbtvalue(s2v(ra));");
                 break;
             }
             case OP_LOADNIL: {
@@ -791,8 +889,9 @@ void create_function(Proto *p)
                 println("    Table *t;");
                 println("    if (b > 0)");
                 println("      b = 1 << (b - 1);  /* size is 2^(b - 1) */");
+                println("    lua_assert((!TESTARG_k(i)) == (GETARG_Ax(0x%08x) == 0));", f->code[pc+1]);
                 println("    if (TESTARG_k(i))");
-                println("      c += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", p->code[pc+1]);
+                println("      c += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
                 println("    /* skip extra argument */"); // (!)
                 println("    L->top = ra + 1;  /* correct top in case of emergency GC */");
                 println("    t = luaH_new(L);  /* memory allocation */");
@@ -800,7 +899,7 @@ void create_function(Proto *p)
                 println("    if (b != 0 || c != 0)");
                 println("      luaH_resize(L, t, c, b);  /* idem */");
                 println("    checkGC(L, ra + 1);");
-                println("    goto LUA_AOT_SKIP1;"); // (!)
+                println("    goto LUAOT_SKIP1;"); // (!)
                 break;
             }
             case OP_SELF: {
@@ -817,23 +916,23 @@ void create_function(Proto *p)
                 break;
             }
             case OP_ADDI: {
-                println("    op_arithI(L, l_addi, luai_numadd, TM_ADD, GETARG_k(i));");
+                println("    op_arithI(L, l_addi, luai_numadd);");
                 break;
             }
             case OP_ADDK: {
-                println("    op_arithK(L, l_addi, luai_numadd, GETARG_k(i));");
+                println("    op_arithK(L, l_addi, luai_numadd);");
                 break;
             }
             case OP_SUBK: {
-                println("    op_arithK(L, l_subi, luai_numsub, 0);");
+                println("    op_arithK(L, l_subi, luai_numsub);");
                 break;
             }
             case OP_MULK: {
-                println("    op_arithK(L, l_muli, luai_nummul, GETARG_k(i));");
+                println("    op_arithK(L, l_muli, luai_nummul);");
                 break;
             }
             case OP_MODK: {
-                println("    op_arithK(L, luaV_mod, luaV_modf, 0);");
+                println("    op_arithK(L, luaV_mod, luaV_modf);");
                 break;
             }
             case OP_POWK: {
@@ -845,7 +944,7 @@ void create_function(Proto *p)
                 break;
             }
             case OP_IDIVK: {
-                println("    op_arithK(L, luaV_idiv, luai_numidiv, 0);");
+                println("    op_arithK(L, luaV_idiv, luai_numidiv);");
                 break;
             }
             case OP_BANDK: {
@@ -866,7 +965,7 @@ void create_function(Proto *p)
                 println("    lua_Integer ib;");
                 println("    if (tointegerns(rb, &ib)) {");
                 println("       setivalue(s2v(ra), luaV_shiftl(ib, -ic));");
-                println("       goto LUA_AOT_SKIP1;"); // (!)
+                println("       goto LUAOT_SKIP1;"); // (!)
                 println("    }");
                 break;
             }
@@ -876,7 +975,7 @@ void create_function(Proto *p)
                 println("    lua_Integer ib;");
                 println("    if (tointegerns(rb, &ib)) {");
                 println("       setivalue(s2v(ra), luaV_shiftl(ic, ib));");
-                println("       goto LUA_AOT_SKIP1;"); // (!)
+                println("       goto LUAOT_SKIP1;"); // (!)
                 println("    }");
                 break;
             }
@@ -929,7 +1028,7 @@ void create_function(Proto *p)
                 break;
             }
             case OP_MMBIN: {
-                println("    Instruction pi = 0x%08x; /* original arith. expression */", p->code[pc-1]);
+                println("    Instruction pi = 0x%08x; /* original arith. expression */", f->code[pc-1]);
                 println("    TValue *rb = vRB(i);");
                 println("    TMS tm = (TMS)GETARG_C(i);");
                 println("    StkId result = RA(pi);");
@@ -938,7 +1037,7 @@ void create_function(Proto *p)
                 break;
             }
             case OP_MMBINI: {
-                println("    Instruction pi = 0x%0x;  /* original arith. expression */", p->code[pc-1]);
+                println("    Instruction pi = 0x%0x;  /* original arith. expression */", f->code[pc-1]);
                 println("    int imm = GETARG_sB(i);");
                 println("    TMS tm = (TMS)GETARG_C(i);");
                 println("    int flip = GETARG_k(i);");
@@ -947,7 +1046,7 @@ void create_function(Proto *p)
                 break;
             }
             case OP_MMBINK: {
-                println("    Instruction pi = 0x%08x;  /* original arith. expression */", p->code[pc-1]);
+                println("    Instruction pi = 0x%08x;  /* original arith. expression */", f->code[pc-1]);
                 println("    TValue *imm = KB(i);");
                 println("    TMS tm = (TMS)GETARG_C(i);");
                 println("    int flip = GETARG_k(i);");
@@ -981,8 +1080,10 @@ void create_function(Proto *p)
             }
             case OP_NOT: {
                 println("    TValue *rb = vRB(i);");
-                println("    int nrb = l_isfalse(rb);  /* next assignment may change this value */");
-                println("    setbvalue(s2v(ra), nrb);");
+                println("    if (l_isfalse(rb))");
+                println("      setbtvalue(s2v(ra));");
+                println("    else");
+                println("      setbfvalue(s2v(ra));");
                 break;
             }
             case OP_LEN: {
@@ -996,11 +1097,18 @@ void create_function(Proto *p)
                 println("    checkGC(L, L->top); /* 'luaV_concat' ensures correct top */");
                 break;
             }
-            // case OP_CLOSE
-            // case OP_TBC
+            case OP_CLOSE: {
+                println("Protect(luaF_close(L, ra, LUA_OK, 1));");
+                break;
+            }
+            case OP_TBC: {
+                println("    /* create new to-be-closed upvalue */");
+                println("    halfProtect(luaF_newtbcupval(L, ra));");
+                break;
+            }
             case OP_JMP: {
                 println("    updatetrap(ci);");
-                println("    goto label_%02d;", jump_target(p, pc));
+                println("    goto label_%02d;", jump_target(f, pc));//(!)
                 break;
             }
             case OP_EQ: {
@@ -1061,7 +1169,7 @@ void create_function(Proto *p)
             case OP_TESTSET: {
                 println("    TValue *rb = vRB(i);");
                 println("    if (l_isfalse(rb) == GETARG_k(i))");
-                println("      goto LUA_AOT_SKIP1;"); // (!)
+                println("      goto LUAOT_SKIP1;"); // (!)
                 println("    else {");
                 println("      setobj2s(L, ra, rb);");
                 println("      donextjump(ci);");
@@ -1069,48 +1177,55 @@ void create_function(Proto *p)
                 break;
             }
             case OP_CALL: {
+                // We have to adapt this opcode to remove the optimization that
+                // reuses the luaV_execute stack frame. The goto startfunc.
+                println("    CallInfo *newci;");
                 println("    int b = GETARG_B(i);");
                 println("    int nresults = GETARG_C(i) - 1;");
                 println("    if (b != 0)  /* fixed number of arguments? */");
-                println("      L->top = ra + b;  /* top signals number of arguments */");
+                println("        L->top = ra + b;  /* top signals number of arguments */");
                 println("    /* else previous instruction set top */");
-                println("    ProtectNT(luaD_call(L, ra, nresults));");
+                println("    savepc(L);  /* in case of errors */");
+                println("    if ((newci = luaD_precall(L, ra, nresults)) == NULL)");
+                println("        updatetrap(ci);  /* C call; nothing else to be done */");
+                println("    else {");
+                println("        newci->callstatus = CIST_FRESH;");
+                println("        Protect(luaV_execute(L, newci));");//(!)
+                println("    }");
                 break;
             }
             case OP_TAILCALL: {
                 println("    int b = GETARG_B(i);  /* number of arguments + 1 (function) */");
                 println("    int nparams1 = GETARG_C(i);");
-                println("    /* delat is virtual 'func' - real 'func' (vararg functions) */");
+                println("    /* delta is virtual 'func' - real 'func' (vararg functions) */");
                 println("    int delta = (nparams1) ? ci->u.l.nextraargs + nparams1 : 0;");
                 println("    if (b != 0)");
                 println("      L->top = ra + b;");
                 println("    else  /* previous instruction set top */");
                 println("      b = cast_int(L->top - ra);");
-                println("    savepc(ci);  /* some calls here can raise errors */");
+                println("    savepc(ci);  /* several calls here can raise errors */");
                 println("    if (TESTARG_k(i)) {");
-                println("      /* close upvalues from current call; the compiler ensures");
-                println("         that there are no to-be-closed variables here, so this");
-                println("         call cannot change the stack */");
-                println("      luaF_close(L, base, NOCLOSINGMETH);");
+                println("      luaF_closeupval(L, base);  /* close upvalues from current call */");
+                println("      lua_assert(L->tbclist < base);  /* no pending tbc variables */");
                 println("      lua_assert(base == ci->func + 1);");
                 println("    }");
-                println("    if (!ttisfunction(s2v(ra))) {  /* not a function? */");
+                println("    while (!ttisfunction(s2v(ra))) {  /* not a function? */");
                 println("      luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */");
                 println("      b++;  /* there is now one extra argument */");
+                println("      checkstackGCp(L, 1, ra);");
                 println("    }");
                 println("    if (!ttisLclosure(s2v(ra))) {  /* C function? */");
-                println("      luaD_call(L, ra, LUA_MULTRET);  /* call it */");
+                println("      luaD_precall(L, ra, LUA_MULTRET);  /* call it */");
                 println("      updatetrap(ci);");
                 println("      updatestack(ci);  /* stack may have been relocated */");
-                println("      ci->func -= delta;");
-                println("      luaD_poscall(L, ci, cast_int(L->top - ra));");
-                println("      return;");
+                println("      ci->func -= delta;  /* restore 'func' (if vararg) */");
+                println("      luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */");
+                println("      updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
+                println("      return;  /* caller returns after the tail call */");//(!)
                 println("    }");
-                println("    else {  /* Lua tail call */");
-                println("      ci->func -= delta;");
-                println("      luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
-                println("      goto tailcall;");
-                println("    }");
+                println("    ci->func -= delta;  /* restore 'func' (if vararg) */");
+                println("    luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
+                println("    return luaV_execute(L, ci); /* execute the callee */");//(!)
                 break;
             }
             case OP_RETURN: {
@@ -1122,7 +1237,7 @@ void create_function(Proto *p)
                 println("    if (TESTARG_k(i)) {  /* may there be open upvalues? */");
                 println("      if (L->top < ci->top)");
                 println("        L->top = ci->top;");
-                println("      luaF_close(L, base, LUA_OK);");
+                println("      luaF_close(L, base, CLOSEKTOP, 1);");
                 println("      updatetrap(ci);");
                 println("      updatestack(ci);");
                 println("    }");
@@ -1130,28 +1245,33 @@ void create_function(Proto *p)
                 println("      ci->func -= ci->u.l.nextraargs + nparams1;");
                 println("    L->top = ra + n;  /* set call for 'luaD_poscall' */");
                 println("    luaD_poscall(L, ci, n);");
-                println("    return;");
+                println("    updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
+                println("    return;"); //(!)
                 break;
             }
             case OP_RETURN0: {
-                println("    if (L->hookmask) {");
+                println("    if (l_unlikely(L->hookmask)) {");
                 println("      L->top = ra;");
-                println("      halfProtectNT(luaD_poscall(L, ci, 0));  /* no hurry... */");
+                println("      savepc(ci);");
+                println("      luaD_poscall(L, ci, 0);  /* no hurry... */");
+                println("      trap = 1;");
                 println("    }");
                 println("    else {  /* do the 'poscall' here */");
-                println("      int nres = ci->nresults;");
+                println("      int nres;");
                 println("      L->ci = ci->previous;  /* back to caller */");
                 println("      L->top = base - 1;");
-                println("      while (nres-- > 0)");
+                println("      for (nres = ci->nresults; l_unlikely(nres > 0); nres--)");
                 println("        setnilvalue(s2v(L->top++));  /* all results are nil */");
                 println("    }");
-                println("    return;");
+                println("    return;"); //(!)
                 break;
             }
             case OP_RETURN1: {
-                println("    if (L->hookmask) {");
+                println("    if (l_unlikely(L->hookmask)) {");
                 println("      L->top = ra + 1;");
-                println("      halfProtectNT(luaD_poscall(L, ci, 1));  /* no hurry... */");
+                println("      savepc(ci);");
+                println("      luaD_poscall(L, ci, 1);  /* no hurry... */");
+                println("      trap = 1;");
                 println("    }");
                 println("    else {  /* do the 'poscall' here */");
                 println("      int nres = ci->nresults;");
@@ -1161,11 +1281,11 @@ void create_function(Proto *p)
                 println("      else {");
                 println("        setobjs2s(L, base - 1, ra);  /* at least this result */");
                 println("        L->top = base;");
-                println("        while (--nres > 0)  /* complete missing results */");
+                println("        for (; l_unlikely(nres > 1); nres--)");
                 println("          setnilvalue(s2v(L->top++));");
                 println("      }");
                 println("    }");
-                println("    return;");
+                println("    return;"); //(!)
                 break;
             }
             case OP_FORLOOP: {
@@ -1178,81 +1298,47 @@ void create_function(Proto *p)
                 println("        idx = intop(+, idx, step);  /* add step to index */");
                 println("        chgivalue(s2v(ra), idx);  /* update internal index */");
                 println("        setivalue(s2v(ra + 3), idx);  /* and control variable */");
-                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr)));
+                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
                 println("      }");
                 println("    }");
-                println("    else {  /* floating loop */");
-                println("      lua_Number step = fltvalue(s2v(ra + 2));");
-                println("      lua_Number limit = fltvalue(s2v(ra + 1));");
-                println("      lua_Number idx = fltvalue(s2v(ra));");
-                println("      idx = luai_numadd(L, idx, step);  /* increment index */");
-                println("      if (luai_numlt(0, step) ? luai_numle(idx, limit)");
-                println("                              : luai_numle(limit, idx)) {");
-                println("        chgfltvalue(s2v(ra), idx);  /* update internal index */");
-                println("        setfltvalue(s2v(ra + 3), idx);  /* and control variable */");
-                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr)));
-                println("      }");
-                println("    }");
+                println("    else if (floatforloop(ra)) /* float loop */");
+                println("      goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
                 println("    updatetrap(ci);  /* allows a signal to break the loop */");
                 break;
             }
             case OP_FORPREP: {
-                println("    TValue *pinit = s2v(ra);");
-                println("    TValue *plimit = s2v(ra + 1);");
-                println("    TValue *pstep = s2v(ra + 2);");
                 println("    savestate(L, ci);  /* in case of errors */");
-                println("    if (ttisinteger(pinit) && ttisinteger(pstep)) { /* integer loop? */");
-                println("      lua_Integer init = ivalue(pinit);");
-                println("      lua_Integer step = ivalue(pstep);");
-                println("      lua_Integer limit;");
-                println("      if (step == 0)");
-                println("        luaG_runerror(L, \"'for' step is zero\");");
-                println("      setivalue(s2v(ra + 3), init);  /* control variable */");
-                println("      if (forlimit(L, init, plimit, &limit, step))");
-                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1));
-                println("      else {  /* prepare loop counter */");
-                println("        lua_Unsigned count;");
-                println("        if (step > 0) {  /* ascending loop? */");
-                println("          count = l_castS2U(limit) - l_castS2U(init);");
-                println("          if (step != 1)  /* avoid division in the too common case */");
-                println("            count /= l_castS2U(step);");
-                println("        }");
-                println("        else {  /* step < 0; descending loop */");
-                println("          count = l_castS2U(init) - l_castS2U(limit);");
-                println("          /* 'step+1' avoids negating 'mininteger' */");
-                println("          count /= l_castS2U(-(step + 1)) + 1u;");
-                println("        }");
-                println("        /* store the counter in place of the limit (which won't be");
-                println("           needed anymore */");
-                println("        setivalue(plimit, l_castU2S(count));");
-                println("      }");
-                println("    }");
-                println("    else {  /* try making all values floats */");
-                println("      lua_Number init; lua_Number limit; lua_Number step;");
-                println("      if (unlikely(!tonumber(plimit, &limit)))");
-                println("        luaG_forerror(L, plimit, \"limit\");");
-                println("      if (unlikely(!tonumber(pstep, &step)))");
-                println("        luaG_forerror(L, pstep, \"step\");");
-                println("      if (unlikely(!tonumber(pinit, &init)))");
-                println("        luaG_forerror(L, pinit, \"initial value\");");
-                println("      if (step == 0)");
-                println("        luaG_runerror(L, \"'for' step is zero\");");
-                println("      if (luai_numlt(0, step) ? luai_numlt(limit, init)");
-                println("                               : luai_numlt(init, limit))");
-                println("        goto label_%02d; /* skip the loop */", ((pc + 1) + GETARG_Bx(instr) + 1));
-                println("      else {");
-                println("        /* make sure internal values are all float */");
-                println("        setfltvalue(plimit, limit);");
-                println("        setfltvalue(pstep, step);");
-                println("        setfltvalue(s2v(ra), init);  /* internal index */");
-                println("        setfltvalue(s2v(ra + 3), init);  /* control variable */");
-                println("      }");
+                println("    if (forprep(L, ra))");
+                println("      goto label_%02d; /* skip the loop */", ((pc+1) + GETARG_Bx(instr) + 1)); //(!)
+                break;
+            }
+            case OP_TFORPREP: {
+                println("    /* create to-be-closed upvalue (if needed) */");
+                println("    halfProtect(luaF_newtbcupval(L, ra + 3));");
+                println("    goto label_%02d;", ((pc+1) + GETARG_Bx(instr))); //(!)
+                break;
+            }
+            case OP_TFORCALL: {
+                println("    /* 'ra' has the iterator function, 'ra + 1' has the state,");
+                println("       'ra + 2' has the control variable, and 'ra + 3' has the");
+                println("       to-be-closed variable. The call will use the stack after");
+                println("       these values (starting at 'ra + 4')");
+                println("    */");
+                println("    /* push function, state, and control variable */");
+                println("    memcpy(ra + 4, ra, 3 * sizeof(*ra));");
+                println("    L->top = ra + 4 + 3;");
+                println("    ProtectNT(luaD_call(L, ra + 4, GETARG_C(i)));  /* do the call */");
+                println("    updatestack(ci);  /* stack may have changed */");
+                // (!) Going to the next instruction is a no-op
+                break;
+            }
+            case OP_TFORLOOP: {
+                println("    if (!ttisnil(s2v(ra + 4))) {  /* continue loop? */");
+                println("      setobjs2s(L, ra + 2, ra + 4);  /* save control variable */");
+                println("      goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
                 println("    }");
                 break;
             }
-            //case OP_TFORPREP
-            //case OP_TFORCALL
-            //case OP_TFORLOOP
             case OP_SETLIST: {
                 println("        int n = GETARG_B(i);");
                 println("        unsigned int last = GETARG_C(i);");
@@ -1264,8 +1350,7 @@ void create_function(Proto *p)
                 println("        last += n;");
                 println("        int has_extra_arg = TESTARG_k(i);"); // (!)
                 println("        if (has_extra_arg) {");
-                println("          last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", p->code[pc+1]);
-                                   // (!)
+                println("          last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]); // (!)
                 println("        }");
                 println("        if (last > luaH_realasize(h))  /* needs more space? */");
                 println("          luaH_resizearray(L, h, last);  /* preallocate it at once */");
@@ -1276,7 +1361,7 @@ void create_function(Proto *p)
                 println("          luaC_barrierback(L, obj2gco(h), val);");
                 println("        }");
                 println("        if (has_extra_arg) {");  // (!)
-                println("          goto LUA_AOT_SKIP1;"); // (!)
+                println("          goto LUAOT_SKIP1;"); // (!)
                 println("        }");                     // (!)
                 break;
             }
@@ -1292,30 +1377,31 @@ void create_function(Proto *p)
                 break;
             }
             case OP_VARARGPREP: {
-                println("    luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p);");
-                println("    updatetrap(ci);");
-                println("    if (trap) {");
+                println("    ProtectNT(luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p));");
+                println("    if (l_unlikely(trap)) {  /* previous \"Protect\" updated trap */");
                 println("      luaD_hookcall(L, ci);");
-                println("      L->oldpc = LUA_AOT_PC + 1;  /* next opcode will be seen as a \"new\" line */");
+                println("      L->oldpc = 1;  /* next opcode will be seen as a \"new\" line */");
                 println("    }");
+                println("    updatebase(ci);  /* function has new base after adjustment */");
                 break;
             }
             case OP_EXTRAARG: {
                 println("    lua_assert(0);");
                 break;
             }
-            default:
-                println("    assert(0); /* TODO */");
+            default: {
+                char msg[64];
+                sprintf(msg, "%s is not implemented yet", opnames[op]);
+                fatal_error(msg);
                 break;
+            }
         }
-
         println("  }");
-        println("  ");
+        printnl();
     }
 
     println("}");
-    println(" ");
-
+    printnl();
 }
 
 static
@@ -1333,7 +1419,7 @@ void print_functions(Proto *p)
 {
     create_functions(p);
 
-    println("static AotCompiledFunction LUA_AOT_FUNCTIONS[] = {");
+    println("static AotCompiledFunction LUAOT_FUNCTIONS[] = {");
     for (int i = 0; i < nfunctions; i++) {
         println("  magic_implementation_%02d,", i);
     }
@@ -1356,21 +1442,21 @@ void print_source_code()
     FILE *infile = fopen(input_filename, "r");
     if (!infile) { fatal_error("could not open input file a second time"); }
 
-    println("static const char LUA_AOT_MODULE_SOURCE_CODE[] = {");
+    println("static const char LUAOT_MODULE_SOURCE_CODE[] = {");
 
     int c;
     int col = 0;
     do {
         if (col == 0) {
-            print("  ");
+            print(" ");
         }
 
         c = fgetc(infile);
         if (c == EOF) {
-            print("%3d", 0);
+            print(" %3d", 0);
         } else {
-            print("%3d", c);
-            print(", ");
+            print(" %3d", c);
+            print(",");
         }
 
         col++;

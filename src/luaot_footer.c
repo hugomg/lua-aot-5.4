@@ -1,22 +1,21 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-
 static int next_id = 0;
 
 static
-void bind_magic(Proto *p)
+void bind_magic(Proto *f)
 {
     // This traversal order should be the same one that luaot.c uses
-    p->aot_implementation = LUA_AOT_FUNCTIONS[next_id++];
-    for(int i=0; i < p->sizep; i++) {
-        bind_magic(p->p[i]);
+    f->aot_implementation = LUAOT_FUNCTIONS[next_id++];
+    for(int i=0; i < f->sizep; i++) {
+        bind_magic(f->p[i]);
     }
 }
 
-int LUA_AOT_LUAOPEN_NAME(lua_State *L) {
-    
-    int ok = luaL_loadstring(L, LUA_AOT_MODULE_SOURCE_CODE);
+int LUAOT_LUAOPEN_NAME(lua_State *L) {
+
+    int ok = luaL_loadstring(L, LUAOT_MODULE_SOURCE_CODE);
     switch (ok) {
       case LUA_OK:
         /* No errors */
