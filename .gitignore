@@ -2,6 +2,9 @@ src/lua
 src/luac
 src/luaot
 
+experiments/*_fast.c
+experiments/*_fast.so
+
 *.a
 *.o
 *.so
