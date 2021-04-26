@@ -1,0 +1,212 @@
+From aac8fb43a394f2fcf709ec0240a6a04c7d6d8860 Mon Sep 17 00:00:00 2001
+From: Hugo Musso Gualandi <hugo_musso_gualandi@hotmail.com>
+Date: Mon, 26 Apr 2021 13:25:53 -0300
+Subject: [PATCH 2/2] Changes to the core Lua interpreter
+
+---
+ src/lfunc.c   |  1 +
+ src/lobject.h |  7 +++++
+ src/luaconf.h |  6 +---
+ src/lvm.c     | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 86 insertions(+), 6 deletions(-)
+
+diff --git a/src/lfunc.c b/src/lfunc.c
+index f5889a2..8948099 100644
+--- a/src/lfunc.c
++++ b/src/lfunc.c
+@@ -260,6 +260,7 @@ Proto *luaF_newproto (lua_State *L) {
+   f->linedefined = 0;
+   f->lastlinedefined = 0;
+   f->source = NULL;
++  f->aot_implementation = NULL;
+   return f;
+ }
+ 
+diff --git a/src/lobject.h b/src/lobject.h
+index 950bebb..06319c8 100644
+--- a/src/lobject.h
++++ b/src/lobject.h
+@@ -533,6 +533,12 @@ typedef struct AbsLineInfo {
+   int line;
+ } AbsLineInfo;
+ 
++
++/*
++** AOT implementation
++*/
++typedef void (*AotCompiledFunction) (lua_State *L, struct CallInfo *ci);
++
+ /*
+ ** Function Prototypes
+ */
+@@ -559,6 +565,7 @@ typedef struct Proto {
+   LocVar *locvars;  /* information about local variables (debug information) */
+   TString  *source;  /* used for debug information */
+   GCObject *gclist;
++  AotCompiledFunction aot_implementation;
+ } Proto;
+ 
+ /* }================================================================== */
+diff --git a/src/luaconf.h b/src/luaconf.h
+index e64d2ee..0f8340a 100644
+--- a/src/luaconf.h
++++ b/src/luaconf.h
+@@ -305,12 +305,8 @@
+ ** give a warning about it. To avoid these warnings, change to the
+ ** default definition.
+ */
+-#if defined(__GNUC__) && ((__GNUC__*100 + __GNUC_MINOR__) >= 302) && \
+-    defined(__ELF__)		/* { */
+-#define LUAI_FUNC	__attribute__((visibility("internal"))) extern
+-#else				/* }{ */
++/* AOT: export all internal APIs */
+ #define LUAI_FUNC	extern
+-#endif				/* } */
+ 
+ #define LUAI_DDEC(dec)	LUAI_FUNC dec
+ #define LUAI_DDEF	/* empty */
+diff --git a/src/lvm.c b/src/lvm.c
+index c9729bc..9a9a6dc 100644
+--- a/src/lvm.c
++++ b/src/lvm.c
+@@ -30,6 +30,11 @@
+ #include "ltm.h"
+ #include "lvm.h"
+ 
++/*
++** We use ifdefs to clearly mark the parts that we had to change
++*/
++#define LUAOT 1
++
+ 
+ /*
+ ** By default, use jump tables in the main interpreter loop on gcc
+@@ -1125,7 +1130,6 @@ void luaV_finishOp (lua_State *L) {
+ #define vmcase(l)	case l:
+ #define vmbreak		break
+ 
+-
+ void luaV_execute (lua_State *L, CallInfo *ci) {
+   LClosure *cl;
+   TValue *k;
+@@ -1135,10 +1139,19 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+ #if LUA_USE_JUMPTABLE
+ #include "ljumptab.h"
+ #endif
++#if LUAOT
++  trap = L->hookmask;
++  cl = clLvalue(s2v(ci->func));
++  lua_assert(ci->callstatus & CIST_FRESH);
++  if (cl->p->aot_implementation) {
++      return cl->p->aot_implementation(L, ci);
++  }
++#else
+  startfunc:
+   trap = L->hookmask;
+  returning:  /* trap already set */
+   cl = clLvalue(s2v(ci->func));
++#endif
+   k = cl->p->k;
+   pc = ci->u.l.savedpc;
+   if (l_unlikely(trap)) {
+@@ -1613,6 +1626,24 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+         }
+         vmbreak;
+       }
++#if LUAOT
++      vmcase(OP_CALL) {
++        CallInfo *newci;
++        int b = GETARG_B(i);
++        int nresults = GETARG_C(i) - 1;
++        if (b != 0)  /* fixed number of arguments? */
++          L->top = ra + b;  /* top signals number of arguments */
++        /* else previous instruction set top */
++        savepc(L);  /* in case of errors */
++        if ((newci = luaD_precall(L, ra, nresults)) == NULL)
++          updatetrap(ci);  /* C call; nothing else to be done */
++        else {  /* Lua call: run function in this same C frame */
++          newci->callstatus = CIST_FRESH;
++          Protect(luaV_execute(L, newci));
++        }
++        vmbreak;
++      }
++#else
+       vmcase(OP_CALL) {
+         CallInfo *newci;
+         int b = GETARG_B(i);
+@@ -1630,6 +1661,44 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+         }
+         vmbreak;
+       }
++#endif
++
++#if LUAOT
++      vmcase(OP_TAILCALL) {
++        int b = GETARG_B(i);  /* number of arguments + 1 (function) */
++        int nparams1 = GETARG_C(i);
++        /* delta is virtual 'func' - real 'func' (vararg functions) */
++        int delta = (nparams1) ? ci->u.l.nextraargs + nparams1 : 0;
++        if (b != 0)
++          L->top = ra + b;
++        else  /* previous instruction set top */
++          b = cast_int(L->top - ra);
++        savepc(ci);  /* several calls here can raise errors */
++        if (TESTARG_k(i)) {
++          luaF_closeupval(L, base);  /* close upvalues from current call */
++          lua_assert(L->tbclist < base);  /* no pending tbc variables */
++          lua_assert(base == ci->func + 1);
++        }
++        while (!ttisfunction(s2v(ra))) {  /* not a function? */
++          luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */
++          b++;  /* there is now one extra argument */
++          checkstackGCp(L, 1, ra);
++        }
++        if (!ttisLclosure(s2v(ra))) {  /* C function? */
++          luaD_precall(L, ra, LUA_MULTRET);  /* call it */
++          updatetrap(ci);
++          updatestack(ci);  /* stack may have been relocated */
++          ci->func -= delta;  /* restore 'func' (if vararg) */
++          luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */
++          updatetrap(ci);  /* 'luaD_poscall' can change hooks */
++          goto ret;  /* caller returns after the tail call */
++        }
++        ci->func -= delta;  /* restore 'func' (if vararg) */
++        luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */
++        return luaV_execute(L, ci); /* execute the callee */
++        vmbreak;
++      }
++#else
+       vmcase(OP_TAILCALL) {
+         int b = GETARG_B(i);  /* number of arguments + 1 (function) */
+         int nparams1 = GETARG_C(i);
+@@ -1662,7 +1731,9 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+         ci->func -= delta;  /* restore 'func' (if vararg) */
+         luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */
+         goto startfunc;  /* execute the callee */
++        vmbreak;
+       }
++#endif
+       vmcase(OP_RETURN) {
+         int n = GETARG_B(i) - 1;  /* number of results */
+         int nparams1 = GETARG_C(i);
+@@ -1719,12 +1790,17 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+           }
+         }
+        ret:  /* return from a Lua function */
++#if LUAOT
++        lua_assert(ci->callstatus & CIST_FRESH);
++        return;
++#else
+         if (ci->callstatus & CIST_FRESH)
+           return;  /* end this frame */
+         else {
+           ci = ci->previous;
+           goto returning;  /* continue running caller in this frame */
+         }
++#endif
+       }
+       vmcase(OP_FORLOOP) {
+         if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */
+-- 
+2.30.2
+

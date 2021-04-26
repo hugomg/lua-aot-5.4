@@ -1,0 +1,29 @@
+Updating this compiler to a new release of Lua is a manual process.
+This document describes how to get started on that.
+
+Updating the code
+=================
+
+1. Back up the luaot.c, luaot_header.c and luaot_footer.c
+2. Replace the src folder with a clean copy of Lua.
+3. Reapply the modifications to the Makefile and the interpreter
+   - These are described in the paper
+   - I put some ".patch" files in the "script" folder.
+     I don't guarantee that they will apply cleanly on a future version; may require manual tweaks.
+4. Update the luaot files
+   - In the luaot.c, update the parts copied from luac.c.
+     The most common source of change is if Lua introduces a new opcode, or changes an existing one.
+   - In the luaot.c, update the parts copied from lvm.c
+     Parts that mess with the program counter or that do gotos require manual intervention
+   - Recreate the luaot_header.c. Go through the lvm.c and check each macro one by one.
+     The macros that do jumps or mess with the program counter need to be modified accordingly.
+
+Testing
+=======
+
+Since we're abusing the Lua internals, it is easy to break things.
+I highly recommend turning on the lua_assert assertions by assing the LUAI_ASSERT compiler flag
+
+    MYCFLAGS=-DLUAI_ASSERT
+
+In Lua ≤ 5.4.3, luac had a bug and did not work correctly with the assertions. This includes the luac code that we copied in the luaot.c. If this isn't fixed yet, you may need to fix the luac.c (see commit 1a1fefac) or just disable the assertions in that file with a `#undef LUAI_ASSERT` at the top of the file.

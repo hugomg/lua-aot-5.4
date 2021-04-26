@@ -1,0 +1,40 @@
+From b0425c637bffba2f6db5f55ff6532716c151895e Mon Sep 17 00:00:00 2001
+From: Hugo Musso Gualandi <hugo_musso_gualandi@hotmail.com>
+Date: Fri, 16 Apr 2021 15:50:29 -0300
+Subject: [PATCH 1/2] Patch the makefile
+
+---
+ src/Makefile | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index f78c0b8..ca46c5d 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -43,8 +43,11 @@ LUA_O=	lua.o
+ LUAC_T=	luac
+ LUAC_O=	luac.o
+ 
+-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
+-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
++AOT_T=	luaot
++AOT_O=	luaot.o
++
++ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O)
++ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T)
+ ALL_A= $(LUA_A)
+ 
+ # Targets start here.
+@@ -66,6 +69,9 @@ $(LUA_T): $(LUA_O) $(LUA_A)
+ $(LUAC_T): $(LUAC_O) $(LUA_A)
+ 	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
+ 
++$(AOT_T): $(AOT_O) $(LUA_A)
++	$(CC) -o $@ $(LDFLAGS) $(AOT_O) $(LUA_A) $(LIBS)
++
+ test:
+ 	./$(LUA_T) -v
+ 
+-- 
+2.30.2
+
