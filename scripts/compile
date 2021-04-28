@@ -2,8 +2,8 @@
 
 lua_file=$1
 base=${lua_file%.lua}
-c_file="$base"_fast.c
-so_file="$base"_fast.so
+c_file="$base"_aot.c
+so_file="$base"_aot.so
 
 echo "Generating $c_file ..."
 ../src/luaot "$lua_file" "$c_file" || exit 1

@@ -1,0 +1,2 @@
+#!/bin/sh
+rm ./*_aot.c ./*_aot.so
