@@ -684,11 +684,15 @@ void create_function(Proto *f)
 
     // If we are resuming a coroutine, the savedpc can be something else
     println("  if (pc != code) {");
+#if 1
+    println("    luaG_runerror(L, \"This version of Luaot does not support coroutines\\n\");");
+#else
     println("    switch (pc - code) {");
     for (int pc = 0; pc < f->sizecode; pc++) {
         println("      case %d: goto label_%02d;", pc, pc);
     }
     println("    }");
+#endif
     println("  }");
     printnl();
 
