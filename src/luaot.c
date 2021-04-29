@@ -34,6 +34,7 @@ static const char *program_name    = "luaot";
 static const char *input_filename  = NULL;
 static const char *output_filename = NULL;
 static const char *module_name     = NULL;
+static int enable_coroutines = 0;
 static FILE * output_file = NULL;
 static int nfunctions = 0;
 static TString **tmname;
@@ -92,6 +93,8 @@ static void doargs(int argc, char **argv)
         if (do_opts && arg[0] == '-') {
             if (0 == strcmp(arg, "--")) {
                 do_opts = 0;
+            } else if (0 == strcmp(arg, "-C")) {
+                enable_coroutines = 1;
             } else if (0 == strcmp(arg, "-h")) {
                 usage();
                 exit(0);
@@ -720,18 +723,19 @@ void create_function(Proto *f)
     println("  StkId ra;");
     printnl();
 
-    // If we are resuming a coroutine, the savedpc can be something else
-    println("  if (pc != code) {");
-#if 1
-    println("    luaG_runerror(L, \"This version of Luaot does not support coroutines\\n\");");
-#else
-    println("    switch (pc - code) {");
-    for (int pc = 0; pc < f->sizecode; pc++) {
-        println("      case %d: goto label_%02d;", pc, pc);
+    // If we are resuming a coroutine, jump to the savedpc.
+    // However, allowing coroutines hurts performance so we disable it by default.
+    if (enable_coroutines) {
+        println("  switch (pc - code) {");
+        for (int pc = 0; pc < f->sizecode; pc++) {
+            println("    case %d: goto label_%02d;", pc, pc);
+        }
+        println("  }");
+    } else {
+        println("  if (pc != code) {");
+        println("    luaG_runerror(L, \"This program was compiled without support for coroutines\\n\");");
+        println("  }");
     }
-    println("    }");
-#endif
-    println("  }");
     printnl();
 
     for (int pc = 0; pc < f->sizecode; pc++) {
