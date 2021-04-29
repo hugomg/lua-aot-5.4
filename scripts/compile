@@ -6,7 +6,7 @@ c_file="$base"_aot.c
 so_file="$base"_aot.so
 
 echo "Generating $c_file ..."
-../src/luaot "$lua_file" "$c_file" || exit 1
+../src/luaot "$lua_file" -o "$c_file" || exit 1
 
 echo "Compiling $so_file ..."
 gcc -shared -fPIC -O2 -g -I../src "$c_file" -o "$so_file" || exit 1

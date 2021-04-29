@@ -39,10 +39,9 @@ static int nfunctions = 0;
 static TString **tmname;
 
 static
-void usage_error()
+void usage()
 {
-    fprintf(stderr, "usage: %s input.lua output.c\n", program_name);
-    exit(1);
+    fprintf(stderr, "usage: %s input.lua -o output.c\n", program_name);
 }
 
 static
@@ -80,19 +79,58 @@ void printnl()
     fprintf(output_file, "\n");
 }
 
+
+static void doargs(int argc, char **argv)
+{
+    // I wonder if I should just use getopt instead of parsing options by hand
+    program_name = argv[0];
+
+    int do_opts = 1;
+    int npos = 0;
+    for (int i = 1; i < argc; i++) {
+        const char *arg = argv[i];
+        if (do_opts && arg[0] == '-') {
+            if (0 == strcmp(arg, "--")) {
+                do_opts = 0;
+            } else if (0 == strcmp(arg, "-h")) {
+                usage();
+                exit(0);
+            } else if (0 == strcmp(arg, "-o")) {
+                i++;
+                if (i >= argc) { fatal_error("missing argument for -o"); }
+                output_filename = argv[i];
+            } else {
+                fprintf(stderr, "unknown option %s\n", arg);
+                exit(1);
+            }
+        } else {
+            switch (npos) {
+                case 0:
+                    input_filename = arg;
+                    break;
+                default:
+                    fatal_error("too many positional arguments");
+                    break;
+            }
+            npos++;
+        }
+    }
+
+    if (output_filename == NULL) {
+        usage();
+        exit(1);
+    }
+}
+
 static const char *get_module_name(const char *);
 static void print_functions();
 static void print_source_code();
 
 int main(int argc, char **argv)
 {
-    program_name = argv[0];
+    // Process input arguments
 
-    // Process input options
-    if (argc != 3) { usage_error(); }
-    input_filename = argv[1];
-    output_filename = argv[2];
-
+    doargs(argc, argv);
     module_name = get_module_name(output_filename);
 
     // Read the input
