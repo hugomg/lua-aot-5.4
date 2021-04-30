@@ -1,2 +1,2 @@
-#!/bin/sh
-rm ./*_aot.c ./*_aot.so
+#!/bin/sh -v
+rm -f ./*.c ./*.so

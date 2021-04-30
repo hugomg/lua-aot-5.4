@@ -1,6 +1,7 @@
 src/lua
 src/luac
 src/luaot
+src/luaot-trampoline
 
 experiments/*.c
 experiments/*.so

@@ -29,9 +29,11 @@ local benchs = {
 }
 
 local impls = {
-    { name = "lua", suffix = "",     interpreter = "../src/lua" },
-    { name = "aot", suffix = "_aot", interpreter = "../src/lua" },
-    { name = "jit", suffix = "",     interpreter = "luajit"     },
+    { name = "jit", suffix = "",     interpreter = "luajit",     compile = false                    },
+    { name = "lua", suffix = "",     interpreter = "../src/lua", compile = false,                   },
+    { name = "aot", suffix = "_aot", interpreter = "../src/lua", compile = "../src/luaot"           },
+    { name = "cor", suffix = "_cor", interpreter = "../src/lua", compile = "../src/luaot -C"        },
+    { name = "trm", suffix = "_trm", interpreter = "../src/lua", compile = "../src/luaot-trampoline"},
 }
 
 --
@@ -65,17 +67,24 @@ end
 -- Recompile
 --
 
-if nkey ~= "fast" then
-    assert(run("cd .. && make guess"))
-    for _, b in ipairs(benchs) do
-        assert(run("../scripts/compile $1.lua", b.name))
-        assert(run("../scripts/compile $1.lua -C", b.name))
+print("Recompiling the compiler...")
+assert(run("cd .. && make guess --quiet"))
+
+for _, b in ipairs(benchs) do
+    for _, s in ipairs(impls) do
+        local mod = b.name .. s.suffix
+        if s.compile and not exists(mod .. ".so") then
+            assert(run(s.compile .. " $1.lua -o $2.c", b.name, mod))
+            assert(run("../scripts/compile $2.c",      b.name, mod))
+        end
     end
 end
 
 --
 -- Execute
 --
+
+print("---START---")
 
 for _, b in ipairs(benchs) do
     for _, s in ipairs(impls) do

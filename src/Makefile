@@ -46,8 +46,11 @@ LUAC_O=	luac.o
 AOT_T=	luaot
 AOT_O=	luaot.o
 
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T)
+AOT2_T=	luaot-trampoline
+AOT2_O=	luaot-trampoline.o
+
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O) $(AOT2_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T) $(AOT2_T)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -71,6 +74,9 @@ $(LUAC_T): $(LUAC_O) $(LUA_A)
 
 $(AOT_T): $(AOT_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(AOT_O) $(LUA_A) $(LIBS)
+
+$(AOT2_T): $(AOT2_O) $(LUA_A)
+	$(CC) -o $@ $(LDFLAGS) $(AOT2_O) $(LUA_A) $(LIBS)
 
 test:
 	./$(LUA_T) -v

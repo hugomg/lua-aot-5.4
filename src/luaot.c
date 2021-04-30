@@ -352,7 +352,7 @@ void luaot_PrintOpcodeComment(Proto *f, int pc)
     int line=luaG_getfuncline(f,pc);
 
     print("  //");
-    print(" %d\t", pc+1);
+    print(" %d\t", pc);
     if (line > 0) {
         print("[%d]\t", line);
     } else {
