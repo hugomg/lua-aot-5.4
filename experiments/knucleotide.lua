@@ -75,14 +75,14 @@ local function single_freq(seq, s)
 end
 
 return function(N)
-    local f, err = io.open("fasta-output-"..N..".txt", "r")
+    local f, err = io.open("fasta-output-"..tostring(N)..".txt", "r")
     if not f then error(err) end
 
     local seq = read_input(f)
 
     sort_by_freq(seq, 1)
     sort_by_freq(seq, 2)
-    
+
     single_freq(seq, "GGT")
     single_freq(seq, "GGTA")
     single_freq(seq, "GGTATT")

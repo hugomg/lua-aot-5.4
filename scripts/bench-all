@@ -1,0 +1,2 @@
+#!/bin/sh
+../src/lua ../scripts/bench-run.lua "$@" 2>&1 | tee bench-times.txt

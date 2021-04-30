@@ -2,9 +2,10 @@ src/lua
 src/luac
 src/luaot
 
-experiments/*_aot.c
-experiments/*_aot.so
+experiments/*.c
+experiments/*.so
 
 *.a
 *.o
 *.so
+.Rproj.user
