@@ -29,11 +29,13 @@ local benchs = {
 }
 
 local impls = {
-    { name = "jit", suffix = "",     interpreter = "luajit",     compile = false                    },
-    { name = "lua", suffix = "",     interpreter = "../src/lua", compile = false,                   },
-    { name = "aot", suffix = "_aot", interpreter = "../src/lua", compile = "../src/luaot"           },
-    { name = "cor", suffix = "_cor", interpreter = "../src/lua", compile = "../src/luaot -C"        },
-    { name = "trm", suffix = "_trm", interpreter = "../src/lua", compile = "../src/luaot-trampoline"},
+    { name = "jit", suffix = "",     interpreter = "luajit",        compile = false                           },
+    { name = "jof", suffix = "",     interpreter = "luajit -j off", compile = false                           },
+    { name = "lua", suffix = "",     interpreter = "../src/lua",    compile = false,                          },
+    { name = "swt", suffix = "",     interpreter = "../src/lua-sw", compile = false,                          },
+    { name = "aot", suffix = "_aot", interpreter = "../src/lua",    compile = "../src/luaot"                  },
+    { name = "cor", suffix = "_cor", interpreter = "../src/lua",    compile = "../src/luaot --coro"           },
+    { name = "trm", suffix = "_trm", interpreter = "../src/lua",    compile = "../src/luaot-trampoline --coro"},
 }
 
 --
@@ -90,14 +92,14 @@ for _, b in ipairs(benchs) do
     for _, s in ipairs(impls) do
 
         local mod
-        if s.name == "jit" and exists(b.name.."_jit.lua") then
+        if string.match(s.interpreter, "luajit") and exists(b.name.."_jit.lua") then
             mod = b.name .. "_jit"
         else
             mod = b.name .. s.suffix
         end
 
         local n = assert(b[nkey])
-        local cmd = prepare("$1 main.lua $2 $3 > /dev/null", s.interpreter, mod, n)
+        local cmd = prepare(s.interpreter .. " main.lua $1 $2 > /dev/null", mod, n)
 
         for rep = 1, repetitions do
             print(string.format("RUN %s %s %s", b.name, s.name, rep))
