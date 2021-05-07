@@ -1,0 +1,4903 @@
+Recompiling the compiler...
+Guessing Linux
+---START---
+RUN binarytrees jit 1
+real 1.47
+user 1.23
+sys 0.23
+
+RUN binarytrees jit 2
+real 1.45
+user 1.23
+sys 0.21
+
+RUN binarytrees jit 3
+real 1.37
+user 1.23
+sys 0.13
+
+RUN binarytrees jit 4
+real 1.47
+user 1.25
+sys 0.21
+
+RUN binarytrees jit 5
+real 1.51
+user 1.27
+sys 0.23
+
+RUN binarytrees jit 6
+real 1.46
+user 1.24
+sys 0.21
+
+RUN binarytrees jit 7
+real 1.46
+user 1.24
+sys 0.21
+
+RUN binarytrees jit 8
+real 1.31
+user 1.17
+sys 0.13
+
+RUN binarytrees jit 9
+real 1.48
+user 1.22
+sys 0.25
+
+RUN binarytrees jit 10
+real 1.49
+user 1.24
+sys 0.24
+
+RUN binarytrees jit 11
+real 1.47
+user 1.23
+sys 0.23
+
+RUN binarytrees jit 12
+real 1.47
+user 1.20
+sys 0.25
+
+RUN binarytrees jit 13
+real 1.48
+user 1.23
+sys 0.24
+
+RUN binarytrees jit 14
+real 1.46
+user 1.23
+sys 0.22
+
+RUN binarytrees jit 15
+real 1.47
+user 1.20
+sys 0.25
+
+RUN binarytrees jit 16
+real 1.47
+user 1.24
+sys 0.22
+
+RUN binarytrees jit 17
+real 1.48
+user 1.24
+sys 0.23
+
+RUN binarytrees jit 18
+real 1.50
+user 1.25
+sys 0.24
+
+RUN binarytrees jit 19
+real 1.45
+user 1.22
+sys 0.22
+
+RUN binarytrees jit 20
+real 1.48
+user 1.22
+sys 0.24
+
+RUN binarytrees jof 1
+real 1.99
+user 1.74
+sys 0.24
+
+RUN binarytrees jof 2
+real 1.75
+user 1.64
+sys 0.10
+
+RUN binarytrees jof 3
+real 1.98
+user 1.69
+sys 0.28
+
+RUN binarytrees jof 4
+real 1.96
+user 1.70
+sys 0.25
+
+RUN binarytrees jof 5
+real 1.98
+user 1.72
+sys 0.24
+
+RUN binarytrees jof 6
+real 1.99
+user 1.74
+sys 0.24
+
+RUN binarytrees jof 7
+real 2.02
+user 1.78
+sys 0.22
+
+RUN binarytrees jof 8
+real 1.97
+user 1.72
+sys 0.25
+
+RUN binarytrees jof 9
+real 1.97
+user 1.74
+sys 0.22
+
+RUN binarytrees jof 10
+real 1.96
+user 1.72
+sys 0.22
+
+RUN binarytrees jof 11
+real 1.76
+user 1.65
+sys 0.10
+
+RUN binarytrees jof 12
+real 1.79
+user 1.66
+sys 0.12
+
+RUN binarytrees jof 13
+real 1.96
+user 1.74
+sys 0.21
+
+RUN binarytrees jof 14
+real 1.75
+user 1.65
+sys 0.08
+
+RUN binarytrees jof 15
+real 1.80
+user 1.69
+sys 0.10
+
+RUN binarytrees jof 16
+real 1.98
+user 1.74
+sys 0.24
+
+RUN binarytrees jof 17
+real 1.99
+user 1.75
+sys 0.23
+
+RUN binarytrees jof 18
+real 1.76
+user 1.63
+sys 0.12
+
+RUN binarytrees jof 19
+real 1.97
+user 1.71
+sys 0.25
+
+RUN binarytrees jof 20
+real 1.80
+user 1.65
+sys 0.13
+
+RUN binarytrees lua 1
+real 3.51
+user 3.49
+sys 0.01
+
+RUN binarytrees lua 2
+real 3.49
+user 3.46
+sys 0.01
+
+RUN binarytrees lua 3
+real 3.51
+user 3.48
+sys 0.01
+
+RUN binarytrees lua 4
+real 3.51
+user 3.48
+sys 0.01
+
+RUN binarytrees lua 5
+real 3.50
+user 3.47
+sys 0.01
+
+RUN binarytrees lua 6
+real 3.50
+user 3.48
+sys 0.01
+
+RUN binarytrees lua 7
+real 3.52
+user 3.49
+sys 0.01
+
+RUN binarytrees lua 8
+real 3.51
+user 3.49
+sys 0.00
+
+RUN binarytrees lua 9
+real 3.53
+user 3.51
+sys 0.01
+
+RUN binarytrees lua 10
+real 3.52
+user 3.48
+sys 0.02
+
+RUN binarytrees lua 11
+real 3.52
+user 3.50
+sys 0.01
+
+RUN binarytrees lua 12
+real 3.54
+user 3.51
+sys 0.01
+
+RUN binarytrees lua 13
+real 3.52
+user 3.49
+sys 0.01
+
+RUN binarytrees lua 14
+real 3.50
+user 3.47
+sys 0.01
+
+RUN binarytrees lua 15
+real 3.50
+user 3.48
+sys 0.01
+
+RUN binarytrees lua 16
+real 3.51
+user 3.49
+sys 0.01
+
+RUN binarytrees lua 17
+real 3.49
+user 3.46
+sys 0.01
+
+RUN binarytrees lua 18
+real 3.51
+user 3.48
+sys 0.01
+
+RUN binarytrees lua 19
+real 3.49
+user 3.46
+sys 0.02
+
+RUN binarytrees lua 20
+real 3.53
+user 3.50
+sys 0.01
+
+RUN binarytrees lsw 1
+real 3.44
+user 3.41
+sys 0.01
+
+RUN binarytrees lsw 2
+real 3.48
+user 3.45
+sys 0.01
+
+RUN binarytrees lsw 3
+real 3.45
+user 3.43
+sys 0.01
+
+RUN binarytrees lsw 4
+real 3.44
+user 3.42
+sys 0.01
+
+RUN binarytrees lsw 5
+real 3.45
+user 3.43
+sys 0.00
+
+RUN binarytrees lsw 6
+real 3.48
+user 3.45
+sys 0.02
+
+RUN binarytrees lsw 7
+real 3.45
+user 3.43
+sys 0.01
+
+RUN binarytrees lsw 8
+real 3.44
+user 3.42
+sys 0.01
+
+RUN binarytrees lsw 9
+real 3.46
+user 3.44
+sys 0.01
+
+RUN binarytrees lsw 10
+real 3.46
+user 3.43
+sys 0.01
+
+RUN binarytrees lsw 11
+real 3.45
+user 3.43
+sys 0.01
+
+RUN binarytrees lsw 12
+real 3.45
+user 3.43
+sys 0.01
+
+RUN binarytrees lsw 13
+real 3.47
+user 3.44
+sys 0.01
+
+RUN binarytrees lsw 14
+real 3.46
+user 3.44
+sys 0.00
+
+RUN binarytrees lsw 15
+real 3.44
+user 3.42
+sys 0.01
+
+RUN binarytrees lsw 16
+real 3.47
+user 3.45
+sys 0.01
+
+RUN binarytrees lsw 17
+real 3.48
+user 3.46
+sys 0.01
+
+RUN binarytrees lsw 18
+real 3.44
+user 3.42
+sys 0.01
+
+RUN binarytrees lsw 19
+real 3.44
+user 3.42
+sys 0.00
+
+RUN binarytrees lsw 20
+real 3.45
+user 3.42
+sys 0.02
+
+RUN binarytrees aot 1
+real 2.70
+user 2.66
+sys 0.02
+
+RUN binarytrees aot 2
+real 2.82
+user 2.79
+sys 0.02
+
+RUN binarytrees aot 3
+real 2.67
+user 2.64
+sys 0.02
+
+RUN binarytrees aot 4
+real 2.67
+user 2.63
+sys 0.02
+
+RUN binarytrees aot 5
+real 2.67
+user 2.63
+sys 0.02
+
+RUN binarytrees aot 6
+real 2.73
+user 2.70
+sys 0.02
+
+RUN binarytrees aot 7
+real 3.02
+user 2.99
+sys 0.02
+
+RUN binarytrees aot 8
+real 2.67
+user 2.65
+sys 0.01
+
+RUN binarytrees aot 9
+real 2.66
+user 2.63
+sys 0.01
+
+RUN binarytrees aot 10
+real 2.66
+user 2.63
+sys 0.01
+
+RUN binarytrees aot 11
+real 2.65
+user 2.63
+sys 0.01
+
+RUN binarytrees aot 12
+real 2.65
+user 2.62
+sys 0.02
+
+RUN binarytrees aot 13
+real 2.66
+user 2.63
+sys 0.01
+
+RUN binarytrees aot 14
+real 2.66
+user 2.63
+sys 0.01
+
+RUN binarytrees aot 15
+real 2.66
+user 2.63
+sys 0.02
+
+RUN binarytrees aot 16
+real 2.64
+user 2.61
+sys 0.02
+
+RUN binarytrees aot 17
+real 2.68
+user 2.65
+sys 0.02
+
+RUN binarytrees aot 18
+real 2.67
+user 2.64
+sys 0.02
+
+RUN binarytrees aot 19
+real 2.67
+user 2.64
+sys 0.02
+
+RUN binarytrees aot 20
+real 2.64
+user 2.61
+sys 0.01
+
+RUN binarytrees cor 1
+real 2.69
+user 2.67
+sys 0.01
+
+RUN binarytrees cor 2
+real 2.66
+user 2.63
+sys 0.01
+
+RUN binarytrees cor 3
+real 2.69
+user 2.67
+sys 0.01
+
+RUN binarytrees cor 4
+real 2.67
+user 2.64
+sys 0.02
+
+RUN binarytrees cor 5
+real 2.66
+user 2.63
+sys 0.02
+
+RUN binarytrees cor 6
+real 2.68
+user 2.66
+sys 0.01
+
+RUN binarytrees cor 7
+real 2.69
+user 2.67
+sys 0.01
+
+RUN binarytrees cor 8
+real 2.67
+user 2.64
+sys 0.02
+
+RUN binarytrees cor 9
+real 2.69
+user 2.65
+sys 0.02
+
+RUN binarytrees cor 10
+real 2.68
+user 2.65
+sys 0.02
+
+RUN binarytrees cor 11
+real 2.66
+user 2.63
+sys 0.01
+
+RUN binarytrees cor 12
+real 2.67
+user 2.64
+sys 0.01
+
+RUN binarytrees cor 13
+real 2.69
+user 2.65
+sys 0.02
+
+RUN binarytrees cor 14
+real 2.67
+user 2.64
+sys 0.01
+
+RUN binarytrees cor 15
+real 2.66
+user 2.63
+sys 0.02
+
+RUN binarytrees cor 16
+real 2.66
+user 2.64
+sys 0.01
+
+RUN binarytrees cor 17
+real 2.67
+user 2.65
+sys 0.01
+
+RUN binarytrees cor 18
+real 2.65
+user 2.62
+sys 0.01
+
+RUN binarytrees cor 19
+real 2.68
+user 2.65
+sys 0.02
+
+RUN binarytrees cor 20
+real 2.78
+user 2.75
+sys 0.02
+
+RUN binarytrees trm 1
+real 3.15
+user 3.09
+sys 0.02
+
+RUN binarytrees trm 2
+real 3.00
+user 2.96
+sys 0.01
+
+RUN binarytrees trm 3
+real 2.87
+user 2.83
+sys 0.02
+
+RUN binarytrees trm 4
+real 2.78
+user 2.74
+sys 0.02
+
+RUN binarytrees trm 5
+real 2.73
+user 2.71
+sys 0.01
+
+RUN binarytrees trm 6
+real 2.71
+user 2.68
+sys 0.02
+
+RUN binarytrees trm 7
+real 2.73
+user 2.70
+sys 0.02
+
+RUN binarytrees trm 8
+real 2.73
+user 2.70
+sys 0.01
+
+RUN binarytrees trm 9
+real 2.72
+user 2.70
+sys 0.01
+
+RUN binarytrees trm 10
+real 2.74
+user 2.72
+sys 0.01
+
+RUN binarytrees trm 11
+real 2.72
+user 2.70
+sys 0.01
+
+RUN binarytrees trm 12
+real 2.75
+user 2.73
+sys 0.01
+
+RUN binarytrees trm 13
+real 2.74
+user 2.71
+sys 0.02
+
+RUN binarytrees trm 14
+real 2.73
+user 2.69
+sys 0.02
+
+RUN binarytrees trm 15
+real 2.71
+user 2.68
+sys 0.02
+
+RUN binarytrees trm 16
+real 2.73
+user 2.70
+sys 0.02
+
+RUN binarytrees trm 17
+real 2.71
+user 2.69
+sys 0.01
+
+RUN binarytrees trm 18
+real 2.71
+user 2.68
+sys 0.01
+
+RUN binarytrees trm 19
+real 2.83
+user 2.80
+sys 0.01
+
+RUN binarytrees trm 20
+real 2.71
+user 2.69
+sys 0.01
+
+RUN fannkuch jit 1
+real 7.09
+user 7.08
+sys 0.00
+
+RUN fannkuch jit 2
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 3
+real 7.11
+user 7.10
+sys 0.00
+
+RUN fannkuch jit 4
+real 7.11
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 5
+real 7.11
+user 7.10
+sys 0.00
+
+RUN fannkuch jit 6
+real 7.11
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 7
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 8
+real 7.11
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 9
+real 7.11
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 10
+real 7.08
+user 7.07
+sys 0.00
+
+RUN fannkuch jit 11
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 12
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 13
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 14
+real 7.10
+user 7.08
+sys 0.00
+
+RUN fannkuch jit 15
+real 7.09
+user 7.08
+sys 0.00
+
+RUN fannkuch jit 16
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 17
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 18
+real 7.10
+user 7.09
+sys 0.00
+
+RUN fannkuch jit 19
+real 7.08
+user 7.06
+sys 0.00
+
+RUN fannkuch jit 20
+real 7.09
+user 7.08
+sys 0.00
+
+RUN fannkuch jof 1
+real 28.96
+user 28.91
+sys 0.00
+
+RUN fannkuch jof 2
+real 30.18
+user 30.13
+sys 0.00
+
+RUN fannkuch jof 3
+real 30.19
+user 30.14
+sys 0.00
+
+RUN fannkuch jof 4
+real 28.86
+user 28.82
+sys 0.00
+
+RUN fannkuch jof 5
+real 30.15
+user 30.10
+sys 0.00
+
+RUN fannkuch jof 6
+real 28.92
+user 28.87
+sys 0.00
+
+RUN fannkuch jof 7
+real 30.14
+user 30.08
+sys 0.00
+
+RUN fannkuch jof 8
+real 28.91
+user 28.86
+sys 0.00
+
+RUN fannkuch jof 9
+real 28.92
+user 28.87
+sys 0.00
+
+RUN fannkuch jof 10
+real 30.13
+user 30.08
+sys 0.00
+
+RUN fannkuch jof 11
+real 28.78
+user 28.73
+sys 0.00
+
+RUN fannkuch jof 12
+real 30.22
+user 30.17
+sys 0.00
+
+RUN fannkuch jof 13
+real 28.82
+user 28.77
+sys 0.00
+
+RUN fannkuch jof 14
+real 28.79
+user 28.73
+sys 0.00
+
+RUN fannkuch jof 15
+real 28.80
+user 28.74
+sys 0.00
+
+RUN fannkuch jof 16
+real 28.92
+user 28.86
+sys 0.00
+
+RUN fannkuch jof 17
+real 29.55
+user 29.50
+sys 0.00
+
+RUN fannkuch jof 18
+real 29.30
+user 29.26
+sys 0.00
+
+RUN fannkuch jof 19
+real 28.87
+user 28.83
+sys 0.00
+
+RUN fannkuch jof 20
+real 30.17
+user 30.13
+sys 0.00
+
+RUN fannkuch lua 1
+real 44.31
+user 44.24
+sys 0.00
+
+RUN fannkuch lua 2
+real 44.20
+user 44.12
+sys 0.00
+
+RUN fannkuch lua 3
+real 44.35
+user 44.28
+sys 0.00
+
+RUN fannkuch lua 4
+real 44.38
+user 44.31
+sys 0.00
+
+RUN fannkuch lua 5
+real 44.35
+user 44.28
+sys 0.00
+
+RUN fannkuch lua 6
+real 44.26
+user 44.19
+sys 0.00
+
+RUN fannkuch lua 7
+real 44.31
+user 44.24
+sys 0.00
+
+RUN fannkuch lua 8
+real 44.34
+user 44.27
+sys 0.00
+
+RUN fannkuch lua 9
+real 44.34
+user 44.27
+sys 0.00
+
+RUN fannkuch lua 10
+real 44.33
+user 44.26
+sys 0.00
+
+RUN fannkuch lua 11
+real 44.40
+user 44.33
+sys 0.00
+
+RUN fannkuch lua 12
+real 44.34
+user 44.27
+sys 0.00
+
+RUN fannkuch lua 13
+real 44.32
+user 44.25
+sys 0.00
+
+RUN fannkuch lua 14
+real 44.27
+user 44.20
+sys 0.00
+
+RUN fannkuch lua 15
+real 44.44
+user 44.37
+sys 0.00
+
+RUN fannkuch lua 16
+real 44.23
+user 44.15
+sys 0.00
+
+RUN fannkuch lua 17
+real 44.26
+user 44.19
+sys 0.00
+
+RUN fannkuch lua 18
+real 44.23
+user 44.15
+sys 0.00
+
+RUN fannkuch lua 19
+real 44.34
+user 44.27
+sys 0.00
+
+RUN fannkuch lua 20
+real 44.20
+user 44.13
+sys 0.00
+
+RUN fannkuch lsw 1
+real 44.48
+user 44.40
+sys 0.00
+
+RUN fannkuch lsw 2
+real 43.83
+user 43.75
+sys 0.00
+
+RUN fannkuch lsw 3
+real 43.85
+user 43.78
+sys 0.00
+
+RUN fannkuch lsw 4
+real 43.89
+user 43.81
+sys 0.00
+
+RUN fannkuch lsw 5
+real 43.84
+user 43.76
+sys 0.00
+
+RUN fannkuch lsw 6
+real 43.98
+user 43.91
+sys 0.00
+
+RUN fannkuch lsw 7
+real 43.91
+user 43.83
+sys 0.00
+
+RUN fannkuch lsw 8
+real 44.10
+user 44.00
+sys 0.00
+
+RUN fannkuch lsw 9
+real 43.94
+user 43.86
+sys 0.00
+
+RUN fannkuch lsw 10
+real 43.83
+user 43.75
+sys 0.00
+
+RUN fannkuch lsw 11
+real 43.93
+user 43.86
+sys 0.00
+
+RUN fannkuch lsw 12
+real 43.93
+user 43.86
+sys 0.00
+
+RUN fannkuch lsw 13
+real 43.83
+user 43.75
+sys 0.00
+
+RUN fannkuch lsw 14
+real 43.88
+user 43.81
+sys 0.00
+
+RUN fannkuch lsw 15
+real 43.93
+user 43.85
+sys 0.00
+
+RUN fannkuch lsw 16
+real 43.95
+user 43.88
+sys 0.00
+
+RUN fannkuch lsw 17
+real 43.91
+user 43.84
+sys 0.00
+
+RUN fannkuch lsw 18
+real 43.95
+user 43.88
+sys 0.00
+
+RUN fannkuch lsw 19
+real 43.95
+user 43.88
+sys 0.00
+
+RUN fannkuch lsw 20
+real 43.85
+user 43.77
+sys 0.00
+
+RUN fannkuch aot 1
+real 20.04
+user 20.01
+sys 0.00
+
+RUN fannkuch aot 2
+real 20.03
+user 19.99
+sys 0.00
+
+RUN fannkuch aot 3
+real 20.03
+user 19.99
+sys 0.00
+
+RUN fannkuch aot 4
+real 19.91
+user 19.87
+sys 0.00
+
+RUN fannkuch aot 5
+real 20.05
+user 20.01
+sys 0.00
+
+RUN fannkuch aot 6
+real 20.01
+user 19.98
+sys 0.00
+
+RUN fannkuch aot 7
+real 20.01
+user 19.98
+sys 0.00
+
+RUN fannkuch aot 8
+real 19.96
+user 19.93
+sys 0.00
+
+RUN fannkuch aot 9
+real 20.05
+user 20.02
+sys 0.00
+
+RUN fannkuch aot 10
+real 20.02
+user 19.99
+sys 0.00
+
+RUN fannkuch aot 11
+real 20.03
+user 20.00
+sys 0.00
+
+RUN fannkuch aot 12
+real 19.95
+user 19.91
+sys 0.00
+
+RUN fannkuch aot 13
+real 20.59
+user 20.56
+sys 0.00
+
+RUN fannkuch aot 14
+real 20.03
+user 20.00
+sys 0.00
+
+RUN fannkuch aot 15
+real 19.91
+user 19.88
+sys 0.00
+
+RUN fannkuch aot 16
+real 20.08
+user 20.05
+sys 0.00
+
+RUN fannkuch aot 17
+real 20.00
+user 19.97
+sys 0.00
+
+RUN fannkuch aot 18
+real 20.03
+user 19.99
+sys 0.00
+
+RUN fannkuch aot 19
+real 20.05
+user 20.02
+sys 0.00
+
+RUN fannkuch aot 20
+real 20.07
+user 20.04
+sys 0.00
+
+RUN fannkuch cor 1
+real 21.88
+user 21.84
+sys 0.00
+
+RUN fannkuch cor 2
+real 22.04
+user 22.01
+sys 0.00
+
+RUN fannkuch cor 3
+real 21.89
+user 21.85
+sys 0.00
+
+RUN fannkuch cor 4
+real 21.89
+user 21.85
+sys 0.00
+
+RUN fannkuch cor 5
+real 21.92
+user 21.88
+sys 0.00
+
+RUN fannkuch cor 6
+real 21.95
+user 21.92
+sys 0.00
+
+RUN fannkuch cor 7
+real 21.91
+user 21.87
+sys 0.00
+
+RUN fannkuch cor 8
+real 21.91
+user 21.88
+sys 0.00
+
+RUN fannkuch cor 9
+real 21.91
+user 21.87
+sys 0.00
+
+RUN fannkuch cor 10
+real 22.07
+user 22.04
+sys 0.00
+
+RUN fannkuch cor 11
+real 21.91
+user 21.87
+sys 0.00
+
+RUN fannkuch cor 12
+real 22.09
+user 22.05
+sys 0.00
+
+RUN fannkuch cor 13
+real 21.83
+user 21.80
+sys 0.00
+
+RUN fannkuch cor 14
+real 21.88
+user 21.84
+sys 0.00
+
+RUN fannkuch cor 15
+real 21.92
+user 21.89
+sys 0.00
+
+RUN fannkuch cor 16
+real 21.87
+user 21.84
+sys 0.00
+
+RUN fannkuch cor 17
+real 21.86
+user 21.82
+sys 0.00
+
+RUN fannkuch cor 18
+real 21.86
+user 21.82
+sys 0.00
+
+RUN fannkuch cor 19
+real 21.87
+user 21.84
+sys 0.00
+
+RUN fannkuch cor 20
+real 21.85
+user 21.81
+sys 0.00
+
+RUN fannkuch trm 1
+real 33.46
+user 33.40
+sys 0.00
+
+RUN fannkuch trm 2
+real 33.46
+user 33.40
+sys 0.00
+
+RUN fannkuch trm 3
+real 33.47
+user 33.41
+sys 0.00
+
+RUN fannkuch trm 4
+real 33.48
+user 33.43
+sys 0.00
+
+RUN fannkuch trm 5
+real 33.50
+user 33.45
+sys 0.00
+
+RUN fannkuch trm 6
+real 33.45
+user 33.39
+sys 0.00
+
+RUN fannkuch trm 7
+real 33.62
+user 33.57
+sys 0.00
+
+RUN fannkuch trm 8
+real 33.38
+user 33.32
+sys 0.00
+
+RUN fannkuch trm 9
+real 33.40
+user 33.34
+sys 0.00
+
+RUN fannkuch trm 10
+real 33.40
+user 33.35
+sys 0.00
+
+RUN fannkuch trm 11
+real 33.39
+user 33.32
+sys 0.00
+
+RUN fannkuch trm 12
+real 33.44
+user 33.38
+sys 0.00
+
+RUN fannkuch trm 13
+real 33.42
+user 33.36
+sys 0.00
+
+RUN fannkuch trm 14
+real 33.50
+user 33.45
+sys 0.00
+
+RUN fannkuch trm 15
+real 33.44
+user 33.37
+sys 0.00
+
+RUN fannkuch trm 16
+real 33.43
+user 33.38
+sys 0.00
+
+RUN fannkuch trm 17
+real 33.49
+user 33.44
+sys 0.00
+
+RUN fannkuch trm 18
+real 33.49
+user 33.44
+sys 0.00
+
+RUN fannkuch trm 19
+real 33.44
+user 33.38
+sys 0.00
+
+RUN fannkuch trm 20
+real 33.41
+user 33.36
+sys 0.00
+
+RUN fasta jit 1
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 2
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 3
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 4
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 5
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 6
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 7
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 8
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 9
+real 1.09
+user 1.08
+sys 0.00
+
+RUN fasta jit 10
+real 1.08
+user 1.08
+sys 0.00
+
+RUN fasta jit 11
+real 1.08
+user 1.08
+sys 0.00
+
+RUN fasta jit 12
+real 1.07
+user 1.07
+sys 0.00
+
+RUN fasta jit 13
+real 1.08
+user 1.08
+sys 0.00
+
+RUN fasta jit 14
+real 1.07
+user 1.07
+sys 0.00
+
+RUN fasta jit 15
+real 1.07
+user 1.07
+sys 0.00
+
+RUN fasta jit 16
+real 1.07
+user 1.07
+sys 0.00
+
+RUN fasta jit 17
+real 1.08
+user 1.08
+sys 0.00
+
+RUN fasta jit 18
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jit 19
+real 1.07
+user 1.07
+sys 0.00
+
+RUN fasta jit 20
+real 1.08
+user 1.07
+sys 0.00
+
+RUN fasta jof 1
+real 3.01
+user 3.00
+sys 0.00
+
+RUN fasta jof 2
+real 3.01
+user 3.01
+sys 0.00
+
+RUN fasta jof 3
+real 3.00
+user 3.00
+sys 0.00
+
+RUN fasta jof 4
+real 3.01
+user 3.00
+sys 0.00
+
+RUN fasta jof 5
+real 3.02
+user 3.01
+sys 0.00
+
+RUN fasta jof 6
+real 3.01
+user 3.01
+sys 0.00
+
+RUN fasta jof 7
+real 3.02
+user 3.01
+sys 0.00
+
+RUN fasta jof 8
+real 3.02
+user 3.01
+sys 0.00
+
+RUN fasta jof 9
+real 3.01
+user 3.00
+sys 0.00
+
+RUN fasta jof 10
+real 3.01
+user 3.01
+sys 0.00
+
+RUN fasta jof 11
+real 3.00
+user 3.00
+sys 0.00
+
+RUN fasta jof 12
+real 3.08
+user 3.07
+sys 0.00
+
+RUN fasta jof 13
+real 3.01
+user 3.00
+sys 0.00
+
+RUN fasta jof 14
+real 3.02
+user 3.01
+sys 0.00
+
+RUN fasta jof 15
+real 3.04
+user 3.03
+sys 0.00
+
+RUN fasta jof 16
+real 3.01
+user 3.01
+sys 0.00
+
+RUN fasta jof 17
+real 3.00
+user 3.00
+sys 0.00
+
+RUN fasta jof 18
+real 3.02
+user 3.02
+sys 0.00
+
+RUN fasta jof 19
+real 3.01
+user 3.00
+sys 0.00
+
+RUN fasta jof 20
+real 3.01
+user 3.01
+sys 0.00
+
+RUN fasta lua 1
+real 5.06
+user 5.04
+sys 0.00
+
+RUN fasta lua 2
+real 5.02
+user 5.01
+sys 0.00
+
+RUN fasta lua 3
+real 5.09
+user 5.08
+sys 0.00
+
+RUN fasta lua 4
+real 5.05
+user 5.04
+sys 0.00
+
+RUN fasta lua 5
+real 5.04
+user 5.02
+sys 0.00
+
+RUN fasta lua 6
+real 5.09
+user 5.08
+sys 0.00
+
+RUN fasta lua 7
+real 5.03
+user 5.02
+sys 0.00
+
+RUN fasta lua 8
+real 5.11
+user 5.10
+sys 0.00
+
+RUN fasta lua 9
+real 5.13
+user 5.12
+sys 0.00
+
+RUN fasta lua 10
+real 5.02
+user 5.01
+sys 0.00
+
+RUN fasta lua 11
+real 5.03
+user 5.01
+sys 0.00
+
+RUN fasta lua 12
+real 5.08
+user 5.07
+sys 0.00
+
+RUN fasta lua 13
+real 5.06
+user 5.05
+sys 0.00
+
+RUN fasta lua 14
+real 5.03
+user 5.02
+sys 0.00
+
+RUN fasta lua 15
+real 5.03
+user 5.02
+sys 0.00
+
+RUN fasta lua 16
+real 5.04
+user 5.03
+sys 0.00
+
+RUN fasta lua 17
+real 5.04
+user 5.03
+sys 0.00
+
+RUN fasta lua 18
+real 5.00
+user 4.99
+sys 0.00
+
+RUN fasta lua 19
+real 5.03
+user 5.02
+sys 0.00
+
+RUN fasta lua 20
+real 5.05
+user 5.04
+sys 0.00
+
+RUN fasta lsw 1
+real 5.33
+user 5.32
+sys 0.00
+
+RUN fasta lsw 2
+real 5.30
+user 5.29
+sys 0.00
+
+RUN fasta lsw 3
+real 5.29
+user 5.27
+sys 0.00
+
+RUN fasta lsw 4
+real 5.31
+user 5.30
+sys 0.00
+
+RUN fasta lsw 5
+real 5.31
+user 5.30
+sys 0.00
+
+RUN fasta lsw 6
+real 5.32
+user 5.31
+sys 0.00
+
+RUN fasta lsw 7
+real 5.33
+user 5.32
+sys 0.00
+
+RUN fasta lsw 8
+real 5.35
+user 5.34
+sys 0.00
+
+RUN fasta lsw 9
+real 5.32
+user 5.30
+sys 0.00
+
+RUN fasta lsw 10
+real 5.31
+user 5.30
+sys 0.00
+
+RUN fasta lsw 11
+real 5.19
+user 5.18
+sys 0.00
+
+RUN fasta lsw 12
+real 5.33
+user 5.31
+sys 0.00
+
+RUN fasta lsw 13
+real 5.33
+user 5.32
+sys 0.00
+
+RUN fasta lsw 14
+real 5.33
+user 5.32
+sys 0.00
+
+RUN fasta lsw 15
+real 5.35
+user 5.34
+sys 0.00
+
+RUN fasta lsw 16
+real 5.33
+user 5.32
+sys 0.00
+
+RUN fasta lsw 17
+real 5.35
+user 5.34
+sys 0.00
+
+RUN fasta lsw 18
+real 5.34
+user 5.33
+sys 0.00
+
+RUN fasta lsw 19
+real 5.30
+user 5.29
+sys 0.00
+
+RUN fasta lsw 20
+real 5.33
+user 5.32
+sys 0.00
+
+RUN fasta aot 1
+real 3.69
+user 3.69
+sys 0.00
+
+RUN fasta aot 2
+real 3.73
+user 3.72
+sys 0.00
+
+RUN fasta aot 3
+real 3.71
+user 3.70
+sys 0.00
+
+RUN fasta aot 4
+real 3.74
+user 3.73
+sys 0.00
+
+RUN fasta aot 5
+real 3.78
+user 3.77
+sys 0.00
+
+RUN fasta aot 6
+real 3.84
+user 3.83
+sys 0.00
+
+RUN fasta aot 7
+real 3.73
+user 3.72
+sys 0.00
+
+RUN fasta aot 8
+real 3.73
+user 3.72
+sys 0.00
+
+RUN fasta aot 9
+real 3.78
+user 3.77
+sys 0.00
+
+RUN fasta aot 10
+real 3.70
+user 3.69
+sys 0.00
+
+RUN fasta aot 11
+real 3.71
+user 3.71
+sys 0.00
+
+RUN fasta aot 12
+real 3.90
+user 3.89
+sys 0.00
+
+RUN fasta aot 13
+real 3.83
+user 3.82
+sys 0.00
+
+RUN fasta aot 14
+real 3.70
+user 3.69
+sys 0.00
+
+RUN fasta aot 15
+real 3.68
+user 3.67
+sys 0.00
+
+RUN fasta aot 16
+real 3.88
+user 3.87
+sys 0.00
+
+RUN fasta aot 17
+real 3.69
+user 3.68
+sys 0.00
+
+RUN fasta aot 18
+real 3.71
+user 3.70
+sys 0.00
+
+RUN fasta aot 19
+real 3.71
+user 3.71
+sys 0.00
+
+RUN fasta aot 20
+real 3.75
+user 3.74
+sys 0.00
+
+RUN fasta cor 1
+real 3.79
+user 3.79
+sys 0.00
+
+RUN fasta cor 2
+real 3.81
+user 3.80
+sys 0.00
+
+RUN fasta cor 3
+real 3.80
+user 3.79
+sys 0.00
+
+RUN fasta cor 4
+real 3.82
+user 3.82
+sys 0.00
+
+RUN fasta cor 5
+real 3.82
+user 3.81
+sys 0.00
+
+RUN fasta cor 6
+real 3.81
+user 3.80
+sys 0.00
+
+RUN fasta cor 7
+real 3.83
+user 3.82
+sys 0.00
+
+RUN fasta cor 8
+real 3.85
+user 3.85
+sys 0.00
+
+RUN fasta cor 9
+real 3.83
+user 3.82
+sys 0.00
+
+RUN fasta cor 10
+real 3.81
+user 3.80
+sys 0.00
+
+RUN fasta cor 11
+real 3.82
+user 3.81
+sys 0.00
+
+RUN fasta cor 12
+real 3.80
+user 3.79
+sys 0.00
+
+RUN fasta cor 13
+real 3.79
+user 3.79
+sys 0.00
+
+RUN fasta cor 14
+real 3.82
+user 3.82
+sys 0.00
+
+RUN fasta cor 15
+real 3.81
+user 3.80
+sys 0.00
+
+RUN fasta cor 16
+real 3.82
+user 3.81
+sys 0.00
+
+RUN fasta cor 17
+real 3.83
+user 3.82
+sys 0.00
+
+RUN fasta cor 18
+real 3.88
+user 3.87
+sys 0.00
+
+RUN fasta cor 19
+real 4.20
+user 4.19
+sys 0.00
+
+RUN fasta cor 20
+real 3.88
+user 3.88
+sys 0.00
+
+RUN fasta trm 1
+real 4.19
+user 4.18
+sys 0.00
+
+RUN fasta trm 2
+real 4.21
+user 4.20
+sys 0.00
+
+RUN fasta trm 3
+real 4.15
+user 4.15
+sys 0.00
+
+RUN fasta trm 4
+real 4.17
+user 4.16
+sys 0.00
+
+RUN fasta trm 5
+real 4.24
+user 4.23
+sys 0.00
+
+RUN fasta trm 6
+real 4.27
+user 4.26
+sys 0.00
+
+RUN fasta trm 7
+real 4.17
+user 4.16
+sys 0.00
+
+RUN fasta trm 8
+real 4.16
+user 4.15
+sys 0.00
+
+RUN fasta trm 9
+real 4.15
+user 4.14
+sys 0.00
+
+RUN fasta trm 10
+real 4.20
+user 4.19
+sys 0.00
+
+RUN fasta trm 11
+real 4.49
+user 4.48
+sys 0.00
+
+RUN fasta trm 12
+real 4.20
+user 4.18
+sys 0.00
+
+RUN fasta trm 13
+real 4.19
+user 4.19
+sys 0.00
+
+RUN fasta trm 14
+real 4.16
+user 4.15
+sys 0.00
+
+RUN fasta trm 15
+real 4.18
+user 4.17
+sys 0.00
+
+RUN fasta trm 16
+real 4.19
+user 4.18
+sys 0.00
+
+RUN fasta trm 17
+real 4.18
+user 4.17
+sys 0.00
+
+RUN fasta trm 18
+real 4.26
+user 4.25
+sys 0.00
+
+RUN fasta trm 19
+real 4.19
+user 4.18
+sys 0.00
+
+RUN fasta trm 20
+real 4.18
+user 4.17
+sys 0.00
+
+RUN knucleotide jit 1
+real 1.27
+user 1.17
+sys 0.02
+
+RUN knucleotide jit 2
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 3
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 4
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 5
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 6
+real 1.17
+user 1.13
+sys 0.02
+
+RUN knucleotide jit 7
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 8
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 9
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 10
+real 1.17
+user 1.15
+sys 0.02
+
+RUN knucleotide jit 11
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 12
+real 1.16
+user 1.13
+sys 0.02
+
+RUN knucleotide jit 13
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 14
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 15
+real 1.17
+user 1.14
+sys 0.01
+
+RUN knucleotide jit 16
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jit 17
+real 1.19
+user 1.15
+sys 0.02
+
+RUN knucleotide jit 18
+real 1.18
+user 1.15
+sys 0.02
+
+RUN knucleotide jit 19
+real 1.17
+user 1.13
+sys 0.03
+
+RUN knucleotide jit 20
+real 1.17
+user 1.14
+sys 0.02
+
+RUN knucleotide jof 1
+real 2.28
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 2
+real 2.26
+user 2.23
+sys 0.02
+
+RUN knucleotide jof 3
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 4
+real 2.28
+user 2.25
+sys 0.02
+
+RUN knucleotide jof 5
+real 2.30
+user 2.26
+sys 0.03
+
+RUN knucleotide jof 6
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 7
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 8
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 9
+real 2.28
+user 2.25
+sys 0.02
+
+RUN knucleotide jof 10
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 11
+real 2.28
+user 2.25
+sys 0.02
+
+RUN knucleotide jof 12
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 13
+real 2.29
+user 2.25
+sys 0.02
+
+RUN knucleotide jof 14
+real 2.27
+user 2.24
+sys 0.03
+
+RUN knucleotide jof 15
+real 2.28
+user 2.25
+sys 0.02
+
+RUN knucleotide jof 16
+real 2.26
+user 2.23
+sys 0.02
+
+RUN knucleotide jof 17
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 18
+real 2.27
+user 2.24
+sys 0.02
+
+RUN knucleotide jof 19
+real 2.26
+user 2.23
+sys 0.02
+
+RUN knucleotide jof 20
+real 2.31
+user 2.28
+sys 0.02
+
+RUN knucleotide lua 1
+real 4.12
+user 4.09
+sys 0.02
+
+RUN knucleotide lua 2
+real 4.12
+user 4.10
+sys 0.01
+
+RUN knucleotide lua 3
+real 4.13
+user 4.10
+sys 0.01
+
+RUN knucleotide lua 4
+real 4.09
+user 4.05
+sys 0.03
+
+RUN knucleotide lua 5
+real 4.17
+user 4.14
+sys 0.02
+
+RUN knucleotide lua 6
+real 4.21
+user 4.18
+sys 0.02
+
+RUN knucleotide lua 7
+real 4.27
+user 4.23
+sys 0.02
+
+RUN knucleotide lua 8
+real 4.19
+user 4.15
+sys 0.02
+
+RUN knucleotide lua 9
+real 4.11
+user 4.08
+sys 0.02
+
+RUN knucleotide lua 10
+real 4.13
+user 4.10
+sys 0.02
+
+RUN knucleotide lua 11
+real 4.18
+user 4.14
+sys 0.02
+
+RUN knucleotide lua 12
+real 4.28
+user 4.24
+sys 0.02
+
+RUN knucleotide lua 13
+real 4.19
+user 4.17
+sys 0.01
+
+RUN knucleotide lua 14
+real 4.10
+user 4.06
+sys 0.02
+
+RUN knucleotide lua 15
+real 4.10
+user 4.07
+sys 0.01
+
+RUN knucleotide lua 16
+real 4.07
+user 4.03
+sys 0.02
+
+RUN knucleotide lua 17
+real 4.06
+user 4.02
+sys 0.02
+
+RUN knucleotide lua 18
+real 4.11
+user 4.08
+sys 0.02
+
+RUN knucleotide lua 19
+real 4.09
+user 4.05
+sys 0.02
+
+RUN knucleotide lua 20
+real 4.18
+user 4.15
+sys 0.01
+
+RUN knucleotide lsw 1
+real 4.10
+user 4.07
+sys 0.02
+
+RUN knucleotide lsw 2
+real 4.11
+user 4.07
+sys 0.02
+
+RUN knucleotide lsw 3
+real 4.10
+user 4.07
+sys 0.02
+
+RUN knucleotide lsw 4
+real 4.22
+user 4.19
+sys 0.02
+
+RUN knucleotide lsw 5
+real 4.10
+user 4.07
+sys 0.02
+
+RUN knucleotide lsw 6
+real 4.08
+user 4.04
+sys 0.02
+
+RUN knucleotide lsw 7
+real 4.41
+user 4.38
+sys 0.02
+
+RUN knucleotide lsw 8
+real 4.18
+user 4.14
+sys 0.02
+
+RUN knucleotide lsw 9
+real 4.08
+user 4.05
+sys 0.01
+
+RUN knucleotide lsw 10
+real 4.15
+user 4.11
+sys 0.02
+
+RUN knucleotide lsw 11
+real 4.08
+user 4.05
+sys 0.01
+
+RUN knucleotide lsw 12
+real 4.12
+user 4.08
+sys 0.03
+
+RUN knucleotide lsw 13
+real 4.27
+user 4.23
+sys 0.02
+
+RUN knucleotide lsw 14
+real 4.11
+user 4.08
+sys 0.02
+
+RUN knucleotide lsw 15
+real 4.12
+user 4.09
+sys 0.02
+
+RUN knucleotide lsw 16
+real 4.13
+user 4.09
+sys 0.02
+
+RUN knucleotide lsw 17
+real 4.11
+user 4.08
+sys 0.01
+
+RUN knucleotide lsw 18
+real 4.12
+user 4.09
+sys 0.02
+
+RUN knucleotide lsw 19
+real 4.18
+user 4.15
+sys 0.02
+
+RUN knucleotide lsw 20
+real 4.12
+user 4.08
+sys 0.02
+
+RUN knucleotide aot 1
+real 3.46
+user 3.42
+sys 0.02
+
+RUN knucleotide aot 2
+real 3.33
+user 3.30
+sys 0.02
+
+RUN knucleotide aot 3
+real 3.36
+user 3.33
+sys 0.02
+
+RUN knucleotide aot 4
+real 3.36
+user 3.33
+sys 0.01
+
+RUN knucleotide aot 5
+real 3.50
+user 3.47
+sys 0.02
+
+RUN knucleotide aot 6
+real 3.38
+user 3.35
+sys 0.01
+
+RUN knucleotide aot 7
+real 3.40
+user 3.37
+sys 0.02
+
+RUN knucleotide aot 8
+real 3.35
+user 3.31
+sys 0.02
+
+RUN knucleotide aot 9
+real 3.55
+user 3.52
+sys 0.02
+
+RUN knucleotide aot 10
+real 3.34
+user 3.31
+sys 0.02
+
+RUN knucleotide aot 11
+real 3.44
+user 3.41
+sys 0.02
+
+RUN knucleotide aot 12
+real 3.33
+user 3.30
+sys 0.02
+
+RUN knucleotide aot 13
+real 3.32
+user 3.29
+sys 0.01
+
+RUN knucleotide aot 14
+real 3.44
+user 3.41
+sys 0.02
+
+RUN knucleotide aot 15
+real 3.36
+user 3.33
+sys 0.02
+
+RUN knucleotide aot 16
+real 3.37
+user 3.34
+sys 0.01
+
+RUN knucleotide aot 17
+real 3.36
+user 3.32
+sys 0.02
+
+RUN knucleotide aot 18
+real 3.35
+user 3.32
+sys 0.02
+
+RUN knucleotide aot 19
+real 3.50
+user 3.47
+sys 0.01
+
+RUN knucleotide aot 20
+real 3.35
+user 3.31
+sys 0.02
+
+RUN knucleotide cor 1
+real 3.45
+user 3.42
+sys 0.02
+
+RUN knucleotide cor 2
+real 3.46
+user 3.42
+sys 0.02
+
+RUN knucleotide cor 3
+real 3.39
+user 3.35
+sys 0.02
+
+RUN knucleotide cor 4
+real 3.47
+user 3.44
+sys 0.02
+
+RUN knucleotide cor 5
+real 3.43
+user 3.40
+sys 0.01
+
+RUN knucleotide cor 6
+real 3.43
+user 3.40
+sys 0.02
+
+RUN knucleotide cor 7
+real 3.56
+user 3.53
+sys 0.02
+
+RUN knucleotide cor 8
+real 3.40
+user 3.37
+sys 0.01
+
+RUN knucleotide cor 9
+real 3.41
+user 3.38
+sys 0.02
+
+RUN knucleotide cor 10
+real 3.45
+user 3.41
+sys 0.02
+
+RUN knucleotide cor 11
+real 3.46
+user 3.43
+sys 0.01
+
+RUN knucleotide cor 12
+real 3.40
+user 3.37
+sys 0.02
+
+RUN knucleotide cor 13
+real 3.37
+user 3.34
+sys 0.02
+
+RUN knucleotide cor 14
+real 3.44
+user 3.41
+sys 0.01
+
+RUN knucleotide cor 15
+real 3.40
+user 3.37
+sys 0.02
+
+RUN knucleotide cor 16
+real 3.40
+user 3.37
+sys 0.01
+
+RUN knucleotide cor 17
+real 3.44
+user 3.40
+sys 0.02
+
+RUN knucleotide cor 18
+real 3.39
+user 3.36
+sys 0.01
+
+RUN knucleotide cor 19
+real 3.45
+user 3.42
+sys 0.02
+
+RUN knucleotide cor 20
+real 3.52
+user 3.49
+sys 0.02
+
+RUN knucleotide trm 1
+real 3.73
+user 3.70
+sys 0.02
+
+RUN knucleotide trm 2
+real 3.70
+user 3.66
+sys 0.02
+
+RUN knucleotide trm 3
+real 3.72
+user 3.68
+sys 0.02
+
+RUN knucleotide trm 4
+real 3.74
+user 3.70
+sys 0.02
+
+RUN knucleotide trm 5
+real 3.68
+user 3.64
+sys 0.03
+
+RUN knucleotide trm 6
+real 3.65
+user 3.62
+sys 0.02
+
+RUN knucleotide trm 7
+real 3.66
+user 3.63
+sys 0.01
+
+RUN knucleotide trm 8
+real 3.69
+user 3.65
+sys 0.02
+
+RUN knucleotide trm 9
+real 3.70
+user 3.66
+sys 0.02
+
+RUN knucleotide trm 10
+real 3.69
+user 3.66
+sys 0.02
+
+RUN knucleotide trm 11
+real 3.68
+user 3.65
+sys 0.01
+
+RUN knucleotide trm 12
+real 3.68
+user 3.65
+sys 0.01
+
+RUN knucleotide trm 13
+real 3.68
+user 3.65
+sys 0.01
+
+RUN knucleotide trm 14
+real 3.68
+user 3.65
+sys 0.02
+
+RUN knucleotide trm 15
+real 3.81
+user 3.77
+sys 0.02
+
+RUN knucleotide trm 16
+real 3.69
+user 3.66
+sys 0.02
+
+RUN knucleotide trm 17
+real 3.71
+user 3.67
+sys 0.02
+
+RUN knucleotide trm 18
+real 3.70
+user 3.66
+sys 0.02
+
+RUN knucleotide trm 19
+real 3.70
+user 3.66
+sys 0.02
+
+RUN knucleotide trm 20
+real 3.81
+user 3.78
+sys 0.02
+
+RUN mandelbrot jit 1
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 2
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 3
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 4
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 5
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 6
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 7
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 8
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 9
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 10
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 11
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 12
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 13
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 14
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 15
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 16
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 17
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 18
+real 1.78
+user 1.78
+sys 0.00
+
+RUN mandelbrot jit 19
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jit 20
+real 1.78
+user 1.77
+sys 0.00
+
+RUN mandelbrot jof 1
+real 9.33
+user 9.32
+sys 0.00
+
+RUN mandelbrot jof 2
+real 9.36
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 3
+real 9.44
+user 9.41
+sys 0.00
+
+RUN mandelbrot jof 4
+real 9.37
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 5
+real 9.34
+user 9.33
+sys 0.00
+
+RUN mandelbrot jof 6
+real 9.35
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 7
+real 9.35
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 8
+real 9.36
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 9
+real 9.37
+user 9.35
+sys 0.00
+
+RUN mandelbrot jof 10
+real 9.36
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 11
+real 9.36
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 12
+real 9.36
+user 9.35
+sys 0.00
+
+RUN mandelbrot jof 13
+real 9.36
+user 9.33
+sys 0.00
+
+RUN mandelbrot jof 14
+real 9.33
+user 9.31
+sys 0.00
+
+RUN mandelbrot jof 15
+real 9.35
+user 9.33
+sys 0.00
+
+RUN mandelbrot jof 16
+real 9.36
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 17
+real 9.35
+user 9.33
+sys 0.00
+
+RUN mandelbrot jof 18
+real 9.35
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 19
+real 9.36
+user 9.34
+sys 0.00
+
+RUN mandelbrot jof 20
+real 9.35
+user 9.34
+sys 0.00
+
+RUN mandelbrot lua 1
+real 16.28
+user 16.25
+sys 0.00
+
+RUN mandelbrot lua 2
+real 16.30
+user 16.27
+sys 0.00
+
+RUN mandelbrot lua 3
+real 16.27
+user 16.23
+sys 0.00
+
+RUN mandelbrot lua 4
+real 16.26
+user 16.24
+sys 0.00
+
+RUN mandelbrot lua 5
+real 16.26
+user 16.23
+sys 0.00
+
+RUN mandelbrot lua 6
+real 16.26
+user 16.23
+sys 0.00
+
+RUN mandelbrot lua 7
+real 16.27
+user 16.24
+sys 0.00
+
+RUN mandelbrot lua 8
+real 16.30
+user 16.27
+sys 0.00
+
+RUN mandelbrot lua 9
+real 16.19
+user 16.16
+sys 0.00
+
+RUN mandelbrot lua 10
+real 16.28
+user 16.25
+sys 0.00
+
+RUN mandelbrot lua 11
+real 16.24
+user 16.22
+sys 0.00
+
+RUN mandelbrot lua 12
+real 16.31
+user 16.28
+sys 0.00
+
+RUN mandelbrot lua 13
+real 16.27
+user 16.25
+sys 0.00
+
+RUN mandelbrot lua 14
+real 16.29
+user 16.27
+sys 0.00
+
+RUN mandelbrot lua 15
+real 16.28
+user 16.26
+sys 0.00
+
+RUN mandelbrot lua 16
+real 16.31
+user 16.28
+sys 0.00
+
+RUN mandelbrot lua 17
+real 16.29
+user 16.26
+sys 0.00
+
+RUN mandelbrot lua 18
+real 16.30
+user 16.28
+sys 0.00
+
+RUN mandelbrot lua 19
+real 16.24
+user 16.22
+sys 0.00
+
+RUN mandelbrot lua 20
+real 16.20
+user 16.18
+sys 0.00
+
+RUN mandelbrot lsw 1
+real 18.38
+user 18.35
+sys 0.00
+
+RUN mandelbrot lsw 2
+real 18.41
+user 18.38
+sys 0.00
+
+RUN mandelbrot lsw 3
+real 18.40
+user 18.37
+sys 0.00
+
+RUN mandelbrot lsw 4
+real 18.32
+user 18.29
+sys 0.00
+
+RUN mandelbrot lsw 5
+real 18.41
+user 18.38
+sys 0.00
+
+RUN mandelbrot lsw 6
+real 18.32
+user 18.28
+sys 0.00
+
+RUN mandelbrot lsw 7
+real 18.34
+user 18.31
+sys 0.00
+
+RUN mandelbrot lsw 8
+real 18.36
+user 18.33
+sys 0.00
+
+RUN mandelbrot lsw 9
+real 18.38
+user 18.35
+sys 0.00
+
+RUN mandelbrot lsw 10
+real 18.37
+user 18.34
+sys 0.00
+
+RUN mandelbrot lsw 11
+real 18.43
+user 18.40
+sys 0.00
+
+RUN mandelbrot lsw 12
+real 18.41
+user 18.38
+sys 0.00
+
+RUN mandelbrot lsw 13
+real 18.38
+user 18.35
+sys 0.00
+
+RUN mandelbrot lsw 14
+real 18.40
+user 18.36
+sys 0.00
+
+RUN mandelbrot lsw 15
+real 18.35
+user 18.32
+sys 0.00
+
+RUN mandelbrot lsw 16
+real 18.32
+user 18.29
+sys 0.00
+
+RUN mandelbrot lsw 17
+real 18.32
+user 18.28
+sys 0.00
+
+RUN mandelbrot lsw 18
+real 18.30
+user 18.26
+sys 0.00
+
+RUN mandelbrot lsw 19
+real 18.32
+user 18.29
+sys 0.00
+
+RUN mandelbrot lsw 20
+real 18.37
+user 18.34
+sys 0.00
+
+RUN mandelbrot aot 1
+real 7.24
+user 7.23
+sys 0.00
+
+RUN mandelbrot aot 2
+real 7.26
+user 7.24
+sys 0.00
+
+RUN mandelbrot aot 3
+real 7.23
+user 7.22
+sys 0.00
+
+RUN mandelbrot aot 4
+real 7.23
+user 7.22
+sys 0.00
+
+RUN mandelbrot aot 5
+real 7.22
+user 7.20
+sys 0.00
+
+RUN mandelbrot aot 6
+real 7.25
+user 7.23
+sys 0.00
+
+RUN mandelbrot aot 7
+real 7.20
+user 7.19
+sys 0.00
+
+RUN mandelbrot aot 8
+real 7.19
+user 7.18
+sys 0.00
+
+RUN mandelbrot aot 9
+real 7.22
+user 7.21
+sys 0.00
+
+RUN mandelbrot aot 10
+real 7.22
+user 7.21
+sys 0.00
+
+RUN mandelbrot aot 11
+real 7.23
+user 7.22
+sys 0.00
+
+RUN mandelbrot aot 12
+real 7.22
+user 7.21
+sys 0.00
+
+RUN mandelbrot aot 13
+real 7.20
+user 7.19
+sys 0.00
+
+RUN mandelbrot aot 14
+real 7.22
+user 7.20
+sys 0.00
+
+RUN mandelbrot aot 15
+real 7.22
+user 7.21
+sys 0.00
+
+RUN mandelbrot aot 16
+real 7.23
+user 7.22
+sys 0.00
+
+RUN mandelbrot aot 17
+real 7.22
+user 7.21
+sys 0.00
+
+RUN mandelbrot aot 18
+real 7.20
+user 7.19
+sys 0.00
+
+RUN mandelbrot aot 19
+real 7.20
+user 7.18
+sys 0.00
+
+RUN mandelbrot aot 20
+real 7.26
+user 7.25
+sys 0.00
+
+RUN mandelbrot cor 1
+real 6.15
+user 6.14
+sys 0.00
+
+RUN mandelbrot cor 2
+real 6.14
+user 6.13
+sys 0.00
+
+RUN mandelbrot cor 3
+real 6.17
+user 6.16
+sys 0.00
+
+RUN mandelbrot cor 4
+real 6.12
+user 6.10
+sys 0.00
+
+RUN mandelbrot cor 5
+real 6.17
+user 6.16
+sys 0.00
+
+RUN mandelbrot cor 6
+real 6.12
+user 6.11
+sys 0.00
+
+RUN mandelbrot cor 7
+real 6.16
+user 6.15
+sys 0.00
+
+RUN mandelbrot cor 8
+real 6.16
+user 6.14
+sys 0.00
+
+RUN mandelbrot cor 9
+real 6.13
+user 6.12
+sys 0.00
+
+RUN mandelbrot cor 10
+real 6.11
+user 6.10
+sys 0.00
+
+RUN mandelbrot cor 11
+real 6.48
+user 6.47
+sys 0.00
+
+RUN mandelbrot cor 12
+real 6.12
+user 6.11
+sys 0.00
+
+RUN mandelbrot cor 13
+real 6.18
+user 6.16
+sys 0.00
+
+RUN mandelbrot cor 14
+real 6.16
+user 6.14
+sys 0.00
+
+RUN mandelbrot cor 15
+real 6.12
+user 6.11
+sys 0.00
+
+RUN mandelbrot cor 16
+real 6.14
+user 6.13
+sys 0.00
+
+RUN mandelbrot cor 17
+real 6.16
+user 6.15
+sys 0.00
+
+RUN mandelbrot cor 18
+real 6.19
+user 6.18
+sys 0.00
+
+RUN mandelbrot cor 19
+real 6.19
+user 6.18
+sys 0.00
+
+RUN mandelbrot cor 20
+real 6.19
+user 6.18
+sys 0.00
+
+RUN mandelbrot trm 1
+real 16.46
+user 16.43
+sys 0.00
+
+RUN mandelbrot trm 2
+real 16.41
+user 16.38
+sys 0.00
+
+RUN mandelbrot trm 3
+real 16.35
+user 16.31
+sys 0.00
+
+RUN mandelbrot trm 4
+real 16.35
+user 16.32
+sys 0.00
+
+RUN mandelbrot trm 5
+real 16.35
+user 16.32
+sys 0.00
+
+RUN mandelbrot trm 6
+real 16.35
+user 16.32
+sys 0.00
+
+RUN mandelbrot trm 7
+real 16.42
+user 16.39
+sys 0.00
+
+RUN mandelbrot trm 8
+real 16.63
+user 16.59
+sys 0.00
+
+RUN mandelbrot trm 9
+real 16.42
+user 16.39
+sys 0.00
+
+RUN mandelbrot trm 10
+real 16.42
+user 16.40
+sys 0.00
+
+RUN mandelbrot trm 11
+real 16.42
+user 16.39
+sys 0.00
+
+RUN mandelbrot trm 12
+real 16.43
+user 16.40
+sys 0.00
+
+RUN mandelbrot trm 13
+real 16.43
+user 16.40
+sys 0.00
+
+RUN mandelbrot trm 14
+real 16.41
+user 16.38
+sys 0.00
+
+RUN mandelbrot trm 15
+real 16.42
+user 16.39
+sys 0.00
+
+RUN mandelbrot trm 16
+real 16.41
+user 16.39
+sys 0.00
+
+RUN mandelbrot trm 17
+real 16.41
+user 16.38
+sys 0.00
+
+RUN mandelbrot trm 18
+real 16.40
+user 16.37
+sys 0.00
+
+RUN mandelbrot trm 19
+real 16.39
+user 16.37
+sys 0.00
+
+RUN mandelbrot trm 20
+real 16.35
+user 16.32
+sys 0.00
+
+RUN nbody jit 1
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 2
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 3
+real 1.13
+user 1.12
+sys 0.00
+
+RUN nbody jit 4
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 5
+real 1.12
+user 1.12
+sys 0.00
+
+RUN nbody jit 6
+real 1.13
+user 1.12
+sys 0.00
+
+RUN nbody jit 7
+real 1.13
+user 1.12
+sys 0.00
+
+RUN nbody jit 8
+real 1.14
+user 1.14
+sys 0.00
+
+RUN nbody jit 9
+real 1.15
+user 1.14
+sys 0.00
+
+RUN nbody jit 10
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 11
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 12
+real 1.13
+user 1.12
+sys 0.00
+
+RUN nbody jit 13
+real 1.14
+user 1.14
+sys 0.00
+
+RUN nbody jit 14
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 15
+real 1.12
+user 1.12
+sys 0.00
+
+RUN nbody jit 16
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 17
+real 1.13
+user 1.12
+sys 0.00
+
+RUN nbody jit 18
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 19
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jit 20
+real 1.13
+user 1.13
+sys 0.00
+
+RUN nbody jof 1
+real 8.87
+user 8.85
+sys 0.00
+
+RUN nbody jof 2
+real 8.98
+user 8.97
+sys 0.00
+
+RUN nbody jof 3
+real 8.96
+user 8.95
+sys 0.00
+
+RUN nbody jof 4
+real 8.99
+user 8.97
+sys 0.00
+
+RUN nbody jof 5
+real 8.86
+user 8.85
+sys 0.00
+
+RUN nbody jof 6
+real 8.94
+user 8.92
+sys 0.00
+
+RUN nbody jof 7
+real 8.89
+user 8.87
+sys 0.00
+
+RUN nbody jof 8
+real 8.87
+user 8.85
+sys 0.00
+
+RUN nbody jof 9
+real 9.02
+user 8.99
+sys 0.00
+
+RUN nbody jof 10
+real 9.06
+user 9.04
+sys 0.00
+
+RUN nbody jof 11
+real 8.91
+user 8.89
+sys 0.00
+
+RUN nbody jof 12
+real 8.93
+user 8.92
+sys 0.00
+
+RUN nbody jof 13
+real 8.96
+user 8.95
+sys 0.00
+
+RUN nbody jof 14
+real 8.85
+user 8.83
+sys 0.00
+
+RUN nbody jof 15
+real 8.90
+user 8.89
+sys 0.00
+
+RUN nbody jof 16
+real 8.90
+user 8.88
+sys 0.00
+
+RUN nbody jof 17
+real 8.84
+user 8.82
+sys 0.00
+
+RUN nbody jof 18
+real 8.86
+user 8.84
+sys 0.00
+
+RUN nbody jof 19
+real 8.88
+user 8.87
+sys 0.00
+
+RUN nbody jof 20
+real 8.93
+user 8.91
+sys 0.00
+
+RUN nbody lua 1
+real 17.58
+user 17.55
+sys 0.00
+
+RUN nbody lua 2
+real 18.90
+user 18.87
+sys 0.00
+
+RUN nbody lua 3
+real 17.56
+user 17.53
+sys 0.00
+
+RUN nbody lua 4
+real 20.08
+user 20.05
+sys 0.00
+
+RUN nbody lua 5
+real 17.77
+user 17.74
+sys 0.00
+
+RUN nbody lua 6
+real 17.21
+user 17.18
+sys 0.00
+
+RUN nbody lua 7
+real 17.75
+user 17.72
+sys 0.00
+
+RUN nbody lua 8
+real 18.72
+user 18.69
+sys 0.00
+
+RUN nbody lua 9
+real 19.28
+user 19.24
+sys 0.00
+
+RUN nbody lua 10
+real 19.01
+user 18.98
+sys 0.00
+
+RUN nbody lua 11
+real 18.78
+user 18.75
+sys 0.00
+
+RUN nbody lua 12
+real 17.65
+user 17.62
+sys 0.00
+
+RUN nbody lua 13
+real 17.50
+user 17.47
+sys 0.00
+
+RUN nbody lua 14
+real 17.55
+user 17.52
+sys 0.00
+
+RUN nbody lua 15
+real 18.97
+user 18.94
+sys 0.00
+
+RUN nbody lua 16
+real 17.18
+user 17.15
+sys 0.00
+
+RUN nbody lua 17
+real 19.40
+user 19.37
+sys 0.00
+
+RUN nbody lua 18
+real 17.22
+user 17.19
+sys 0.00
+
+RUN nbody lua 19
+real 17.56
+user 17.53
+sys 0.00
+
+RUN nbody lua 20
+real 18.98
+user 18.95
+sys 0.00
+
+RUN nbody lsw 1
+real 17.32
+user 17.29
+sys 0.00
+
+RUN nbody lsw 2
+real 19.03
+user 18.99
+sys 0.00
+
+RUN nbody lsw 3
+real 17.83
+user 17.80
+sys 0.00
+
+RUN nbody lsw 4
+real 18.54
+user 18.51
+sys 0.00
+
+RUN nbody lsw 5
+real 17.90
+user 17.87
+sys 0.00
+
+RUN nbody lsw 6
+real 17.54
+user 17.51
+sys 0.00
+
+RUN nbody lsw 7
+real 19.02
+user 18.98
+sys 0.00
+
+RUN nbody lsw 8
+real 19.18
+user 19.15
+sys 0.00
+
+RUN nbody lsw 9
+real 17.81
+user 17.78
+sys 0.00
+
+RUN nbody lsw 10
+real 19.06
+user 19.02
+sys 0.00
+
+RUN nbody lsw 11
+real 19.05
+user 19.02
+sys 0.00
+
+RUN nbody lsw 12
+real 19.10
+user 19.07
+sys 0.00
+
+RUN nbody lsw 13
+real 17.91
+user 17.88
+sys 0.00
+
+RUN nbody lsw 14
+real 18.89
+user 18.85
+sys 0.00
+
+RUN nbody lsw 15
+real 18.94
+user 18.91
+sys 0.00
+
+RUN nbody lsw 16
+real 17.87
+user 17.84
+sys 0.00
+
+RUN nbody lsw 17
+real 19.00
+user 18.97
+sys 0.00
+
+RUN nbody lsw 18
+real 17.63
+user 17.60
+sys 0.00
+
+RUN nbody lsw 19
+real 17.71
+user 17.68
+sys 0.00
+
+RUN nbody lsw 20
+real 19.08
+user 19.05
+sys 0.00
+
+RUN nbody aot 1
+real 11.11
+user 11.09
+sys 0.00
+
+RUN nbody aot 2
+real 10.78
+user 10.76
+sys 0.00
+
+RUN nbody aot 3
+real 11.05
+user 11.03
+sys 0.00
+
+RUN nbody aot 4
+real 10.72
+user 10.70
+sys 0.00
+
+RUN nbody aot 5
+real 11.04
+user 11.02
+sys 0.00
+
+RUN nbody aot 6
+real 11.49
+user 11.47
+sys 0.00
+
+RUN nbody aot 7
+real 11.27
+user 11.25
+sys 0.00
+
+RUN nbody aot 8
+real 11.35
+user 11.33
+sys 0.00
+
+RUN nbody aot 9
+real 11.15
+user 11.14
+sys 0.00
+
+RUN nbody aot 10
+real 10.76
+user 10.74
+sys 0.00
+
+RUN nbody aot 11
+real 11.27
+user 11.24
+sys 0.00
+
+RUN nbody aot 12
+real 10.71
+user 10.69
+sys 0.00
+
+RUN nbody aot 13
+real 11.25
+user 11.23
+sys 0.00
+
+RUN nbody aot 14
+real 11.44
+user 11.42
+sys 0.00
+
+RUN nbody aot 15
+real 11.36
+user 11.34
+sys 0.00
+
+RUN nbody aot 16
+real 10.60
+user 10.58
+sys 0.00
+
+RUN nbody aot 17
+real 11.24
+user 11.22
+sys 0.00
+
+RUN nbody aot 18
+real 10.81
+user 10.79
+sys 0.00
+
+RUN nbody aot 19
+real 10.72
+user 10.70
+sys 0.00
+
+RUN nbody aot 20
+real 10.93
+user 10.91
+sys 0.00
+
+RUN nbody cor 1
+real 12.61
+user 12.58
+sys 0.00
+
+RUN nbody cor 2
+real 11.81
+user 11.79
+sys 0.00
+
+RUN nbody cor 3
+real 11.80
+user 11.78
+sys 0.00
+
+RUN nbody cor 4
+real 12.21
+user 12.18
+sys 0.00
+
+RUN nbody cor 5
+real 11.84
+user 11.82
+sys 0.00
+
+RUN nbody cor 6
+real 12.23
+user 12.21
+sys 0.00
+
+RUN nbody cor 7
+real 12.46
+user 12.44
+sys 0.00
+
+RUN nbody cor 8
+real 12.18
+user 12.16
+sys 0.00
+
+RUN nbody cor 9
+real 12.16
+user 12.13
+sys 0.00
+
+RUN nbody cor 10
+real 12.25
+user 12.22
+sys 0.00
+
+RUN nbody cor 11
+real 12.63
+user 12.61
+sys 0.00
+
+RUN nbody cor 12
+real 11.90
+user 11.88
+sys 0.00
+
+RUN nbody cor 13
+real 11.84
+user 11.82
+sys 0.00
+
+RUN nbody cor 14
+real 12.23
+user 12.21
+sys 0.00
+
+RUN nbody cor 15
+real 12.15
+user 12.13
+sys 0.00
+
+RUN nbody cor 16
+real 11.74
+user 11.72
+sys 0.00
+
+RUN nbody cor 17
+real 12.03
+user 12.01
+sys 0.00
+
+RUN nbody cor 18
+real 11.85
+user 11.83
+sys 0.00
+
+RUN nbody cor 19
+real 12.36
+user 12.34
+sys 0.00
+
+RUN nbody cor 20
+real 12.43
+user 12.41
+sys 0.00
+
+RUN nbody trm 1
+real 15.91
+user 15.88
+sys 0.00
+
+RUN nbody trm 2
+real 16.53
+user 16.50
+sys 0.00
+
+RUN nbody trm 3
+real 16.48
+user 16.45
+sys 0.00
+
+RUN nbody trm 4
+real 16.99
+user 16.97
+sys 0.00
+
+RUN nbody trm 5
+real 15.77
+user 15.74
+sys 0.00
+
+RUN nbody trm 6
+real 16.14
+user 16.11
+sys 0.00
+
+RUN nbody trm 7
+real 16.05
+user 16.03
+sys 0.00
+
+RUN nbody trm 8
+real 16.17
+user 16.14
+sys 0.00
+
+RUN nbody trm 9
+real 16.42
+user 16.40
+sys 0.00
+
+RUN nbody trm 10
+real 15.57
+user 15.55
+sys 0.00
+
+RUN nbody trm 11
+real 15.71
+user 15.68
+sys 0.00
+
+RUN nbody trm 12
+real 15.75
+user 15.72
+sys 0.00
+
+RUN nbody trm 13
+real 15.82
+user 15.80
+sys 0.00
+
+RUN nbody trm 14
+real 16.05
+user 16.02
+sys 0.00
+
+RUN nbody trm 15
+real 16.28
+user 16.25
+sys 0.00
+
+RUN nbody trm 16
+real 16.03
+user 16.00
+sys 0.00
+
+RUN nbody trm 17
+real 16.18
+user 16.15
+sys 0.00
+
+RUN nbody trm 18
+real 16.98
+user 16.96
+sys 0.00
+
+RUN nbody trm 19
+real 15.80
+user 15.77
+sys 0.00
+
+RUN nbody trm 20
+real 15.90
+user 15.88
+sys 0.00
+
+RUN spectralnorm jit 1
+real 1.27
+user 1.26
+sys 0.00
+
+RUN spectralnorm jit 2
+real 1.27
+user 1.26
+sys 0.00
+
+RUN spectralnorm jit 3
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 4
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 5
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 6
+real 1.27
+user 1.26
+sys 0.00
+
+RUN spectralnorm jit 7
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 8
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 9
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 10
+real 1.28
+user 1.28
+sys 0.00
+
+RUN spectralnorm jit 11
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 12
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 13
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 14
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 15
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 16
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 17
+real 1.27
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 18
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 19
+real 1.28
+user 1.27
+sys 0.00
+
+RUN spectralnorm jit 20
+real 1.26
+user 1.26
+sys 0.00
+
+RUN spectralnorm jof 1
+real 20.26
+user 20.21
+sys 0.00
+
+RUN spectralnorm jof 2
+real 20.27
+user 20.24
+sys 0.00
+
+RUN spectralnorm jof 3
+real 20.25
+user 20.22
+sys 0.00
+
+RUN spectralnorm jof 4
+real 20.27
+user 20.23
+sys 0.00
+
+RUN spectralnorm jof 5
+real 20.24
+user 20.21
+sys 0.00
+
+RUN spectralnorm jof 6
+real 20.31
+user 20.27
+sys 0.00
+
+RUN spectralnorm jof 7
+real 20.27
+user 20.23
+sys 0.00
+
+RUN spectralnorm jof 8
+real 20.28
+user 20.24
+sys 0.00
+
+RUN spectralnorm jof 9
+real 20.31
+user 20.27
+sys 0.00
+
+RUN spectralnorm jof 10
+real 20.32
+user 20.28
+sys 0.00
+
+RUN spectralnorm jof 11
+real 20.26
+user 20.23
+sys 0.00
+
+RUN spectralnorm jof 12
+real 20.33
+user 20.30
+sys 0.00
+
+RUN spectralnorm jof 13
+real 20.30
+user 20.27
+sys 0.00
+
+RUN spectralnorm jof 14
+real 20.34
+user 20.30
+sys 0.00
+
+RUN spectralnorm jof 15
+real 20.32
+user 20.28
+sys 0.00
+
+RUN spectralnorm jof 16
+real 20.32
+user 20.29
+sys 0.00
+
+RUN spectralnorm jof 17
+real 20.30
+user 20.26
+sys 0.00
+
+RUN spectralnorm jof 18
+real 20.30
+user 20.26
+sys 0.00
+
+RUN spectralnorm jof 19
+real 20.27
+user 20.23
+sys 0.00
+
+RUN spectralnorm jof 20
+real 20.32
+user 20.28
+sys 0.00
+
+RUN spectralnorm lua 1
+real 40.06
+user 39.99
+sys 0.00
+
+RUN spectralnorm lua 2
+real 39.78
+user 39.71
+sys 0.00
+
+RUN spectralnorm lua 3
+real 39.89
+user 39.82
+sys 0.00
+
+RUN spectralnorm lua 4
+real 40.13
+user 40.06
+sys 0.00
+
+RUN spectralnorm lua 5
+real 39.84
+user 39.77
+sys 0.00
+
+RUN spectralnorm lua 6
+real 39.96
+user 39.89
+sys 0.00
+
+RUN spectralnorm lua 7
+real 39.98
+user 39.91
+sys 0.00
+
+RUN spectralnorm lua 8
+real 39.82
+user 39.74
+sys 0.00
+
+RUN spectralnorm lua 9
+real 39.77
+user 39.70
+sys 0.00
+
+RUN spectralnorm lua 10
+real 39.79
+user 39.72
+sys 0.00
+
+RUN spectralnorm lua 11
+real 39.74
+user 39.67
+sys 0.00
+
+RUN spectralnorm lua 12
+real 39.78
+user 39.70
+sys 0.00
+
+RUN spectralnorm lua 13
+real 39.81
+user 39.73
+sys 0.00
+
+RUN spectralnorm lua 14
+real 39.82
+user 39.75
+sys 0.00
+
+RUN spectralnorm lua 15
+real 39.78
+user 39.70
+sys 0.00
+
+RUN spectralnorm lua 16
+real 39.87
+user 39.80
+sys 0.00
+
+RUN spectralnorm lua 17
+real 39.90
+user 39.84
+sys 0.00
+
+RUN spectralnorm lua 18
+real 39.86
+user 39.80
+sys 0.00
+
+RUN spectralnorm lua 19
+real 39.78
+user 39.71
+sys 0.00
+
+RUN spectralnorm lua 20
+real 39.86
+user 39.79
+sys 0.00
+
+RUN spectralnorm lsw 1
+real 42.98
+user 42.91
+sys 0.00
+
+RUN spectralnorm lsw 2
+real 43.00
+user 42.92
+sys 0.00
+
+RUN spectralnorm lsw 3
+real 42.93
+user 42.84
+sys 0.00
+
+RUN spectralnorm lsw 4
+real 42.87
+user 42.79
+sys 0.00
+
+RUN spectralnorm lsw 5
+real 43.01
+user 42.94
+sys 0.00
+
+RUN spectralnorm lsw 6
+real 42.99
+user 42.91
+sys 0.00
+
+RUN spectralnorm lsw 7
+real 43.01
+user 42.93
+sys 0.00
+
+RUN spectralnorm lsw 8
+real 43.18
+user 43.09
+sys 0.00
+
+RUN spectralnorm lsw 9
+real 43.13
+user 43.06
+sys 0.00
+
+RUN spectralnorm lsw 10
+real 43.06
+user 42.98
+sys 0.00
+
+RUN spectralnorm lsw 11
+real 43.00
+user 42.93
+sys 0.00
+
+RUN spectralnorm lsw 12
+real 43.03
+user 42.96
+sys 0.00
+
+RUN spectralnorm lsw 13
+real 42.87
+user 42.79
+sys 0.00
+
+RUN spectralnorm lsw 14
+real 42.88
+user 42.80
+sys 0.00
+
+RUN spectralnorm lsw 15
+real 43.09
+user 43.00
+sys 0.00
+
+RUN spectralnorm lsw 16
+real 42.84
+user 42.77
+sys 0.00
+
+RUN spectralnorm lsw 17
+real 43.02
+user 42.95
+sys 0.00
+
+RUN spectralnorm lsw 18
+real 43.02
+user 42.94
+sys 0.00
+
+RUN spectralnorm lsw 19
+real 42.91
+user 42.83
+sys 0.00
+
+RUN spectralnorm lsw 20
+real 43.07
+user 42.99
+sys 0.00
+
+RUN spectralnorm aot 1
+real 18.57
+user 18.54
+sys 0.00
+
+RUN spectralnorm aot 2
+real 18.65
+user 18.61
+sys 0.00
+
+RUN spectralnorm aot 3
+real 18.57
+user 18.54
+sys 0.00
+
+RUN spectralnorm aot 4
+real 18.56
+user 18.53
+sys 0.00
+
+RUN spectralnorm aot 5
+real 18.55
+user 18.51
+sys 0.00
+
+RUN spectralnorm aot 6
+real 18.52
+user 18.48
+sys 0.00
+
+RUN spectralnorm aot 7
+real 19.12
+user 19.09
+sys 0.00
+
+RUN spectralnorm aot 8
+real 18.57
+user 18.53
+sys 0.00
+
+RUN spectralnorm aot 9
+real 18.62
+user 18.59
+sys 0.00
+
+RUN spectralnorm aot 10
+real 18.56
+user 18.52
+sys 0.00
+
+RUN spectralnorm aot 11
+real 18.47
+user 18.43
+sys 0.00
+
+RUN spectralnorm aot 12
+real 18.49
+user 18.46
+sys 0.00
+
+RUN spectralnorm aot 13
+real 18.62
+user 18.59
+sys 0.00
+
+RUN spectralnorm aot 14
+real 18.54
+user 18.51
+sys 0.00
+
+RUN spectralnorm aot 15
+real 18.56
+user 18.53
+sys 0.00
+
+RUN spectralnorm aot 16
+real 18.50
+user 18.46
+sys 0.00
+
+RUN spectralnorm aot 17
+real 18.53
+user 18.49
+sys 0.00
+
+RUN spectralnorm aot 18
+real 18.85
+user 18.82
+sys 0.00
+
+RUN spectralnorm aot 19
+real 18.58
+user 18.54
+sys 0.00
+
+RUN spectralnorm aot 20
+real 18.57
+user 18.53
+sys 0.00
+
+RUN spectralnorm cor 1
+real 18.95
+user 18.91
+sys 0.00
+
+RUN spectralnorm cor 2
+real 18.98
+user 18.95
+sys 0.00
+
+RUN spectralnorm cor 3
+real 19.78
+user 19.75
+sys 0.00
+
+RUN spectralnorm cor 4
+real 18.92
+user 18.88
+sys 0.00
+
+RUN spectralnorm cor 5
+real 18.91
+user 18.87
+sys 0.00
+
+RUN spectralnorm cor 6
+real 18.89
+user 18.85
+sys 0.00
+
+RUN spectralnorm cor 7
+real 18.85
+user 18.81
+sys 0.00
+
+RUN spectralnorm cor 8
+real 18.82
+user 18.79
+sys 0.00
+
+RUN spectralnorm cor 9
+real 18.89
+user 18.85
+sys 0.00
+
+RUN spectralnorm cor 10
+real 18.85
+user 18.81
+sys 0.00
+
+RUN spectralnorm cor 11
+real 18.94
+user 18.91
+sys 0.00
+
+RUN spectralnorm cor 12
+real 19.72
+user 19.68
+sys 0.00
+
+RUN spectralnorm cor 13
+real 18.85
+user 18.82
+sys 0.00
+
+RUN spectralnorm cor 14
+real 18.91
+user 18.88
+sys 0.00
+
+RUN spectralnorm cor 15
+real 18.96
+user 18.92
+sys 0.00
+
+RUN spectralnorm cor 16
+real 19.23
+user 19.20
+sys 0.00
+
+RUN spectralnorm cor 17
+real 18.86
+user 18.83
+sys 0.00
+
+RUN spectralnorm cor 18
+real 18.96
+user 18.92
+sys 0.00
+
+RUN spectralnorm cor 19
+real 18.93
+user 18.90
+sys 0.00
+
+RUN spectralnorm cor 20
+real 18.87
+user 18.84
+sys 0.00
+
+RUN spectralnorm trm 1
+real 26.95
+user 26.90
+sys 0.00
+
+RUN spectralnorm trm 2
+real 27.11
+user 27.06
+sys 0.00
+
+RUN spectralnorm trm 3
+real 26.90
+user 26.85
+sys 0.00
+
+RUN spectralnorm trm 4
+real 26.98
+user 26.93
+sys 0.00
+
+RUN spectralnorm trm 5
+real 27.01
+user 26.97
+sys 0.00
+
+RUN spectralnorm trm 6
+real 27.05
+user 27.01
+sys 0.00
+
+RUN spectralnorm trm 7
+real 27.02
+user 26.98
+sys 0.00
+
+RUN spectralnorm trm 8
+real 27.05
+user 27.00
+sys 0.00
+
+RUN spectralnorm trm 9
+real 27.09
+user 27.04
+sys 0.00
+
+RUN spectralnorm trm 10
+real 27.00
+user 26.95
+sys 0.00
+
+RUN spectralnorm trm 11
+real 27.04
+user 26.99
+sys 0.00
+
+RUN spectralnorm trm 12
+real 27.10
+user 27.05
+sys 0.00
+
+RUN spectralnorm trm 13
+real 27.03
+user 26.99
+sys 0.00
+
+RUN spectralnorm trm 14
+real 27.07
+user 27.02
+sys 0.00
+
+RUN spectralnorm trm 15
+real 26.93
+user 26.88
+sys 0.00
+
+RUN spectralnorm trm 16
+real 26.96
+user 26.91
+sys 0.00
+
+RUN spectralnorm trm 17
+real 27.07
+user 27.02
+sys 0.00
+
+RUN spectralnorm trm 18
+real 26.96
+user 26.91
+sys 0.00
+
+RUN spectralnorm trm 19
+real 27.02
+user 26.97
+sys 0.00
+
+RUN spectralnorm trm 20
+real 27.05
+user 27.01
+sys 0.00
+

@@ -1,0 +1,266 @@
+
+ Performance counter stats for 'sh -c ../src/lua main.lua binarytrees 16 > /dev/null':
+
+           3498.81 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+             10825      page-faults:u             #    0.003 M/sec                  
+       10714515448      cycles:u                  #    3.062 GHz                    
+       23182028454      instructions:u            #    2.16  insn per cycle         
+        4183194356      branches:u                # 1195.605 M/sec                  
+          41003302      branch-misses:u           #    0.98% of all branches        
+
+       3.499638249 seconds time elapsed
+
+       3.478564000 seconds user
+       0.010552000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua binarytrees_cor 16 > /dev/null':
+
+           2681.44 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+             14612      page-faults:u             #    0.005 M/sec                  
+        8180779719      cycles:u                  #    3.051 GHz                    
+       18059597852      instructions:u            #    2.21  insn per cycle         
+        3581028602      branches:u                # 1335.486 M/sec                  
+           8663518      branch-misses:u           #    0.24% of all branches        
+
+       2.682297120 seconds time elapsed
+
+       2.648731000 seconds user
+       0.024941000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua fannkuch 11 > /dev/null':
+
+          44404.77 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               262      page-faults:u             #    0.006 K/sec                  
+      136945125044      cycles:u                  #    3.084 GHz                    
+      421455540653      instructions:u            #    3.08  insn per cycle         
+       73500278905      branches:u                # 1655.234 M/sec                  
+         428101332      branch-misses:u           #    0.58% of all branches        
+
+      44.408986860 seconds time elapsed
+
+      44.321898000 seconds user
+       0.003677000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua fannkuch_cor 11 > /dev/null':
+
+          22035.72 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               275      page-faults:u             #    0.012 K/sec                  
+       67989547777      cycles:u                  #    3.085 GHz                    
+      185477589105      instructions:u            #    2.73  insn per cycle         
+       43538173703      branches:u                # 1975.800 M/sec                  
+         272062641      branch-misses:u           #    0.62% of all branches        
+
+      22.037820011 seconds time elapsed
+
+      22.001945000 seconds user
+       0.000982000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua fasta 2500000 > /dev/null':
+
+           5032.76 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               272      page-faults:u             #    0.054 K/sec                  
+       15512470030      cycles:u                  #    3.082 GHz                    
+       45957694220      instructions:u            #    2.96  insn per cycle         
+        8037480504      branches:u                # 1597.031 M/sec                  
+          17604406      branch-misses:u           #    0.22% of all branches        
+
+       5.033611347 seconds time elapsed
+
+       5.021880000 seconds user
+       0.003530000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua fasta_cor 2500000 > /dev/null':
+
+           3968.42 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               287      page-faults:u             #    0.072 K/sec                  
+       12227168589      cycles:u                  #    3.081 GHz                    
+       31897754595      instructions:u            #    2.61  insn per cycle         
+        6560084305      branches:u                # 1653.072 M/sec                  
+          20269263      branch-misses:u           #    0.31% of all branches        
+
+       3.969399735 seconds time elapsed
+
+       3.959387000 seconds user
+       0.003077000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua knucleotide 1000000 > /dev/null':
+
+           4249.90 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+             13370      page-faults:u             #    0.003 M/sec                  
+       13014456950      cycles:u                  #    3.062 GHz                    
+       35604808273      instructions:u            #    2.74  insn per cycle         
+        6467235704      branches:u                # 1521.737 M/sec                  
+          20261762      branch-misses:u           #    0.31% of all branches        
+
+       4.251001107 seconds time elapsed
+
+       4.220979000 seconds user
+       0.018897000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua knucleotide_cor 1000000 > /dev/null':
+
+           3561.67 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+             13377      page-faults:u             #    0.004 M/sec                  
+       10889078995      cycles:u                  #    3.057 GHz                    
+       26912317915      instructions:u            #    2.47  insn per cycle         
+        5490253899      branches:u                # 1541.482 M/sec                  
+          21296770      branch-misses:u           #    0.39% of all branches        
+
+       3.562742623 seconds time elapsed
+
+       3.529263000 seconds user
+       0.022919000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua mandelbrot 4000 > /dev/null':
+
+          16275.99 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               269      page-faults:u             #    0.017 K/sec                  
+       50212346738      cycles:u                  #    3.085 GHz                    
+      168231774746      instructions:u            #    3.35  insn per cycle         
+       28715822336      branches:u                # 1764.306 M/sec                  
+          19952754      branch-misses:u           #    0.07% of all branches        
+
+      16.277441440 seconds time elapsed
+
+      16.248664000 seconds user
+       0.001934000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua mandelbrot_cor 4000 > /dev/null':
+
+           6163.27 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               274      page-faults:u             #    0.044 K/sec                  
+       19012423885      cycles:u                  #    3.085 GHz                    
+       54685401566      instructions:u            #    2.88  insn per cycle         
+       16323314389      branches:u                # 2648.481 M/sec                  
+          15607506      branch-misses:u           #    0.10% of all branches        
+
+       6.164294325 seconds time elapsed
+
+       6.152359000 seconds user
+       0.002087000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua nbody 5000000 > /dev/null':
+
+          19710.56 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               268      page-faults:u             #    0.014 K/sec                  
+       60806909626      cycles:u                  #    3.085 GHz                    
+      169352377837      instructions:u            #    2.79  insn per cycle         
+       31105486784      branches:u                # 1578.112 M/sec                  
+         383740411      branch-misses:u           #    1.23% of all branches        
+
+      19.713137586 seconds time elapsed
+
+      19.677080000 seconds user
+       0.003075000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua nbody_cor 5000000 > /dev/null':
+
+          12716.85 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               278      page-faults:u             #    0.022 K/sec                  
+       39234404682      cycles:u                  #    3.085 GHz                    
+      101132436510      instructions:u            #    2.58  insn per cycle         
+       27630494203      branches:u                # 2172.747 M/sec                  
+          30166717      branch-misses:u           #    0.11% of all branches        
+
+      12.718192267 seconds time elapsed
+
+      12.696132000 seconds user
+       0.001965000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua spectralnorm 4000 > /dev/null':
+
+          39940.70 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               344      page-faults:u             #    0.009 K/sec                  
+      123195874626      cycles:u                  #    3.084 GHz                    
+      437169473940      instructions:u            #    3.55  insn per cycle         
+       67208570918      branches:u                # 1682.709 M/sec                  
+            989293      branch-misses:u           #    0.00% of all branches        
+
+      39.944515192 seconds time elapsed
+
+      39.866638000 seconds user
+       0.002579000 seconds sys
+
+
+
+
+ Performance counter stats for 'sh -c ../src/lua main.lua spectralnorm_cor 4000 > /dev/null':
+
+          18918.05 msec task-clock:u              #    1.000 CPUs utilized          
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+               351      page-faults:u             #    0.019 K/sec                  
+       58361263886      cycles:u                  #    3.085 GHz                    
+      207390381776      instructions:u            #    3.55  insn per cycle         
+       40325937234      branches:u                # 2131.611 M/sec                  
+            425440      branch-misses:u           #    0.00% of all branches        
+
+      18.919499356 seconds time elapsed
+
+      18.884666000 seconds user
+       0.002541000 seconds sys
+
+
+
