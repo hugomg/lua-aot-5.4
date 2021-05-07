@@ -1,0 +1,26 @@
+#!/bin/sh
+
+measure() {
+    ls -lh "$@" | awk '{ print $5, $9 }'
+}
+
+# Compile
+for f in ./*.lua; do
+    ../src/luac -o "${f%.lua}.byte" "$f"
+done
+
+if ! test -f empty_aot.so; then
+    ../src/luaot empty.lua -o empty_aot.c
+    ../scripts/compile empty_aot.c
+fi
+
+echo "==== LUA SOURCE ===="
+measure -- *.lua
+
+echo
+echo "==== LUA BYTECODE ===="
+measure -- *.byte
+
+echo
+echo "==== AOT COMPILED ===="
+measure -- *_aot.so 

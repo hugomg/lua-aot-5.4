@@ -1,9 +1,5 @@
 #!/usr/bin/lua
 
-repeat
-    local line = io.read("*l")
-until line == "---START---"
-
 print("Benchmark,Implementation,N,Time")
 while true do
     local line1 = io.read("*l")
