@@ -5,6 +5,7 @@ src/luaot-trampoline
 
 experiments/*.c
 experiments/*.so
+experiments/*.byte
 
 *.a
 *.o
