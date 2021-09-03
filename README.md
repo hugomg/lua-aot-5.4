@@ -1,4 +1,4 @@
-# Lua-AOT 5.4.3
+# LuaAOT 5.4.3
 
 This is a modified version of Lua 5.4.3 that allows Lua functions to be compiled ahead-of-time to more efficient code. It also includes a compiler called `luaot` that converts a Lua module to an equivalent one written in C.
 
@@ -16,7 +16,7 @@ This is a modified version of the Lua interpreter so the process is the same you
 
 Our compiler generates a `.c` file. You can compile that into a `.so` module and then require it from Lua.
 
-    ./src/luaot test.lua testcompiled.c
+    ./src/luaot test.lua -o testcompiled.c
     gcc -shared -fPIC -O2 -I./src testcompiled.c -o testcompiled.so
     ./src/lua -l testcompiled
 
