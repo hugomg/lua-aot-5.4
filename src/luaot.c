@@ -1388,6 +1388,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SETLIST: {
+                int has_extra_arg = TESTARG_k(instr);
                 println("        int n = GETARG_B(i);");
                 println("        unsigned int last = GETARG_C(i);");
                 println("        Table *h = hvalue(s2v(ra));");
@@ -1396,10 +1397,9 @@ void create_function(Proto *f)
                 println("        else");
                 println("          L->top = ci->top;  /* correct top in case of emergency GC */");
                 println("        last += n;");
-                println("        int has_extra_arg = TESTARG_k(i);"); // (!)
-                println("        if (has_extra_arg) {");
-                println("          last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]); // (!)
-                println("        }");
+                if (has_extra_arg) {
+                 println("        last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]); // (!)
+                }
                 println("        if (last > luaH_realasize(h))  /* needs more space? */");
                 println("          luaH_resizearray(L, h, last);  /* preallocate it at once */");
                 println("        for (; n > 0; n--) {");
@@ -1408,9 +1408,9 @@ void create_function(Proto *f)
                 println("          last--;");
                 println("          luaC_barrierback(L, obj2gco(h), val);");
                 println("        }");
-                println("        if (has_extra_arg) {");  // (!)
-                println("          goto LUAOT_SKIP1;"); // (!)
-                println("        }");                     // (!)
+                if (has_extra_arg) {
+                 println("        goto LUAOT_SKIP1;"); // (!)
+                }
                 break;
             }
             case OP_CLOSURE: {
