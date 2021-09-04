@@ -105,6 +105,7 @@ static int l_strton (const TValue *obj, TValue *result) {
 ** Try to convert a value to a float. The float case is already handled
 ** by the macro 'tonumber'.
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_tonumber_ (const TValue *obj, lua_Number *n) {
   TValue v;
   if (ttisinteger(obj)) {
@@ -118,11 +119,13 @@ int luaV_tonumber_ (const TValue *obj, lua_Number *n) {
   else
     return 0;  /* conversion failed */
 }
+#endif
 
 
 /*
 ** try to convert a float to an integer, rounding according to 'mode'.
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_flttointeger (lua_Number n, lua_Integer *p, F2Imod mode) {
   lua_Number f = l_floor(n);
   if (n != f) {  /* not an integral value? */
@@ -132,6 +135,7 @@ int luaV_flttointeger (lua_Number n, lua_Integer *p, F2Imod mode) {
   }
   return lua_numbertointeger(f, p);
 }
+#endif
 
 
 /*
@@ -139,6 +143,7 @@ int luaV_flttointeger (lua_Number n, lua_Integer *p, F2Imod mode) {
 ** without string coercion.
 ** ("Fast track" handled by macro 'tointegerns'.)
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_tointegerns (const TValue *obj, lua_Integer *p, F2Imod mode) {
   if (ttisfloat(obj))
     return luaV_flttointeger(fltvalue(obj), p, mode);
@@ -149,17 +154,20 @@ int luaV_tointegerns (const TValue *obj, lua_Integer *p, F2Imod mode) {
   else
     return 0;
 }
+#endif
 
 
 /*
 ** try to convert a value to an integer.
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_tointeger (const TValue *obj, lua_Integer *p, F2Imod mode) {
   TValue v;
   if (l_strton(obj, &v))  /* does 'obj' point to a numerical string? */
     obj = &v;  /* change it to point to its corresponding number */
   return luaV_tointegerns(obj, p, mode);
 }
+#endif
 
 
 /*
@@ -289,6 +297,7 @@ static int floatforloop (StkId ra) {
 ** if 'slot' is NULL, 't' is not a table; otherwise, 'slot' points to
 ** t[k] entry (which must be empty).
 */
+#ifndef LUAOT_IS_MODULE
 void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
                       const TValue *slot) {
   int loop;  /* counter to avoid infinite loops */
@@ -323,6 +332,7 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
   }
   luaG_runerror(L, "'__index' chain too long; possible loop");
 }
+#endif
 
 
 /*
@@ -332,6 +342,7 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
 ** is no such entry.  (The value at 'slot' must be empty, otherwise
 ** 'luaV_fastget' would have done the job.)
 */
+#ifndef LUAOT_IS_MODULE
 void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
                      TValue *val, const TValue *slot) {
   int loop;  /* counter to avoid infinite loops */
@@ -368,6 +379,7 @@ void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
   }
   luaG_runerror(L, "'__newindex' chain too long; possible loop");
 }
+#endif
 
 
 /*
@@ -534,11 +546,13 @@ static int lessthanothers (lua_State *L, const TValue *l, const TValue *r) {
 /*
 ** Main operation less than; return 'l < r'.
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_lessthan (lua_State *L, const TValue *l, const TValue *r) {
   if (ttisnumber(l) && ttisnumber(r))  /* both operands are numbers? */
     return LTnum(l, r);
   else return lessthanothers(L, l, r);
 }
+#endif
 
 
 /*
@@ -556,17 +570,20 @@ static int lessequalothers (lua_State *L, const TValue *l, const TValue *r) {
 /*
 ** Main operation less than or equal to; return 'l <= r'.
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_lessequal (lua_State *L, const TValue *l, const TValue *r) {
   if (ttisnumber(l) && ttisnumber(r))  /* both operands are numbers? */
     return LEnum(l, r);
   else return lessequalothers(L, l, r);
 }
+#endif
 
 
 /*
 ** Main operation for equality of Lua values; return 't1 == t2'.
 ** L == NULL means raw equality (no metamethods)
 */
+#ifndef LUAOT_IS_MODULE
 int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
   const TValue *tm;
   if (ttypetag(t1) != ttypetag(t2)) {  /* not the same variant? */
@@ -617,6 +634,7 @@ int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
     return !l_isfalse(s2v(L->top));
   }
 }
+#endif
 
 
 /* macro used by 'luaV_concat' to ensure that element at 'o' is a string */
@@ -640,6 +658,7 @@ static void copy2buff (StkId top, int n, char *buff) {
 ** Main operation for concatenation: concat 'total' values in the stack,
 ** from 'L->top - total' up to 'L->top - 1'.
 */
+#ifndef LUAOT_IS_MODULE
 void luaV_concat (lua_State *L, int total) {
   if (total == 1)
     return;  /* "all" values already concatenated */
@@ -680,11 +699,13 @@ void luaV_concat (lua_State *L, int total) {
     L->top -= n-1;  /* popped 'n' strings and pushed one */
   } while (total > 1);  /* repeat until only 1 result left */
 }
+#endif
 
 
 /*
 ** Main operation 'ra = #rb'.
 */
+#ifndef LUAOT_IS_MODULE
 void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
   const TValue *tm;
   switch (ttypetag(rb)) {
@@ -712,6 +733,7 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
   }
   luaT_callTMres(L, tm, rb, rb, ra);
 }
+#endif
 
 
 /*
@@ -720,6 +742,7 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
 ** 'floor(q) == trunc(q)' when 'q >= 0' or when 'q' is integer,
 ** otherwise 'floor(q) == trunc(q) - 1'.
 */
+#ifndef LUAOT_IS_MODULE
 lua_Integer luaV_idiv (lua_State *L, lua_Integer m, lua_Integer n) {
   if (l_unlikely(l_castS2U(n) + 1u <= 1u)) {  /* special cases: -1 or 0 */
     if (n == 0)
@@ -733,6 +756,7 @@ lua_Integer luaV_idiv (lua_State *L, lua_Integer m, lua_Integer n) {
     return q;
   }
 }
+#endif
 
 
 /*
@@ -740,6 +764,7 @@ lua_Integer luaV_idiv (lua_State *L, lua_Integer m, lua_Integer n) {
 ** negative operands follows C99 behavior. See previous comment
 ** about luaV_idiv.)
 */
+#ifndef LUAOT_IS_MODULE
 lua_Integer luaV_mod (lua_State *L, lua_Integer m, lua_Integer n) {
   if (l_unlikely(l_castS2U(n) + 1u <= 1u)) {  /* special cases: -1 or 0 */
     if (n == 0)
@@ -753,16 +778,19 @@ lua_Integer luaV_mod (lua_State *L, lua_Integer m, lua_Integer n) {
     return r;
   }
 }
+#endif
 
 
 /*
 ** Float modulus
 */
+#ifndef LUAOT_IS_MODULE
 lua_Number luaV_modf (lua_State *L, lua_Number m, lua_Number n) {
   lua_Number r;
   luai_nummod(L, m, n, r);
   return r;
 }
+#endif
 
 
 /* number of bits in an integer */
@@ -773,6 +801,7 @@ lua_Number luaV_modf (lua_State *L, lua_Number m, lua_Number n) {
 */
 #define luaV_shiftr(x,y)	luaV_shiftl(x,-(y))
 
+#ifndef LUAOT_IS_MODULE
 lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
   if (y < 0) {  /* shift right? */
     if (y <= -NBITS) return 0;
@@ -783,6 +812,7 @@ lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
     else return intop(<<, x, y);
   }
 }
+#endif
 
 
 /*
@@ -810,6 +840,7 @@ static void pushclosure (lua_State *L, Proto *p, UpVal **encup, StkId base,
 /*
 ** finish execution of an opcode interrupted by a yield
 */
+#ifndef LUAOT_IS_MODULE
 void luaV_finishOp (lua_State *L) {
   CallInfo *ci = L->ci;
   StkId base = ci->func + 1;
@@ -865,6 +896,7 @@ void luaV_finishOp (lua_State *L) {
     }
   }
 }
+#endif
 
 
 
@@ -1130,6 +1162,7 @@ void luaV_finishOp (lua_State *L) {
 #define vmcase(l)	case l:
 #define vmbreak		break
 
+#ifndef LUAOT_IS_MODULE
 void luaV_execute (lua_State *L, CallInfo *ci) {
   LClosure *cl;
   TValue *k;
@@ -1841,5 +1874,6 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
     }
   }
 }
+#endif
 
 /* }================================================================== */

@@ -2,6 +2,9 @@
 // Most of what we need is copied verbatim from lvm.c
 //
 
+// Get access to static" functions from lvm.c, but be careful to not re-define the
+// functions that are already exported by liblua.a
+#define LUAOT_IS_MODULE 1
 #include "lvm.c"
 
 //
