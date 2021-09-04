@@ -12,6 +12,7 @@ bench_codes <- c(
   "nbody",
   "spectralnorm"
 )
+
 bench_names <- c(
   "Binary Trees",
   "Fannkuch",
@@ -24,7 +25,7 @@ bench_names <- c(
 
 impl_codes <- c("lsw","lua","trm", "cor", "aot","jof", "jit")
 impl_used <- c("lua", "trm", "cor", "jit")
-impl_names <- c("Lua","LuaAOT (Trampoline)", "LuaAOT (Goto)","LuaJIT")
+impl_names <- c("Lua", "Trampoline", "LuaAOT","LuaJIT")
 
 data <- read_csv("times-slow.csv", col_types = cols(
     Benchmark = col_factor(bench_codes),
@@ -33,16 +34,15 @@ data <- read_csv("times-slow.csv", col_types = cols(
     Time = col_double()
 ))
 
-#data <- filter(data, Implementation %in% c("lsw","lua","trm","cor","aot","jof","jit"))
-data <- filter(data, Implementation %in% impl_used)
+plot_data <- filter(data, Implementation %in% impl_used)
 
 aggr_data <- data %>%
-  group_by(Benchmark, Implementation) %>%
+  group_by(Benchmark,Implementation) %>%
   summarize(
     meanTime=mean(Time),
     d=max(max(Time)-meanTime, meanTime-min(Time)))
 
-# mean_times <- data %>%
+mean_times <- plot_data %>%
     group_by(Benchmark,Implementation) %>%
     summarize(Time=mean(Time)) %>%
     ungroup()
@@ -51,7 +51,7 @@ mean_times_lua <- mean_times %>%
       filter(Implementation=="lua") %>%
       select(Benchmark, LuaTime=Time)
 
-normal_times <- data %>%
+normal_times <- plot_data %>%
     inner_join(mean_times_lua, by=c("Benchmark")) %>%
     mutate(Time=Time/LuaTime) %>%
     group_by(Benchmark,Implementation) %>%
@@ -63,7 +63,6 @@ normal_times <- data %>%
     ungroup()
     
 dodge <- position_dodge(0.9)
-    
 ggplot(normal_times,
        aes(x=Benchmark,y=mean_time,fill=Implementation)) +
   geom_col(position=dodge) +
@@ -73,6 +72,19 @@ ggplot(normal_times,
   scale_fill_discrete(labels=impl_names) +
   scale_x_discrete(labels=bench_names) +
   scale_y_continuous(limits=c(0.0, 1.2), breaks=seq(from=0.0,to=1.2,by=0.25) ) +
-  theme(
-    legend.position = "top",
-    axis.text.x=element_text(angle=30, hjust=1))
+  theme(axis.text.x=element_text(angle=30, hjust=1), legend.position = "top",)
+
+##########
+
+trm_times <- data %>%
+  filter(Implementation %in% c("trm", "cor")) %>%
+  group_by(Benchmark,Implementation) %>%
+  summarize(Time=mean(Time)) %>%
+  ungroup()
+
+trm_ratio <- inner_join(
+  filter(trm_times, Implementation=="trm"),
+  filter(trm_times, Implementation=="cor"),
+  by=c("Benchmark")) %>%
+mutate(Ratio=100.0*Time.x/Time.y) %>%
+select(Benchmark, Ratio)

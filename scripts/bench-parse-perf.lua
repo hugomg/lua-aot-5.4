@@ -10,6 +10,15 @@ local pretty_names = {
     spectralnorm = "Spectral Norm",
 }
 
+local function parse_name(module)
+    local code, is_aot = string.match(module, "^(.*)(_cor)$")
+    if is_aot then
+        return code, "aot"
+    else
+        return module, "lua"
+    end
+end
+
 local function pretty_name(module)
     local code, aot = string.match(module, "^(.*)(_cor)$")
     local name = assert(pretty_names[code or module])
@@ -20,6 +29,7 @@ local function pretty_name(module)
     end
 end
 
+local rows = {}
 while true do
     local blank = io.read("l");
     if not blank then break end
@@ -36,13 +46,26 @@ while true do
     local ipc    = assert(string.match(lines[8], "(%S+) *insn per cycle"))
     local time   = assert(string.match(lines[12], "(%S+) *seconds time elapsed"))
 
-    local bench = pretty_name(module)
-    cycle = tonumber(cycle)
-    instr = tonumber(instr)
-    ipc   = tonumber(ipc)
-    time  = tonumber(time)
+    local r = {}
+    r.code, r.is_aot = parse_name(module)
+    r.cycle = tonumber(cycle)
+    r.instr = tonumber(instr)
+    r.ipc   = tonumber(ipc)
+    r.time  = tonumber(time)
 
-    local sinstr = string.format("$%6.2f\\times10^9$", instr/1.0e9)
-    local scycle = string.format("$%6.2f\\times10^9$", cycle/1.0e9)
-    print(string.format("%-20s & %6.2f & %18s & %18s & %4.2f \\\\", bench, time, sinstr, scycle, ipc))
+    table.insert(rows, r)
+end
+
+for i = 1, #rows, 2 do
+    local lua = rows[i]
+    local aot = rows[i+1]
+
+    assert(lua.code == aot.code)
+    assert(lua.is_aot == "lua")
+    assert(aot.is_aot == "aot")
+
+    local name = pretty_names[lua.code]
+    local instr = (aot.instr / lua.instr) * 100.0
+    local cycle = (aot.cycle / lua.cycle) * 100.0
+    print(string.format("%-14s & %3.1f & %3.1f \\\\", name, instr, cycle))
 end
