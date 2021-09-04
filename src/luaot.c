@@ -304,10 +304,10 @@ void PrintConstant(const Proto* f, int i)
             print("nil");
             break;
         case LUA_VFALSE:
-            printf("false");
+            print("false");
             break;
         case LUA_VTRUE:
-            printf("true");
+            print("true");
             break;
         case LUA_VNUMFLT:
             {
