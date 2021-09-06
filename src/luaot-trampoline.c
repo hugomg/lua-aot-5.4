@@ -1477,6 +1477,12 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SETLIST: {
+                // We should take care to only generate code for the extra argument if it actually exists.
+                // In a previous version of this compiler, we were putting the "if" in the generated code
+                // instead of in the code generator and that resulted in compile-time warnings from gcc.
+                // Sometimes, the last += GETARG_Ax" line would overflow and the C compiler would naturally
+                // complain (even though the offending line was never executed).
+                int has_extra_arg = TESTARG_k(instr);
                 println("        int n = GETARG_B(i);");
                 println("        unsigned int last = GETARG_C(i);");
                 println("        Table *h = hvalue(s2v(ra));");
@@ -1485,9 +1491,10 @@ void create_function(Proto *f)
                 println("        else");
                 println("          L->top = ci->top;  /* correct top in case of emergency GC */");
                 println("        last += n;");
-                println("        if (TESTARG_k(i)) {");
-                println("          last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
-                println("          pc++;");
+                if (has_extra_arg) {
+                 println("        last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
+                 println("        pc++;");
+                }
                 println("        }");
                 println("        if (last > luaH_realasize(h))  /* needs more space? */");
                 println("          luaH_resizearray(L, h, last);  /* preallocate it at once */");
