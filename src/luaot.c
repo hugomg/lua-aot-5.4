@@ -1388,6 +1388,11 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SETLIST: {
+                // We should take care to only generate code for the extra argument if it actually exists.
+                // In a previous version of this compiler, we were putting the "if" in the generated code
+                // instead of in the code generator and that resulted in compile-time warnings from gcc.
+                // Sometimes, the last += GETARG_Ax" line would overflow and the C compiler would naturally
+                // complain (even though the offending line was never executed).
                 int has_extra_arg = TESTARG_k(instr);
                 println("        int n = GETARG_B(i);");
                 println("        unsigned int last = GETARG_C(i);");
