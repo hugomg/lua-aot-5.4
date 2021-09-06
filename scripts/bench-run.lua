@@ -31,12 +31,11 @@ local benchs = {
 }
 
 local impls = {
-    { name = "jit", suffix = "",     interpreter = "luajit",        compile = false                           },
-    { name = "jof", suffix = "",     interpreter = "luajit -j off", compile = false                           },
-    { name = "lua", suffix = "",     interpreter = "../src/lua",    compile = false,                          },
-    { name = "lsw", suffix = "",     interpreter = "../src/lua-sw", compile = false,                          },
-    { name = "aot", suffix = "_aot", interpreter = "../src/lua",    compile = "../src/luaot"                  },
-    { name = "cor", suffix = "_cor", interpreter = "../src/lua",    compile = "../src/luaot --coro"           },
+    { name = "jit", suffix = "",     interpreter = "luajit",        compile = false                    },
+    { name = "jof", suffix = "",     interpreter = "luajit -j off", compile = false                    },
+    { name = "lua", suffix = "",     interpreter = "../src/lua",    compile = false,                   },
+    { name = "lsw", suffix = "",     interpreter = "../src/lua-sw", compile = false,                   },
+    { name = "aot", suffix = "_aot", interpreter = "../src/lua",    compile = "../src/luaot"           },
     { name = "trm", suffix = "_trm", interpreter = "../src/lua",    compile = "../src/luaot-trampoline --coro"},
 }
 
