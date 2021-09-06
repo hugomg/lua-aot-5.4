@@ -677,6 +677,19 @@ void luaot_PrintOpcodeComment(Proto *f, int pc)
 //
 
 static
+void println_goto_ret()
+{
+    // This is the piece of code that is after the "ret" label.
+    // It should be used in the places that do "goto ret;"
+    println("        if (ci->callstatus & CIST_FRESH)");
+    println("            return;  /* end this frame */");
+    println("        else {");
+    println("            ci = ci->previous;");
+    println("            return luaV_execute(L, ci); /* continue running caller in this frame */"); // (!)
+    println("        }");
+}
+
+static
 void create_function(Proto *f)
 {
     int func_id = nfunctions++;
@@ -717,21 +730,6 @@ void create_function(Proto *f)
     println("  StkId ra;");
     printnl();
 
-    // If we are resuming a coroutine, jump to the savedpc.
-    // However, allowing coroutines hurts performance so we disable it by default.
-    if (enable_coroutines) {
-        println("  switch (pc - code) {");
-        for (int pc = 0; pc < f->sizecode; pc++) {
-            println("    case %d: goto label_%02d;", pc, pc);
-        }
-        println("  }");
-    } else {
-        println("  if (pc != code) {");
-        println("    luaG_runerror(L, \"This program was compiled without support for coroutines\\n\");");
-        println("  }");
-    }
-    printnl();
-
     println("  while (1) {");
     println("    switch (pc - code) {");
     for (int pc = 0; pc < f->sizecode; pc++) {
@@ -740,13 +738,8 @@ void create_function(Proto *f)
 
         luaot_PrintOpcodeComment(f, pc);
 
-        if (enable_coroutines) {
-            println("      case %d: label_%02d: {", pc, pc);
-            println("        aot_vmfetch(0x%08x);", instr);
-        } else {
-            println("      case %d: {", pc);
-            println("        aot_vmfetch(0x%08x);", instr);
-        }
+        println("      case %d: {", pc);
+        println("        aot_vmfetch(0x%08x);", instr);
 
         switch (op) {
             case OP_MOVE: {
@@ -1308,8 +1301,6 @@ void create_function(Proto *f)
                 break;
             }
             case OP_CALL: {
-                // We have to adapt this opcode to remove the optimization that
-                // reuses the luaV_execute stack frame. The goto startfunc.
                 println("        CallInfo *newci;");
                 println("        int b = GETARG_B(i);");
                 println("        int nresults = GETARG_C(i) - 1;");
@@ -1320,8 +1311,9 @@ void create_function(Proto *f)
                 println("        if ((newci = luaD_precall(L, ra, nresults)) == NULL)");
                 println("            updatetrap(ci);  /* C call; nothing else to be done */");
                 println("        else {");
-                println("            newci->callstatus = CIST_FRESH;");
-                println("            Protect(luaV_execute(L, newci));");//(!)
+                println("            ci = newci;");
+                println("            ci->callstatus = 0;  /* call re-uses 'luaV_execute' */");
+                println("            return luaV_execute(L, ci);"); // (!!!)
                 println("        }");
                 // FALLTHROUGH
                 break;
@@ -1353,11 +1345,11 @@ void create_function(Proto *f)
                 println("          ci->func -= delta;  /* restore 'func' (if vararg) */");
                 println("          luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */");
                 println("          updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
-                println("          return;  /* caller returns after the tail call */");//(!)
+                println_goto_ret(); // (!)
                 println("        }");
                 println("        ci->func -= delta;  /* restore 'func' (if vararg) */");
                 println("        luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
-                println("        return luaV_execute(L, ci); /* execute the callee */");//(!)
+                println("        return luaV_execute(L, ci); /* execute the callee */"); // (!)
                 // FALLTHROUGH
                 break;
             }
@@ -1379,7 +1371,7 @@ void create_function(Proto *f)
                 println("        L->top = ra + n;  /* set call for 'luaD_poscall' */");
                 println("        luaD_poscall(L, ci, n);");
                 println("        updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
-                println("        return;"); //(!)
+                println_goto_ret(); // (!)
                 // FALLTHROUGH
                 break;
             }
@@ -1397,7 +1389,7 @@ void create_function(Proto *f)
                 println("          for (nres = ci->nresults; l_unlikely(nres > 0); nres--)");
                 println("            setnilvalue(s2v(L->top++));  /* all results are nil */");
                 println("        }");
-                println("        return;"); //(!)
+                println_goto_ret(); // (!)
                 // FALLTHROUGH
                 break;
             }
@@ -1420,7 +1412,7 @@ void create_function(Proto *f)
                 println("              setnilvalue(s2v(L->top++));");
                 println("          }");
                 println("        }");
-                println("        return;"); //(!)
+                println_goto_ret(); // (!)
                 // FALLTHROUGH
                 break;
             }

@@ -1139,18 +1139,14 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
 #if LUA_USE_JUMPTABLE
 #include "ljumptab.h"
 #endif
-#if LUAOT
-  trap = L->hookmask;
-  cl = clLvalue(s2v(ci->func));
-  lua_assert(ci->callstatus & CIST_FRESH);
-  if (cl->p->aot_implementation) {
-      return cl->p->aot_implementation(L, ci);
-  }
-#else
  startfunc:
   trap = L->hookmask;
  returning:  /* trap already set */
   cl = clLvalue(s2v(ci->func));
+#if LUAOT
+  if (cl->p->aot_implementation) {
+      return cl->p->aot_implementation(L, ci);
+  }
 #endif
   k = cl->p->k;
   pc = ci->u.l.savedpc;
@@ -1626,24 +1622,6 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         }
         vmbreak;
       }
-#if LUAOT
-      vmcase(OP_CALL) {
-        CallInfo *newci;
-        int b = GETARG_B(i);
-        int nresults = GETARG_C(i) - 1;
-        if (b != 0)  /* fixed number of arguments? */
-          L->top = ra + b;  /* top signals number of arguments */
-        /* else previous instruction set top */
-        savepc(L);  /* in case of errors */
-        if ((newci = luaD_precall(L, ra, nresults)) == NULL)
-          updatetrap(ci);  /* C call; nothing else to be done */
-        else {  /* Lua call: run function in this same C frame */
-          newci->callstatus = CIST_FRESH;
-          Protect(luaV_execute(L, newci));
-        }
-        vmbreak;
-      }
-#else
       vmcase(OP_CALL) {
         CallInfo *newci;
         int b = GETARG_B(i);
@@ -1661,44 +1639,6 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         }
         vmbreak;
       }
-#endif
-
-#if LUAOT
-      vmcase(OP_TAILCALL) {
-        int b = GETARG_B(i);  /* number of arguments + 1 (function) */
-        int nparams1 = GETARG_C(i);
-        /* delta is virtual 'func' - real 'func' (vararg functions) */
-        int delta = (nparams1) ? ci->u.l.nextraargs + nparams1 : 0;
-        if (b != 0)
-          L->top = ra + b;
-        else  /* previous instruction set top */
-          b = cast_int(L->top - ra);
-        savepc(ci);  /* several calls here can raise errors */
-        if (TESTARG_k(i)) {
-          luaF_closeupval(L, base);  /* close upvalues from current call */
-          lua_assert(L->tbclist < base);  /* no pending tbc variables */
-          lua_assert(base == ci->func + 1);
-        }
-        while (!ttisfunction(s2v(ra))) {  /* not a function? */
-          luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */
-          b++;  /* there is now one extra argument */
-          checkstackGCp(L, 1, ra);
-        }
-        if (!ttisLclosure(s2v(ra))) {  /* C function? */
-          luaD_precall(L, ra, LUA_MULTRET);  /* call it */
-          updatetrap(ci);
-          updatestack(ci);  /* stack may have been relocated */
-          ci->func -= delta;  /* restore 'func' (if vararg) */
-          luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */
-          updatetrap(ci);  /* 'luaD_poscall' can change hooks */
-          goto ret;  /* caller returns after the tail call */
-        }
-        ci->func -= delta;  /* restore 'func' (if vararg) */
-        luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */
-        return luaV_execute(L, ci); /* execute the callee */
-        vmbreak;
-      }
-#else
       vmcase(OP_TAILCALL) {
         int b = GETARG_B(i);  /* number of arguments + 1 (function) */
         int nparams1 = GETARG_C(i);
@@ -1731,9 +1671,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         ci->func -= delta;  /* restore 'func' (if vararg) */
         luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */
         goto startfunc;  /* execute the callee */
-        vmbreak;
       }
-#endif
       vmcase(OP_RETURN) {
         int n = GETARG_B(i) - 1;  /* number of results */
         int nparams1 = GETARG_C(i);
@@ -1790,17 +1728,12 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
           }
         }
        ret:  /* return from a Lua function */
-#if LUAOT
-        lua_assert(ci->callstatus & CIST_FRESH);
-        return;
-#else
         if (ci->callstatus & CIST_FRESH)
           return;  /* end this frame */
         else {
           ci = ci->previous;
           goto returning;  /* continue running caller in this frame */
         }
-#endif
       }
       vmcase(OP_FORLOOP) {
         if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */
