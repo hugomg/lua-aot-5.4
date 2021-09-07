@@ -165,6 +165,16 @@ lparser.o:
 lcode.o:
 	$(CC) $(CFLAGS) $(CMCFLAGS) -c lcode.c
 
+# LuaAOT has extra if-defs
+
+luaot.o: luaot.c luaot_gotos.c \
+ lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
+	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_GOTOS
+
+luaot-trampoline.o: luaot.c luaot_switches.c \
+ lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
+	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_SWITCHES
+
 # DO NOT DELETE
 
 lapi.o: lapi.c lprefix.h lua.h luaconf.h lapi.h llimits.h lstate.h \
