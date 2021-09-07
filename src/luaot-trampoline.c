@@ -34,7 +34,6 @@ static const char *program_name    = "luaot";
 static const char *input_filename  = NULL;
 static const char *output_filename = NULL;
 static const char *module_name     = NULL;
-static int enable_coroutines = 0;
 static FILE * output_file = NULL;
 static int nfunctions = 0;
 static TString **tmname;
@@ -93,10 +92,6 @@ static void doargs(int argc, char **argv)
         if (do_opts && arg[0] == '-') {
             if (0 == strcmp(arg, "--")) {
                 do_opts = 0;
-            } else if (0 == strcmp(arg, "--coro")) {
-                enable_coroutines = 1;
-            } else if (0 == strcmp(arg, "--no-coro")) {
-                enable_coroutines = 0;
             } else if (0 == strcmp(arg, "-h")) {
                 usage();
                 exit(0);
