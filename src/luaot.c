@@ -31,9 +31,10 @@
 //
 
 static const char *program_name    = "luaot";
-static const char *input_filename  = NULL;
-static const char *output_filename = NULL;
-static const char *module_name     = NULL;
+static char *input_filename  = NULL;
+static char *output_filename = NULL;
+static char *module_name     = NULL;
+
 static FILE * output_file = NULL;
 static int nfunctions = 0;
 static TString **tmname;
@@ -88,13 +89,17 @@ static void doargs(int argc, char **argv)
     int do_opts = 1;
     int npos = 0;
     for (int i = 1; i < argc; i++) {
-        const char *arg = argv[i];
+        char *arg = argv[i];
         if (do_opts && arg[0] == '-') {
             if (0 == strcmp(arg, "--")) {
                 do_opts = 0;
             } else if (0 == strcmp(arg, "-h")) {
                 usage();
                 exit(0);
+            } else if (0 == strcmp(arg, "-m")) {
+                i++;
+                if (i >= argc) { fatal_error("missing argument for -m"); }
+                module_name = argv[i];
             } else if (0 == strcmp(arg, "-o")) {
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -o"); }
@@ -122,7 +127,9 @@ static void doargs(int argc, char **argv)
     }
 }
 
-static const char *get_module_name(const char *);
+static char *get_module_name_from_filename(const char *);
+static void check_module_name(const char *);
+static void replace_dots(char *);
 static void print_functions();
 static void print_source_code();
 
@@ -131,7 +138,12 @@ int main(int argc, char **argv)
     // Process input arguments
 
     doargs(argc, argv);
-    module_name = get_module_name(output_filename);
+
+    if (!module_name) {
+        module_name = get_module_name_from_filename(output_filename);
+    }
+    check_module_name(module_name);
+    replace_dots(module_name);
 
     // Read the input
 
@@ -159,9 +171,9 @@ int main(int argc, char **argv)
 }
 
 // Deduce the Lua module name given the file name
-// Example:  ./foo/bar/baz.c -> foo_bar_baz
+// Example:  ./foo/bar/baz.c -> foo.bar.baz
 static
-const char *get_module_name(const char *filename)
+char *get_module_name_from_filename(const char *filename)
 {
     size_t n = strlen(filename);
 
@@ -181,24 +193,40 @@ const char *get_module_name(const char *filename)
     char *module_name = malloc(sep+1);
     for (size_t i = 0; i < sep; i++) {
         int c = filename[i];
-        if (c == '/' || c == '.') {
-            module_name[i] = '_';
+        if (c == '/') {
+            module_name[i] = '.';
         } else {
             module_name[i] = c;
         }
     }
     module_name[sep] = '\0';
 
-
-    for (size_t i = 0; i < sep; i++) {
-        int c = module_name[i];
-        if (!isalnum(c) && c != '_') {
-            fatal_error("output module name contains invalid characters");
-        }
-    }
-
     return module_name;
 }
+
+// Check if a module name contains only allowed characters
+static
+void check_module_name(const char *module_name)
+{
+    for (size_t i = 0; module_name[i] != '\0'; i++) {
+        int c = module_name[i];
+        if (!isalnum(c) && c != '_' && c != '.') {
+            fatal_error("output module name must contain only letters, numbers, or '.'");
+        }
+    }
+}
+
+// Convert a module name to the internal "luaopen" name
+static
+void replace_dots(char *module_name)
+{
+    for (size_t i = 0; module_name[i] != '\0'; i++) {
+        if (module_name[i] == '.') {
+            module_name[i] = '_';
+        }
+    }
+}
+
 
 //
 // Printing bytecode information
