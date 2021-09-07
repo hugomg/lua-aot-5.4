@@ -537,7 +537,11 @@ typedef struct AbsLineInfo {
 /*
 ** AOT implementation
 */
+#if AOT_USE_TAILCALL
 typedef void (*AotCompiledFunction) (lua_State *L, struct CallInfo *ci);
+#else
+typedef struct CallInfo *(*AotCompiledFunction) (lua_State *L, struct CallInfo *ci);
+#endif
 
 /*
 ** Function Prototypes

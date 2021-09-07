@@ -11,12 +11,21 @@ void println_goto_ret()
 {
     // This is the piece of code that is after the "ret" label.
     // It should be used in the places that do "goto ret;"
+    #if AOT_USE_TAILCALL
     println("        if (ci->callstatus & CIST_FRESH)");
     println("            return;  /* end this frame */");
     println("        else {");
     println("            ci = ci->previous;");
     println("            return luaV_execute(L, ci); /* continue running caller in this frame */"); // (!)
     println("        }");
+    #else
+    println("    if (ci->callstatus & CIST_FRESH)");
+    println("        return NULL;  /* end this frame */");
+    println("    else {");
+    println("        ci = ci->previous;");
+    println("        return ci;");
+    println("    }");
+    #endif
 }
 
 static
@@ -32,7 +41,11 @@ void create_function(Proto *f)
     }
 
     println("static");
+#if AOT_USE_TAILCALL
     println("void magic_implementation_%02d(lua_State *L, CallInfo *ci)", func_id);
+#else
+    println("CallInfo *magic_implementation_%02d(lua_State *L, CallInfo *ci)", func_id);
+#endif
     println("{");
     println("  LClosure *cl;");
     println("  TValue *k;");
@@ -643,7 +656,11 @@ void create_function(Proto *f)
                 println("        else {");
                 println("            ci = newci;");
                 println("            ci->callstatus = 0;  /* call re-uses 'luaV_execute' */");
+                #if AOT_USE_TAILCALL
                 println("            return luaV_execute(L, ci);"); // (!!!)
+                #else
+                println("            return ci;");
+                #endif
                 println("        }");
                 // FALLTHROUGH
                 break;
@@ -679,7 +696,11 @@ void create_function(Proto *f)
                 println("        }");
                 println("        ci->func -= delta;  /* restore 'func' (if vararg) */");
                 println("        luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
+                #if AOT_USE_TAILCALL
                 println("        return luaV_execute(L, ci); /* execute the callee */"); // (!)
+                #else
+                println("        return ci;");
+                #endif
                 // FALLTHROUGH
                 break;
             }

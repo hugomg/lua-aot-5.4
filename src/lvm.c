@@ -1162,8 +1162,12 @@ void luaV_finishOp (lua_State *L) {
 #define vmcase(l)	case l:
 #define vmbreak		break
 
-#ifndef LUAOT_IS_MODULE
-void luaV_execute (lua_State *L, CallInfo *ci) {
+#if AOT_USE_TAILCALL
+static void luaV_execute_(lua_State *L, CallInfo *ci)
+#else
+static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
+#endif
+{
   LClosure *cl;
   TValue *k;
   StkId base;
@@ -1178,7 +1182,11 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
   cl = clLvalue(s2v(ci->func));
 #if LUAOT
   if (cl->p->aot_implementation) {
-      return cl->p->aot_implementation(L, ci);
+      #if AOT_USE_TAILCALL
+          return cl->p->aot_implementation(L, ci);
+      #else
+          return ci;
+      #endif
   }
 #endif
   k = cl->p->k;
@@ -1762,7 +1770,11 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         }
        ret:  /* return from a Lua function */
         if (ci->callstatus & CIST_FRESH)
+      #if AOT_USE_TAILCALL
           return;  /* end this frame */
+      #else
+          return NULL;  /* end this frame */
+      #endif
         else {
           ci = ci->previous;
           goto returning;  /* continue running caller in this frame */
@@ -1873,6 +1885,22 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
       }
     }
   }
+}
+
+#ifndef LUAOT_IS_MODULE
+void luaV_execute (lua_State *L, CallInfo *ci) {
+#if AOT_USE_TAILCALL
+    return luaV_execute_(L, ci);
+#else
+    do {
+        LClosure *cl = clLvalue(s2v(ci->func));
+        if (cl->p->aot_implementation) {
+            ci = cl->p->aot_implementation(L, ci);
+        } else {
+            ci = luaV_execute_(L, ci);
+        }
+    } while (ci);
+#endif
 }
 #endif
 
