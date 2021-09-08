@@ -14,11 +14,13 @@ This is a modified version of the Lua interpreter so the process is the same you
 
 # Usage
 
-Our compiler generates a `.c` file. You can compile that into a `.so` module and then require it from Lua.
+Our compiler generates a `.c` file with a `luaopen_` function. You can compile that into a `.so` module and then require it from Lua. The compilation is the same as any other extension module, except that you need to pass the path to the LuaAOT headers.
 
     ./src/luaot test.lua -o testcompiled.c
     gcc -shared -fPIC -O2 -I./src testcompiled.c -o testcompiled.so
     ./src/lua -l testcompiled
+
+Be careful about the name of the generated file. If it has the same name as the original Lua file, the `require` may prioritize the Lua file instead of the compiled on. We also recommend compiling with optimizations, at least -O2.
 
 # Experiments
 
