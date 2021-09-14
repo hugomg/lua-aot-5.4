@@ -825,7 +825,6 @@ void create_function(Proto *f)
                  println("        last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
                  println("        pc++;");
                 }
-                println("        }");
                 println("        if (last > luaH_realasize(h))  /* needs more space? */");
                 println("          luaH_resizearray(L, h, last);  /* preallocate it at once */");
                 println("        for (; n > 0; n--) {");
