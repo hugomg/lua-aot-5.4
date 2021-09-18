@@ -1,9 +1,9 @@
 #!/bin/sh
 
-c_file=$1;
+c_file=$1; shift
 so_file=${c_file%.c}.so
 
-echo "Compiling $so_file ..."
-gcc -shared -fPIC -O2 -g -I../src "$c_file" -o "$so_file" || exit 1
+echo "Compiling $so_file ... $@"
+gcc -shared -fPIC -O2 -g -I../src "$@" "$c_file" -o "$so_file" || exit 1
 
 exit 0
