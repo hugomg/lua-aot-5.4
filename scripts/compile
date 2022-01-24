@@ -1,9 +1,15 @@
 #!/bin/sh
 
+script_dir="$(dirname "$0")"
+src_dir="$script_dir/../src"
+
+# Canonicalize the path for prettyness
+src_dir="$(realpath "$src_dir")"
+
 c_file=$1; shift
 so_file=${c_file%.c}.so
 
 echo "Compiling $so_file ... $@"
-gcc -shared -fPIC -O2 -g -I../src "$@" "$c_file" -o "$so_file" || exit 1
+gcc -shared -fPIC -O2 -g -I"$src_dir" "$@" "$c_file" -o "$so_file" || exit 1
 
 exit 0

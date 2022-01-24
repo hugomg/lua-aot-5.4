@@ -163,6 +163,10 @@ int main(int argc, char **argv)
     println("#include \"luaot_header.c\"");
     #elif defined(LUAOT_USE_SWITCHES)
     println("#include \"trampoline_header.c\"");
+    #elif defined(LUAOT_USE_FUNCTIONS)
+    println("#include \"functions_header.c\"");
+    #else
+    #error "Unknown type"
     #endif
     printnl();
     print_functions(proto);
@@ -175,6 +179,10 @@ int main(int argc, char **argv)
     println("#include \"luaot_footer.c\"");
     #elif defined(LUAOT_USE_SWITCHES)
     println("#include \"trampoline_footer.c\"");
+    #elif defined(LUAOT_USE_FUNCTIONS)
+    println("#include \"luaot_footer.c\"");
+    #else
+    #error "Unknown type"
     #endif
 
 }
@@ -703,8 +711,10 @@ void luaot_PrintOpcodeComment(Proto *f, int pc)
 #include "luaot_gotos.c"
 #elif defined(LUAOT_USE_SWITCHES)
 #include "luaot_switches.c"
+#elif defined(LUAOT_USE_FUNCTIONS)
+#include "luaot_functions.c"
 #else
-#error "Must define LUAOT_USE_GOTOS or LUAOT_USE_SWITCHES"
+#error "Must define LUAOT_USE_GOTOS or LUAOT_USE_SWITCHES or LUAOT_USE_FUNCTIONS"
 #endif
 
 static

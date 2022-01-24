@@ -2,6 +2,7 @@ src/lua
 src/luac
 src/luaot
 src/luaot-trampoline
+src/luaot-functions
 
 experiments/*.c
 experiments/*.so
