@@ -48,9 +48,9 @@ void create_function(Proto *f)
     println("  ctx->trap = L->hookmask;");
     println("  ctx->cl = clLvalue(s2v(ctx->ci->func));");
     println("  ctx->k = ctx->cl->p->k;");
-    println("  ctx->pc = ctx->ci->u.l.savedpc;");
+    println("  const Instruction *pc = ctx->ci->u.l.savedpc;");
     println("  if (l_unlikely(ctx->trap)) {");
-    println("    if (ctx->pc == ctx->cl->p->code) {  /* first instruction (not resuming)? */");
+    println("    if (pc == ctx->cl->p->code) {  /* first instruction (not resuming)? */");
     println("      if (ctx->cl->p->is_vararg)");
     println("        ctx->trap = 0;  /* hooks will start after VARARGPREP instruction */");
     println("      else  /* check 'call' hook */");
@@ -67,7 +67,7 @@ void create_function(Proto *f)
 
     // If we are returning from another function, or resuming a coroutine,
     // jump back to where left.
-    println("  switch (ctx->pc - code) {");
+    println("  switch (pc - code) {");
     for (int pc = 0; pc < f->sizecode; pc++) {
         println("    case %d: goto label_%02d;", pc, pc);
     }
@@ -84,8 +84,7 @@ void create_function(Proto *f)
         // points towards the next instruction. There are some corner cases
         // where the program counter getss adjusted mid-instruction, but I
         // am not breaking anything because of those...
-        println("  #undef  LUAOT_PC");
-        println("  #define LUAOT_PC (code + %d)", pc+1);
+        println("  pc = (code + %d);", pc+1);
 
         int next = pc + 1;
         println("  #undef  LUAOT_NEXT_JUMP");
@@ -100,6 +99,7 @@ void create_function(Proto *f)
         }
 
         println("  label_%02d: {", pc);
+        //println("    fprintf(stderr, \"OP=%%d\\n\", %d);", pc);
         println("    aot_vmfetch(0x%08x);", instr);
 
         switch (op) {

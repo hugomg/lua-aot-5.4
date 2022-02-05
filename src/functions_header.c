@@ -19,7 +19,6 @@ typedef struct {
     LClosure *cl;
     TValue *k;
     StkId base;
-    const Instruction *pc;
     int trap;
 } LuaotExecuteState;
 
@@ -139,7 +138,7 @@ typedef struct {
 //
 
 #undef  savepc
-#define savepc(L)	(ctx->ci->u.l.savedpc = LUAOT_PC)
+#define savepc(L)	(ctx->ci->u.l.savedpc = pc)
 
 //
 
@@ -160,7 +159,7 @@ typedef struct {
 #undef  vmfetch
 #define aot_vmfetch(instr)	{ \
   if (l_unlikely(ctx->trap)) {  /* stack reallocation or hooks? */ \
-    luaot_vmfetch_trap(L, ctx, LUAOT_PC-1); \
+    luaot_vmfetch_trap(L, ctx, pc-1); \
   } \
   i = instr; \
   ra = RA(i); /* WARNING: any stack reallocation invalidates 'ra' */ \
