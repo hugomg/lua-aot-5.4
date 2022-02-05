@@ -114,62 +114,53 @@ void create_function(Proto *f)
             }
             case OP_LOADF: {
                 println("    int b = GETARG_sBx(i);");
-                println("    setfltvalue(s2v(ra), cast_num(b));");
+                println("    luaot_LOADF(ra, b);");
                 break;
             }
             case OP_LOADK: {
                 println("    TValue *rb = ctx->k + GETARG_Bx(i);");
-                println("    setobj2s(L, ra, rb);");
+                println("    luaot_LOADK(L, ra, rb);");
                 break;
             }
             case OP_LOADKX: {
                 println("    TValue *rb;");
                 println("    rb = ctx->k + GETARG_Ax(0x%08x);", f->code[pc+1]);
-                println("    setobj2s(L, ra, rb);");
+                println("    luaot_LOADKX(L, ra, rb);");
                 println("    goto LUAOT_SKIP1;"); //(!)
                 break;
             }
             case OP_LOADFALSE: {
-                println("    setbfvalue(s2v(ra));");
+                println("    luaot_LOADFALSE(ra);");
                 break;
             }
             case OP_LFALSESKIP: {
-                println("    setbfvalue(s2v(ra));");
+                println("    luaot_LFALSESKIP(ra);");
                 println("    goto LUAOT_SKIP1;"); //(!)
                 break;
             }
             case OP_LOADTRUE: {
-                println("    setbtvalue(s2v(ra));");
+                println("    luaot_LOADTRUE(ra)");
                 break;
             }
             case OP_LOADNIL: {
                 println("    int b = GETARG_B(i);");
-                println("    do {");
-                println("      setnilvalue(s2v(ra++));");
-                println("    } while (b--);");
+                println("    luaot_LOADNIL(ra, b);");
                 break;
             }
             case OP_GETUPVAL: {
                 println("    int b = GETARG_B(i);");
-                println("    setobj2s(L, ra, ctx->cl->upvals[b]->v);");
+                println("    luaot_GETUPVAL(L, ctx, ra, b);");
                 break;
             }
             case OP_SETUPVAL: {
-                println("    UpVal *uv = ctx->cl->upvals[GETARG_B(i)];");
-                println("    setobj(L, uv->v, s2v(ra));");
-                println("    luaC_barrier(L, uv, s2v(ra));");
+                println("    int b = GETARG_B(i);");
+                println("    luaot_SETUPVAL(L, ctx, ra, b);");
                 break;
             }
             case OP_GETTABUP: {
-                println("    const TValue *slot;");
-                println("    TValue *upval = ctx->cl->upvals[GETARG_B(i)]->v;");
+                println("    int b = GETARG_B(i);");
                 println("    TValue *rc = KC(i);");
-                println("    TString *key = tsvalue(rc);  /* key must be a string */");
-                println("    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {");
-                println("      setobj2s(L, ra, slot);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishget(L, upval, rc, ra, slot));");
+                println("    luaot_GETTABUP(L, ctx, pc, ra, b, rc);");
                 break;
             }
             case OP_GETTABLE: {

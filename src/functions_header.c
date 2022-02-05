@@ -190,3 +190,79 @@ void luaot_LOADI(lua_State *L,
 {
     setivalue(s2v(ra), b);
 }
+
+static
+void luaot_LOADF(StkId ra, int b)
+{
+    setfltvalue(s2v(ra), cast_num(b));
+}
+
+static
+void luaot_LOADK(lua_State *L,
+                 StkId ra, TValue * rb)
+{
+    setobj2s(L, ra, rb);
+}
+
+static
+void luaot_LOADKX(lua_State *L,
+                  StkId ra, TValue *rb)
+{
+    setobj2s(L, ra, rb);
+}
+
+static
+void luaot_LOADFALSE(StkId ra)
+{
+    setbfvalue(s2v(ra));
+}
+
+static
+void luaot_LFALSESKIP(StkId ra)
+{
+     setbfvalue(s2v(ra));
+}
+
+static
+void luaot_LOADTRUE(StkId ra)
+{
+    setbtvalue(s2v(ra));
+}
+
+static
+void luaot_LOADNIL(StkId ra, int b)
+{
+    do {
+        setnilvalue(s2v(ra++));
+    } while (b--);
+}
+
+static
+void luaot_GETUPVAL(lua_State *L, LuaotExecuteState *ctx,
+                    StkId ra, int b)
+{
+    setobj2s(L, ra, ctx->cl->upvals[b]->v);
+}
+
+static
+void luaot_SETUPVAL(lua_State *L, LuaotExecuteState *ctx,
+                    StkId ra, int b)
+{
+    UpVal *uv = ctx->cl->upvals[b];
+    setobj(L, uv->v, s2v(ra));
+    luaC_barrier(L, uv, s2v(ra));
+}
+
+static
+void luaot_GETTABUP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                    StkId ra, int b, TValue *rc)
+{
+    const TValue *slot;
+    TValue *upval = ctx->cl->upvals[b]->v;
+    TString *key = tsvalue(rc);  /* key must be a string */
+    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {
+      setobj2s(L, ra, slot);
+    }
+    else
+      Protect(luaV_finishget(L, upval, rc, ra, slot));
+}
