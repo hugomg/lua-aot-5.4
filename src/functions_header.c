@@ -178,3 +178,16 @@ void luaot_vmfetch_trap(lua_State *L, LuaotExecuteState *ctx, const Instruction 
     updatebase(ctx->ci);  /* correct stack */ \
 }
 
+static
+void luaot_MOVE(lua_State *L,
+                StkId ra, StkId rb)
+{
+    setobjs2s(L, ra, rb);
+}
+
+static
+void luaot_LOADI(lua_State *L,
+                 StkId ra, lua_Integer b)
+{
+    setivalue(s2v(ra), b);
+}

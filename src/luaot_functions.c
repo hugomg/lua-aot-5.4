@@ -104,12 +104,12 @@ void create_function(Proto *f)
 
         switch (op) {
             case OP_MOVE: {
-                println("    setobjs2s(L, ra, RB(i));");
+                println("    luaot_MOVE(L, ra, RB(i));");
                 break;
             }
             case OP_LOADI: {
                 println("    lua_Integer b = GETARG_sBx(i);");
-                println("    setivalue(s2v(ra), b);");
+                println("    luaot_LOADI(L, ra, b);");
                 break;
             }
             case OP_LOADF: {
