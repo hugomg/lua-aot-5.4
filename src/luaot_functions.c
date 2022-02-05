@@ -41,8 +41,8 @@ void create_function(Proto *f)
     println("static");
     println("CallInfo *magic_implementation_%02d(lua_State *L, CallInfo *ci)", func_id);
     println("{");
-    println("  struct LuaotExecuteState ctx_;");
-    println("  struct LuaotExecuteState *ctx = &ctx_;");
+    println("  LuaotExecuteState ctx_;");
+    println("  LuaotExecuteState *ctx = &ctx_;");
     printnl();    
     println("  ctx->ci = ci;");
     println("  ctx->trap = L->hookmask;");

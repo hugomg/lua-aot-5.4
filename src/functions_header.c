@@ -12,7 +12,7 @@
 //
 //
 
-struct LuaotExecuteState {
+typedef struct {
     //lua_State *L;
     //Instruction i;
     CallInfo *ci;
@@ -21,7 +21,7 @@ struct LuaotExecuteState {
     StkId base;
     const Instruction *pc;
     int trap;
-};
+} LuaotExecuteState;
 
 
 //
@@ -160,8 +160,7 @@ struct LuaotExecuteState {
 #undef  vmfetch
 #define aot_vmfetch(instr)	{ \
   if (l_unlikely(ctx->trap)) {  /* stack reallocation or hooks? */ \
-    ctx->trap = luaG_traceexec(L, LUAOT_PC - 1);  /* handle hooks */ \
-    updatebase(ctx->ci);  /* correct stack */ \
+    luaot_vmfetch_trap(L, ctx, LUAOT_PC-1); \
   } \
   i = instr; \
   ra = RA(i); /* WARNING: any stack reallocation invalidates 'ra' */ \
@@ -170,4 +169,12 @@ struct LuaotExecuteState {
 #undef  vmdispatch
 #undef  vmcase
 #undef  vmbreak
+
+
+static
+void luaot_vmfetch_trap(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc)
+{
+    ctx->trap = luaG_traceexec(L, pc);  /* handle hooks */ \
+    updatebase(ctx->ci);  /* correct stack */ \
+}
 
