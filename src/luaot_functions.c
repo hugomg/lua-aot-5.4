@@ -209,33 +209,21 @@ void create_function(Proto *f)
             case OP_NEWTABLE: {
                 println("    int b = GETARG_B(i);  /* log2(hash size) + 1 */");
                 println("    int c = GETARG_C(i);  /* array size */");
-                println("    Table *t;");
-                println("    if (b > 0)");
-                println("      b = 1 << (b - 1);  /* size is 2^(b - 1) */");
-                println("    lua_assert((!TESTARG_k(i)) == (GETARG_Ax(0x%08x) == 0));", f->code[pc+1]);
-                println("    if (TESTARG_k(i))");
-                println("      c += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
-                println("    /* skip extra argument */"); // (!)
-                println("    L->top = ra + 1;  /* correct top in case of emergency GC */");
-                println("    t = luaH_new(L);  /* memory allocation */");
-                println("    sethvalue2s(L, ra, t);");
-                println("    if (b != 0 || c != 0)");
-                println("      luaH_resize(L, t, c, b);  /* idem */");
-                println("    checkGC(L, ra + 1);");
+                println("    int k = TESTARK_k(i);");
+                println("    lua_assert((!k) == (GETARG_Ax(0x%08x) == 0));", f->code[pc+1]);
+                println("    if (k) {");
+                println("        luaot_NEWTABLE_1(L, ctx, pc, ra, b, c);");
+                println("    } else {");
+                println("        c += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
+                println("        luaot_NEWTABLE_1(L, ctx, pc, ra, b, c);");
+                println("    }");
                 println("    goto LUAOT_SKIP1;"); // (!)
                 break;
             }
             case OP_SELF: {
-                println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    TValue *rc = RKC(i);");
-                println("    TString *key = tsvalue(rc);  /* key must be a string */");
-                println("    setobj2s(L, ra + 1, rb);");
-                println("    if (luaV_fastget(L, rb, key, slot, luaH_getstr)) {");
-                println("      setobj2s(L, ra, slot);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
+                println("    luaot_SELF(L, ctx, pc, ra, rb, rc);");
                 break;
             }
             case OP_ADDI: {

@@ -151,6 +151,12 @@ typedef struct {
 #undef  halfProtect
 #define halfProtect(exp)  (savestate(L,ctx->ci), (exp))
 
+#undef checkGC
+#define checkGC(L,c)  \
+	{ luaC_condGC(L, (savepc(L), L->top = (c)), \
+                         updatetrap(ctx->ci)); \
+           luai_threadyield(L); }
+
 //
 // Our modified version of vmfetch(). Since instr and index are compile time
 // constants, the C compiler should be able to optimize the code in many cases.
@@ -365,4 +371,52 @@ void luaot_SETFIELD(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
     }
     else
       Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
+}
+
+static
+void luaot_NEWTABLE_0(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                      StkId ra, int b, int c)
+{
+    Table *t;
+    if (b > 0)
+      b = 1 << (b - 1);  /* size is 2^(b - 1) */
+    lua_assert((!TESTARG_k(i)) == (GETARG_Ax(0x%08x) == 0));
+    /* skip extra argument */
+    L->top = ra + 1;  /* correct top in case of emergency GC */
+    t = luaH_new(L);  /* memory allocation */
+    sethvalue2s(L, ra, t);
+    if (b != 0 || c != 0)
+      luaH_resize(L, t, c, b);  /* idem */
+    checkGC(L, ra + 1);
+}
+
+static
+void luaot_NEWTABLE_1(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                      StkId ra, int b, int c)
+{
+    Table *t;
+    if (b > 0)
+      b = 1 << (b - 1);  /* size is 2^(b - 1) */
+    lua_assert((!TESTARG_k(i)) == (GETARG_Ax(0x%08x) == 0));
+    /* skip extra argument */
+    L->top = ra + 1;  /* correct top in case of emergency GC */
+    t = luaH_new(L);  /* memory allocation */
+    sethvalue2s(L, ra, t);
+    if (b != 0 || c != 0)
+      luaH_resize(L, t, c, b);  /* idem */
+    checkGC(L, ra + 1);
+}
+
+static
+void luaot_SELF(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                StkId ra, TValue *rb, TValue *rc)
+{
+    const TValue *slot;
+    TString *key = tsvalue(rc);  /* key must be a string */
+    setobj2s(L, ra + 1, rb);
+    if (luaV_fastget(L, rb, key, slot, luaH_getstr)) {
+      setobj2s(L, ra, slot);
+    }
+    else
+      Protect(luaV_finishget(L, rb, rc, ra, slot));
 }
