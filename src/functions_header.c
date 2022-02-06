@@ -110,6 +110,13 @@ typedef struct {
   (f)(L, ctx, pc, ra, v1, v2); \
 }
 
+#define luaot_arithfK(L, f) {  \
+  TValue *v1 = vRB(i);  \
+  TValue *v2 = KC(i); \
+  lua_assert(ttisnumber(v2));  \
+  (f)(L, ctx, pc, ra, v1, v2); \
+}
+
 #define luaot_bitwiseK(L, f) { \
   TValue *v1 = vRB(i); \
   TValue *v2 = KC(i);  \

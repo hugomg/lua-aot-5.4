@@ -145,7 +145,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_LOADTRUE: {
-                println("    luaot_LOADTRUE(ra)");
+                println("    luaot_LOADTRUE(ra);");
                 break;
             }
             case OP_LOADNIL: {
@@ -178,7 +178,7 @@ void create_function(Proto *f)
             case OP_GETI: {
                 println("    TValue *rb = vRB(i);");
                 println("    int c = GETARG_C(i);");
-                println("    luaot_GETI(L, ctx, pc, ra, rb, rc);");
+                println("    luaot_GETI(L, ctx, pc, ra, rb, c);");
                 break;
             }
             case OP_GETFIELD: {
@@ -215,7 +215,7 @@ void create_function(Proto *f)
             case OP_NEWTABLE: {
                 println("    int b = GETARG_B(i);  /* log2(hash size) + 1 */");
                 println("    int c = GETARG_C(i);  /* array size */");
-                println("    int k = TESTARK_k(i);");
+                println("    int k = TESTARG_k(i);");
                 println("    lua_assert((!k) == (GETARG_Ax(0x%08x) == 0));", f->code[pc+1]);
                 println("    if (k) {");
                 println("        luaot_NEWTABLE_1(L, ctx, pc, ra, b, c);");
@@ -590,7 +590,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_TFORLOOP: {
-                println("    if (luaot_TFORLOOP(L, ctx, pc, ra) {");
+                println("    if (luaot_TFORLOOP(L, ctx, pc, ra)) {");
                 println("      goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
                 println("    }");
                 break;
