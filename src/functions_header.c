@@ -266,3 +266,103 @@ void luaot_GETTABUP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
     else
       Protect(luaV_finishget(L, upval, rc, ra, slot));
 }
+
+static
+void luaot_GETTABLE(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                    StkId ra, TValue *rb, TValue *rc)
+{
+    const TValue *slot;
+    lua_Unsigned n;
+    if (ttisinteger(rc)  /* fast track for integers? */
+        ? (cast_void(n = ivalue(rc)), luaV_fastgeti(L, rb, n, slot))
+        : luaV_fastget(L, rb, rc, slot, luaH_get)) {
+      setobj2s(L, ra, slot);
+    }
+    else
+      Protect(luaV_finishget(L, rb, rc, ra, slot));
+}
+
+static
+void luaot_GETI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                StkId ra, TValue *rb, int c)
+{
+    const TValue *slot;
+    if (luaV_fastgeti(L, rb, c, slot)) {
+      setobj2s(L, ra, slot);
+    }
+    else {
+      TValue key;
+      setivalue(&key, c);
+      Protect(luaV_finishget(L, rb, &key, ra, slot));
+    }
+}
+
+static
+void luaot_GETFIELD(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                    StkId ra, TValue *rb, TValue *rc)
+{
+    const TValue *slot;
+    TString *key = tsvalue(rc);  /* key must be a string */
+    if (luaV_fastget(L, rb, key, slot, luaH_getshortstr)) {
+      setobj2s(L, ra, slot);
+    }
+    else
+      Protect(luaV_finishget(L, rb, rc, ra, slot));
+}
+
+static
+void luaot_SETTABUP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                    int a, TValue *rb, TValue *rc)
+{
+    const TValue *slot;
+    TValue *upval = ctx->cl->upvals[a]->v;
+    TString *key = tsvalue(rb);  /* key must be a string */
+    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {
+      luaV_finishfastset(L, upval, slot, rc);
+    }
+    else
+      Protect(luaV_finishset(L, upval, rb, rc, slot));
+}
+
+static
+void luaot_SETTABLE(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                    StkId ra, TValue *rb, TValue *rc)
+{
+    const TValue *slot;
+    lua_Unsigned n;
+    if (ttisinteger(rb)  /* fast track for integers? */
+        ? (cast_void(n = ivalue(rb)), luaV_fastgeti(L, s2v(ra), n, slot))
+        : luaV_fastget(L, s2v(ra), rb, slot, luaH_get)) {
+      luaV_finishfastset(L, s2v(ra), slot, rc);
+    }
+    else
+      Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
+}
+
+static
+void luaot_SETI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                StkId ra, int b, TValue *rc)
+{
+    const TValue *slot;
+    if (luaV_fastgeti(L, s2v(ra), b, slot)) {
+      luaV_finishfastset(L, s2v(ra), slot, rc);
+    }
+    else {
+      TValue key;
+      setivalue(&key, b);
+      Protect(luaV_finishset(L, s2v(ra), &key, rc, slot));
+    }
+}
+
+static
+void luaot_SETFIELD(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                    StkId ra, TValue *rb, TValue *rc)
+{
+    const TValue *slot;
+    TString *key = tsvalue(rb);  /* key must be a string */
+    if (luaV_fastget(L, s2v(ra), key, slot, luaH_getshortstr)) {
+      luaV_finishfastset(L, s2v(ra), slot, rc);
+    }
+    else
+      Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
+}

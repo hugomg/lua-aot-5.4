@@ -164,96 +164,46 @@ void create_function(Proto *f)
                 break;
             }
             case OP_GETTABLE: {
-                println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    TValue *rc = vRC(i);");
-                println("    lua_Unsigned n;");
-                println("    if (ttisinteger(rc)  /* fast track for integers? */");
-                println("        ? (cast_void(n = ivalue(rc)), luaV_fastgeti(L, rb, n, slot))");
-                println("        : luaV_fastget(L, rb, rc, slot, luaH_get)) {");
-                println("      setobj2s(L, ra, slot);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
+                println("    luaot_GETTABLE(L, ctx, pc, ra, rb, rc);");
                 break;
             }
             case OP_GETI: {
-                println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    int c = GETARG_C(i);");
-                println("    if (luaV_fastgeti(L, rb, c, slot)) {");
-                println("      setobj2s(L, ra, slot);");
-                println("    }");
-                println("    else {");
-                println("      TValue key;");
-                println("      setivalue(&key, c);");
-                println("      Protect(luaV_finishget(L, rb, &key, ra, slot));");
-                println("    }");
+                println("    luaot_GETI(L, ctx, pc, ra, rb, rc);");
                 break;
             }
             case OP_GETFIELD: {
-                println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    TValue *rc = KC(i);");
-                println("    TString *key = tsvalue(rc);  /* key must be a string */");
-                println("    if (luaV_fastget(L, rb, key, slot, luaH_getshortstr)) {");
-                println("      setobj2s(L, ra, slot);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishget(L, rb, rc, ra, slot));");
+                println("    luaot_GETFIELD(L, ctx, pc, ra, rb, rc);");
                 break;
             }
             case OP_SETTABUP: {
-                println("    const TValue *slot;");
-                println("    TValue *upval = ctx->cl->upvals[GETARG_A(i)]->v;");
+                println("    int a = GETARG_A(i);");
                 println("    TValue *rb = KB(i);");
                 println("    TValue *rc = RKC(i);");
-                println("    TString *key = tsvalue(rb);  /* key must be a string */");
-                println("    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {");
-                println("      luaV_finishfastset(L, upval, slot, rc);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishset(L, upval, rb, rc, slot));");
+                println("    luaot_SETTABUP(L, ctx, pc, a, rb, rc);");
                 break;
             }
             case OP_SETTABLE: {
-                println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);  /* key (table is in 'ra') */");
                 println("    TValue *rc = RKC(i);  /* value */");
-                println("    lua_Unsigned n;");
-                println("    if (ttisinteger(rb)  /* fast track for integers? */");
-                println("        ? (cast_void(n = ivalue(rb)), luaV_fastgeti(L, s2v(ra), n, slot))");
-                println("        : luaV_fastget(L, s2v(ra), rb, slot, luaH_get)) {");
-                println("      luaV_finishfastset(L, s2v(ra), slot, rc);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));");
+                println("    luaot_SETTABLE(L, ctx, pc, ra, rb, rc);");
                 break;
             }
             case OP_SETI: {
-                println("    const TValue *slot;");
-                println("    int c = GETARG_B(i);");
+                println("    int b = GETARG_B(i);");
                 println("    TValue *rc = RKC(i);");
-                println("    if (luaV_fastgeti(L, s2v(ra), c, slot)) {");
-                println("      luaV_finishfastset(L, s2v(ra), slot, rc);");
-                println("    }");
-                println("    else {");
-                println("      TValue key;");
-                println("      setivalue(&key, c);");
-                println("      Protect(luaV_finishset(L, s2v(ra), &key, rc, slot));");
-                println("    }");
+                println("    luaot_SETI(L, ctx, pc, ra, b, rc);");
                 break;
             }
             case OP_SETFIELD: {
-                println("    const TValue *slot;");
                 println("    TValue *rb = KB(i);");
                 println("    TValue *rc = RKC(i);");
-                println("    TString *key = tsvalue(rb);  /* key must be a string */");
-                println("    if (luaV_fastget(L, s2v(ra), key, slot, luaH_getshortstr)) {");
-                println("      luaV_finishfastset(L, s2v(ra), slot, rc);");
-                println("    }");
-                println("    else");
-                println("      Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));");
+                println("    luaot_SETFIELD(L, ctx, pc, ra, rb, rc);");
                 break;
             }
             case OP_NEWTABLE: {
