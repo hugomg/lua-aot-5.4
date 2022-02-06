@@ -656,16 +656,12 @@ void create_function(Proto *f)
             }
             case OP_VARARG: {
                 println("    int n = GETARG_C(i) - 1;  /* required results */");
-                println("    Protect(luaT_getvarargs(L, ctx->ci, ra, n));");
+                println("    luaot_VARARG(L, ctx, pc, ra, n);");
                 break;
             }
             case OP_VARARGPREP: {
-                println("    ProtectNT(luaT_adjustvarargs(L, GETARG_A(i), ctx->ci, ctx->cl->p));");
-                println("    if (l_unlikely(ctx->trap)) {  /* previous \"Protect\" updated trap */");
-                println("      luaD_hookcall(L, ctx->ci);");
-                println("      L->oldpc = 1;  /* next opcode will be seen as a \"new\" line */");
-                println("    }");
-                println("    updatebase(ctx->ci);  /* function has new base after adjustment */");
+                println("    int a = GETARG_A(i);");
+                println("    luaot_VARARGPREP(L, ctx, pc, a);");
                 break;
             }
             case OP_EXTRAARG: {

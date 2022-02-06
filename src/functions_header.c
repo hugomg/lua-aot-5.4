@@ -878,3 +878,22 @@ CallInfo* luaot_CALL(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc
         return ctx->ci;
     }
 }
+
+static
+void luaot_VARARG(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                  StkId ra, int n)
+{
+    Protect(luaT_getvarargs(L, ctx->ci, ra, n));
+}
+
+static
+void luaot_VARARGPREP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                      int a)
+{
+    ProtectNT(luaT_adjustvarargs(L, a, ctx->ci, ctx->cl->p));
+    if (l_unlikely(ctx->trap)) {  /* previous "Protect" updated trap */
+      luaD_hookcall(L, ctx->ci);
+      L->oldpc = 1;  /* next opcode will be seen as a "new" line */
+    }
+    updatebase(ctx->ci);  /* function has new base after adjustment */
+}
