@@ -80,6 +80,12 @@ void create_function(Proto *f)
 
         luaot_PrintOpcodeComment(f, pc);
 
+        if (op == OP_MMBIN || op == OP_MMBINI || op == OP_MMBINK) {
+            println("  label_%02d: {}", pc);
+            printnl();
+            continue;
+        }
+
         // While an instruction is executing, the program counter typically
         // points towards the next instruction. There are some corner cases
         // where the program counter getss adjusted mid-instruction, but I
@@ -273,16 +279,13 @@ void create_function(Proto *f)
             case OP_SHRI: {
                 println("    TValue *rb = vRB(i);");
                 println("    int ic = GETARG_sC(i);");
-                println("    if (luaot_SHRI(L, ra, rb, ic))");
-                println("      goto LUAOT_SKIP1;");
+                println("    luaot_SHRI(L, ctx, pc, ra, rb, ic);");
                 break;
             }
             case OP_SHLI: {
                 println("    TValue *rb = vRB(i);");
                 println("    int ic = GETARG_sC(i);");
-                println("    if (luaot_SHLI(L, ra, rb, ic))");
-                println("      goto LUAOT_SKIP1;");
-                println("    luaot_arithI(L, luaot_SHRL);");
+                println("    luaot_SHLI(L, ctx, pc, ra, rb, ic);");
                 break;
             }
             case OP_ADD: {
@@ -334,30 +337,15 @@ void create_function(Proto *f)
                 break;
             }
             case OP_MMBIN: {
-                println("    Instruction pi = 0x%08x; /* original arith. expression */", f->code[pc-1]);
-                println("    TValue *rb = vRB(i);");
-                println("    TMS tm = (TMS)GETARG_C(i);");
-                println("    StkId result = RA(pi);");
-                println("    lua_assert(OP_ADD <= GET_OPCODE(pi) && GET_OPCODE(pi) <= OP_SHR);");
-                println("    Protect(luaT_trybinTM(L, s2v(ra), rb, result, tm));");
+                // Inlined in previous opcode
                 break;
             }
             case OP_MMBINI: {
-                println("    Instruction pi = 0x%0x;  /* original arith. expression */", f->code[pc-1]);
-                println("    int imm = GETARG_sB(i);");
-                println("    TMS tm = (TMS)GETARG_C(i);");
-                println("    int flip = GETARG_k(i);");
-                println("    StkId result = RA(pi);");
-                println("    Protect(luaT_trybiniTM(L, s2v(ra), imm, flip, result, tm));");
+                // Inlined in previous opcode
                 break;
             }
             case OP_MMBINK: {
-                println("    Instruction pi = 0x%08x;  /* original arith. expression */", f->code[pc-1]);
-                println("    TValue *imm = KB(i);");
-                println("    TMS tm = (TMS)GETARG_C(i);");
-                println("    int flip = GETARG_k(i);");
-                println("    StkId result = RA(pi);");
-                println("    Protect(luaT_trybinassocTM(L, s2v(ra), imm, flip, result, tm));");
+                // Inlined in previous opcode
                 break;
             }
             case OP_UNM: {
