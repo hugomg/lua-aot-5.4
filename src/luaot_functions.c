@@ -350,38 +350,22 @@ void create_function(Proto *f)
             }
             case OP_UNM: {
                 println("    TValue *rb = vRB(i);");
-                println("    lua_Number nb;");
-                println("    if (ttisinteger(rb)) {");
-                println("      lua_Integer ib = ivalue(rb);");
-                println("      setivalue(s2v(ra), intop(-, 0, ib));");
-                println("    }");
-                println("    else if (tonumberns(rb, nb)) {");
-                println("      setfltvalue(s2v(ra), luai_numunm(L, nb));");
-                println("    }");
-                println("    else");
-                println("      Protect(luaT_trybinTM(L, rb, rb, ra, TM_UNM));");
+                println("    luaot_UNM(L, ctx, pc, ra, rb);");
                 break;
             }
             case OP_BNOT: {
                 println("    TValue *rb = vRB(i);");
-                println("    lua_Integer ib;");
-                println("    if (tointegerns(rb, &ib)) {");
-                println("      setivalue(s2v(ra), intop(^, ~l_castS2U(0), ib));");
-                println("    }");
-                println("    else");
-                println("      Protect(luaT_trybinTM(L, rb, rb, ra, TM_BNOT));");
+                println("    luaot_BNOT(L, ctx, pc, ra, rb);");
                 break;
             }
             case OP_NOT: {
                 println("    TValue *rb = vRB(i);");
-                println("    if (l_isfalse(rb))");
-                println("      setbtvalue(s2v(ra));");
-                println("    else");
-                println("      setbfvalue(s2v(ra));");
+                println("    luaot_NOT(L, ctx, pc, ra, rb);");
                 break;
             }
             case OP_LEN: {
-                println("    Protect(luaV_objlen(L, ra, vRB(i)));");
+                println("    TValue *rb = vRB(i);");
+                println("    luaot_LEN(L, ctx, pc, ra, rb);");
                 break;
             }
             case OP_CONCAT: {

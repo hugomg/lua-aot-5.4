@@ -691,12 +691,47 @@ void luaot_SHL(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
     op_bitwise_aux(L, luaV_shiftl);
 }
 
-#if 0
 static
-void luaot_(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
-           LuaotExecuteState *ctx, const Instruction *pc,
-           StkId ra, TValue *v1, int c)
+void luaot_UNM(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+               StkId ra, TValue *rb)
 {
+    lua_Number nb;
+    if (ttisinteger(rb)) {
+      lua_Integer ib = ivalue(rb);
+      setivalue(s2v(ra), intop(-, 0, ib));
+    }
+    else if (tonumberns(rb, nb)) {
+      setfltvalue(s2v(ra), luai_numunm(L, nb));
+    }
+    else
+      Protect(luaT_trybinTM(L, rb, rb, ra, TM_UNM));
 }
-#endif
 
+static
+void luaot_BNOT(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                StkId ra, TValue *rb)
+{
+    lua_Integer ib;
+    if (tointegerns(rb, &ib)) {
+      setivalue(s2v(ra), intop(^, ~l_castS2U(0), ib));
+    }
+    else
+      Protect(luaT_trybinTM(L, rb, rb, ra, TM_BNOT));
+}
+
+static
+void luaot_NOT(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+               StkId ra, TValue *rb)
+{
+    if (l_isfalse(rb))
+      setbtvalue(s2v(ra));
+    else
+      setbfvalue(s2v(ra));
+}
+
+static
+void luaot_LEN(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+               StkId ra, TValue *rb)
+{
+    Protect(luaV_objlen(L, ra, rb));
+}
