@@ -193,7 +193,7 @@ typedef struct {
 
 #undef  updatestack
 #define updatestack(ci)  \
-	{ if (l_unlikely(ctx->trap)) { updatebase(ci); ra = RA(i); } }
+	{ if (l_unlikely(ctx->trap)) { updatebase(ci); ra = RA(*(pc-1)); } }
 
 //
 // These are the core macros for performing jumps.
@@ -876,6 +876,72 @@ CallInfo* luaot_CALL(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc
         ctx->ci = newci;
         ctx->ci->callstatus = 0;  /* call re-uses 'luaV_execute' */
         return ctx->ci;
+    }
+}
+
+static
+int luaot_FORLOOP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                   StkId ra)
+{
+    if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */
+      lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));
+      if (count > 0) {  /* still more iterations? */
+        lua_Integer step = ivalue(s2v(ra + 2));
+        lua_Integer idx = ivalue(s2v(ra));  /* internal index */
+        chgivalue(s2v(ra + 1), count - 1);  /* update counter */
+        idx = intop(+, idx, step);  /* add step to index */
+        chgivalue(s2v(ra), idx);  /* update internal index */
+        setivalue(s2v(ra + 3), idx);  /* and control variable */
+        return 1; // Jump back
+      }
+    }
+    else if (floatforloop(ra)) /* float loop */
+      return 1; // jump back
+    updatetrap(ctx->ci);  /* allows a signal to break the loop */
+    return 0;
+}
+
+static
+int luaot_FORPREP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                  StkId ra)
+{
+    savestate(L, ctx->ci);  /* in case of errors */
+    return forprep(L, ra);
+}
+
+static
+void luaot_TFORPREP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                   StkId ra)
+{
+    /* create to-be-closed upvalue (if needed) */
+    halfProtect(luaF_newtbcupval(L, ra + 3));
+}
+
+static
+void luaot_TFORCALL(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                   StkId ra, int c)
+{
+    /* 'ra' has the iterator function, 'ra + 1' has the state,
+       'ra + 2' has the control variable, and 'ra + 3' has the
+       to-be-closed variable. The call will use the stack after
+       these values (starting at 'ra + 4')
+    */
+    /* push function, state, and control variable */
+    memcpy(ra + 4, ra, 3 * sizeof(*ra));
+    L->top = ra + 4 + 3;
+    ProtectNT(luaD_call(L, ra + 4, c));  /* do the call */
+    updatestack(ctx->ci);  /* stack may have changed */
+}
+
+static
+int luaot_TFORLOOP(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                   StkId ra)
+{
+    if (!ttisnil(s2v(ra + 4))) {  /* continue loop? */
+      setobjs2s(L, ra + 2, ra + 4);  /* save control variable */
+      return 1;
+    } else {
+      return 0;
     }
 }
 

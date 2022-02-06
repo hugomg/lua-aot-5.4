@@ -567,52 +567,30 @@ void create_function(Proto *f)
                 break;
             }
             case OP_FORLOOP: {
-                println("    if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */");
-                println("      lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));");
-                println("      if (count > 0) {  /* still more iterations? */");
-                println("        lua_Integer step = ivalue(s2v(ra + 2));");
-                println("        lua_Integer idx = ivalue(s2v(ra));  /* internal index */");
-                println("        chgivalue(s2v(ra + 1), count - 1);  /* update counter */");
-                println("        idx = intop(+, idx, step);  /* add step to index */");
-                println("        chgivalue(s2v(ra), idx);  /* update internal index */");
-                println("        setivalue(s2v(ra + 3), idx);  /* and control variable */");
-                println("        goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
-                println("      }");
-                println("    }");
-                println("    else if (floatforloop(ra)) /* float loop */");
+                println("    if (luaot_FORLOOP(L, ctx, pc, ra)) {");
                 println("      goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
-                println("    updatetrap(ctx->ci);  /* allows a signal to break the loop */");
+                println("    }");
                 break;
             }
             case OP_FORPREP: {
-                println("    savestate(L, ctx->ci);  /* in case of errors */");
-                println("    if (forprep(L, ra))");
+                println("    if (luaot_FORPREP(L, ctx, pc, ra)) {");
                 println("      goto label_%02d; /* skip the loop */", ((pc+1) + GETARG_Bx(instr) + 1)); //(!)
+                println("    }");
                 break;
             }
             case OP_TFORPREP: {
-                println("    /* create to-be-closed upvalue (if needed) */");
-                println("    halfProtect(luaF_newtbcupval(L, ra + 3));");
+                println("    luaot_TFORPREP(L, ctx, pc, ra);");
                 println("    goto label_%02d;", ((pc+1) + GETARG_Bx(instr))); //(!)
                 break;
             }
             case OP_TFORCALL: {
-                println("    /* 'ra' has the iterator function, 'ra + 1' has the state,");
-                println("       'ra + 2' has the control variable, and 'ra + 3' has the");
-                println("       to-be-closed variable. The call will use the stack after");
-                println("       these values (starting at 'ra + 4')");
-                println("    */");
-                println("    /* push function, state, and control variable */");
-                println("    memcpy(ra + 4, ra, 3 * sizeof(*ra));");
-                println("    L->top = ra + 4 + 3;");
-                println("    ProtectNT(luaD_call(L, ra + 4, GETARG_C(i)));  /* do the call */");
-                println("    updatestack(ctx->ci);  /* stack may have changed */");
+                println("    int c = GETARG_C(i);");
+                println("    luaot_TFORCALL(L, ctx, pc, ra, c);");
                 // (!) Going to the next instruction is a no-op
                 break;
             }
             case OP_TFORLOOP: {
-                println("    if (!ttisnil(s2v(ra + 4))) {  /* continue loop? */");
-                println("      setobjs2s(L, ra + 2, ra + 4);  /* save control variable */");
+                println("    if (luaot_TFORLOOP(L, ctx, pc, ra) {");
                 println("      goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
                 println("    }");
                 break;
