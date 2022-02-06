@@ -227,115 +227,110 @@ void create_function(Proto *f)
                 break;
             }
             case OP_ADDI: {
-                println("    op_arithI(L, l_addi, luai_numadd);");
+                println("    luaot_arithI(L, luaot_ADDI);");
                 break;
             }
             case OP_ADDK: {
-                println("    op_arithK(L, l_addi, luai_numadd);");
+                println("    luot_arithK(L, luaot_ADDK);");
                 break;
             }
             case OP_SUBK: {
-                println("    op_arithK(L, l_subi, luai_numsub);");
+                println("    luaot_arithK(L, luaot_SUBK);");
                 break;
             }
             case OP_MULK: {
-                println("    op_arithK(L, l_muli, luai_nummul);");
+                println("    luaot_arithK(L, luaot_MULK);");
                 break;
             }
             case OP_MODK: {
-                println("    op_arithK(L, luaV_mod, luaV_modf);");
+                println("    luaot_arithK(L, luaot_MODK);");
                 break;
             }
             case OP_POWK: {
-                println("    op_arithfK(L, luai_numpow);");
+                println("    luaot_arithfK(L, luaot_POWK);");
                 break;
             }
             case OP_DIVK: {
-                println("    op_arithfK(L, luai_numdiv);");
+                println("    luaot_arithfK(L, luaot_DIVK);");
                 break;
             }
             case OP_IDIVK: {
-                println("    op_arithK(L, luaV_idiv, luai_numidiv);");
+                println("    luaot_arithK(L, luaot_IDIVK);");
                 break;
             }
             case OP_BANDK: {
-                println("    op_bitwiseK(L, l_band);");
+                println("    luaot_bitwiseK(L, luaot_BANDK);");
                 break;
             }
             case OP_BORK: {
-                println("    op_bitwiseK(L, l_bor);");
+                println("    luaot_bitwiseK(L, luaot_BORK);");
                 break;
             }
             case OP_BXORK: {
-                println("    op_bitwiseK(L, l_bxor);");
+                println("    luaot_bitwiseK(L, luaot_BXORK);");
                 break;
             }
             case OP_SHRI: {
                 println("    TValue *rb = vRB(i);");
                 println("    int ic = GETARG_sC(i);");
-                println("    lua_Integer ib;");
-                println("    if (tointegerns(rb, &ib)) {");
-                println("       setivalue(s2v(ra), luaV_shiftl(ib, -ic));");
-                println("       goto LUAOT_SKIP1;"); // (!)
-                println("    }");
+                println("    if (luaot_SHRI(L, ra, rb, ic))");
+                println("      goto LUAOT_SKIP1;");
                 break;
             }
             case OP_SHLI: {
                 println("    TValue *rb = vRB(i);");
                 println("    int ic = GETARG_sC(i);");
-                println("    lua_Integer ib;");
-                println("    if (tointegerns(rb, &ib)) {");
-                println("       setivalue(s2v(ra), luaV_shiftl(ic, ib));");
-                println("       goto LUAOT_SKIP1;"); // (!)
-                println("    }");
+                println("    if (luaot_SHLI(L, ra, rb, ic))");
+                println("      goto LUAOT_SKIP1;");
+                println("    luaot_arithI(L, luaot_SHRL);");
                 break;
             }
             case OP_ADD: {
-                println("    op_arith(L, l_addi, luai_numadd);");
+                println("    luaot_arith(L, luaot_ADD);");
                 break;
             }
             case OP_SUB: {
-                println("    op_arith(L, l_subi, luai_numsub);");
+                println("    luaot_arith(L, luaot_SUB);");
                 break;
             }
             case OP_MUL: {
-                println("    op_arith(L, l_muli, luai_nummul);");
+                println("    luaot_arith(L, luaot_MUL);");
                 break;
             }
             case OP_MOD: {
-                println("    op_arith(L, luaV_mod, luaV_modf);");
+                println("    luaot_arith(L, luaot_MOD);");
                 break;
             }
             case OP_POW: {
-                println("    op_arithf(L, luai_numpow);");
+                println("    luaot_arithf(L, luaot_POW);");
                 break;
             }
             case OP_DIV: {  /* float division (always with floats: */
-                println("    op_arithf(L, luai_numdiv);");
+                println("    luaot_arithf(L, luaot_DIV);");
                 break;
             }
             case OP_IDIV: {  /* floor division */
-                println("    op_arith(L, luaV_idiv, luai_numidiv);");
+                println("    luaot_arith(L, luaot_IDIV);");
                 break;
             }
             case OP_BAND: {
-                println("    op_bitwise(L, l_band);");
+                println("    luaot_bitwise(L, luaot_BAND);");
                 break;
             }
             case OP_BOR: {
-                println("    op_bitwise(L, l_bor);");
+                println("    luaot_bitwise(L, luaot_BOR);");
                 break;
             }
             case OP_BXOR: {
-                println("    op_bitwise(L, l_bxor);");
+                println("    luaot_bitwise(L, luaot_BXOR);");
                 break;
             }
             case OP_SHR: {
-                println("    op_bitwise(L, luaV_shiftr);");
+                println("    luaot_bitwise(L, luaot_SHR);");
                 break;
             }
             case OP_SHL: {
-                println("    op_bitwise(L, luaV_shiftl);");
+                println("    luaot_bitwise(L, luaot_SHL);");
                 break;
             }
             case OP_MMBIN: {

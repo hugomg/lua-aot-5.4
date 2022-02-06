@@ -28,59 +28,110 @@ typedef struct {
 // fast case. We have to replace this with `goto LUAOT_SKIP1`
 //
 
-#undef  op_arithI
-#define op_arithI(L,iop,fop) {  \
-  TValue *v1 = vRB(i);  \
-  int imm = GETARG_sC(i);  \
+#undef op_arithI
+#undef op_arith
+#undef op_arithK
+#undef op_bitwiseK
+#undef op_bitwise
+
+#define op_arithI_aux(L,iop,fop) {  \
   if (ttisinteger(v1)) {  \
     lua_Integer iv1 = ivalue(v1);  \
     setivalue(s2v(ra), iop(L, iv1, imm));  \
-    goto LUAOT_SKIP1; \
+    return 1; \
   }  \
   else if (ttisfloat(v1)) {  \
     lua_Number nb = fltvalue(v1);  \
     lua_Number fimm = cast_num(imm);  \
     setfltvalue(s2v(ra), fop(L, nb, fimm)); \
-    goto LUAOT_SKIP1; \
+    return 1; \
+ } else { \
+    return 0; \
  }}
 
 #undef op_arithf_aux
-#define op_arithf_aux(L,v1,v2,fop) {  \
+#define op_arithf_aux(L,fop) {  \
   lua_Number n1; lua_Number n2;  \
   if (tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
     setfltvalue(s2v(ra), fop(L, n1, n2));  \
-    goto LUAOT_SKIP1; \
+    return 1; \
+  } else { \
+    return 0; \
   }}
 
 #undef op_arith_aux
-#define op_arith_aux(L,v1,v2,iop,fop) {  \
+#define op_arith_aux(L,iop,fop) {  \
   if (ttisinteger(v1) && ttisinteger(v2)) {  \
     lua_Integer i1 = ivalue(v1); lua_Integer i2 = ivalue(v2);  \
     setivalue(s2v(ra), iop(L, i1, i2));  \
-    goto LUAOT_SKIP1; \
+    return 1; \
   }  \
-  else op_arithf_aux(L, v1, v2, fop); }
+  else op_arithf_aux(L,fop); }
 
-#undef  op_bitwiseK
-#define op_bitwiseK(L,op) {  \
-  TValue *v1 = vRB(i);  \
-  TValue *v2 = KC(i);  \
+#define op_bitwiseK_aux(L,op) {  \
   lua_Integer i1;  \
   lua_Integer i2 = ivalue(v2);  \
   if (tointegerns(v1, &i1)) {  \
     setivalue(s2v(ra), op(i1, i2));  \
-    goto LUAOT_SKIP1; \
+    return 1; \
+  } else { \
+    return 0; \
   }}
 
-#undef  op_bitwise
-#define op_bitwise(L,op) {  \
-  TValue *v1 = vRB(i);  \
-  TValue *v2 = vRC(i);  \
+#define op_bitwise_aux(L,op) {  \
   lua_Integer i1; lua_Integer i2;  \
   if (tointegerns(v1, &i1) && tointegerns(v2, &i2)) {  \
     setivalue(s2v(ra), op(i1, i2));  \
-    goto LUAOT_SKIP1; \
+    return 1; \
+  } else { \
+    return 0; \
   }}
+
+//
+//
+//
+
+#define luaot_arithI(L,f) { \
+  TValue *v1 = vRB(i);  \
+  int imm = GETARG_sC(i);  \
+  if ((f)(L, ra, v1, imm)) \
+    goto LUAOT_SKIP1; \
+}
+
+#define luaot_arithK(L, f) { \
+  TValue *v1 = vRB(i); \
+  TValue *v2 = KC(i); lua_assert(ttisnumber(v2)); \
+  if ((f)(L, ra, v1, v2)) \
+    goto LUAOT_SKIP1; \
+}
+
+#define luaot_arith(L, f) { \
+  TValue *v1 = vRB(i); \
+  TValue *v2 = vRC(i); \
+  if ((f)(L, ra, v1, v2)) \
+    goto LUAOT_SKIP1; \
+}
+
+#define luaot_arithf(L, f) { \
+  TValue *v1 = vRB(i);  \
+  TValue *v2 = vRC(i);  \
+  if ((f)(L, ra, v1, v2)) \
+    goto LUAOT_SKIP1; \
+}
+
+#define luaot_bitwiseK(L, f) { \
+  TValue *v1 = vRB(i);  \
+  TValue *v2 = KC(i);  \
+  if ((f)(L, ra, v1, v2)) \
+    goto LUAOT_SKIP1; \
+}
+
+#define luaot_bitwise(L, f) {  \
+  TValue *v1 = vRB(i);  \
+  TValue *v2 = vRC(i);  \
+  if ((f)(L, ra, v1, v2)) \
+    goto LUAOT_SKIP1; \
+}
 
 /*
 ** some macros for common tasks in 'luaV_execute'
@@ -420,3 +471,175 @@ void luaot_SELF(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
     else
       Protect(luaV_finishget(L, rb, rc, ra, slot));
 }
+
+static
+int luaot_ADDI(lua_State *L, StkId ra, TValue *v1, int imm)
+{
+    op_arithI_aux(L, l_addi, luai_numadd);
+}
+
+static
+int luaot_ADDK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, l_addi, luai_numadd);
+}
+
+static
+int luaot_SUBK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, l_subi, luai_numsub);
+}
+
+static
+int luaot_MULK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, l_muli, luai_nummul);
+}
+
+static
+int luaot_MODK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, luaV_mod, luaV_modf);
+}
+
+static
+int luaot_POWK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arithf_aux(L, luai_numpow);
+}
+
+static
+int luaot_DIVK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arithf_aux(L, luai_numdiv);
+}
+
+static
+int luaot_IDIVK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, luaV_idiv, luai_numidiv);
+}
+
+static
+int luaot_BANDK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwiseK_aux(L, l_band);
+}
+
+static
+int luaot_BORK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwiseK_aux(L, l_bor);
+}
+
+static
+int luaot_BXORK(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwiseK_aux(L, l_bxor);
+}
+
+static
+int luaot_SHRI(lua_State *L, StkId ra, TValue *rb, int ic)
+{
+    lua_Integer ib;
+    if (tointegerns(rb, &ib)) {
+        setivalue(s2v(ra), luaV_shiftl(ib, -ic));
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+static
+int luaot_SHLI(lua_State *L,
+               StkId ra, TValue *rb, int ic)
+{
+    lua_Integer ib;
+    if (tointegerns(rb, &ib)) {
+        setivalue(s2v(ra), luaV_shiftl(ic, ib));
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+static
+int luaot_ADD(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, l_addi, luai_numadd);
+}
+
+static
+int luaot_SUB(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, l_subi, luai_numsub);
+}
+
+static
+int luaot_MUL(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, l_muli, luai_nummul);
+}
+
+static
+int luaot_MOD(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, luaV_mod, luaV_modf);
+}
+
+static
+int luaot_POW(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arithf_aux(L, luai_numpow);
+}
+
+static
+int luaot_DIV(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arithf_aux(L, luai_numdiv);
+}
+
+static
+int luaot_IDIV(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_arith_aux(L, luaV_idiv, luai_numidiv);
+}
+
+static
+int luaot_BAND(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwise_aux(L, l_band);
+}
+
+static
+int luaot_BOR(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwise_aux(L, l_bor);
+}
+
+static
+int luaot_BXOR(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwise_aux(L, l_bxor);
+}
+
+static
+int luaot_SHR(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwise_aux(L, luaV_shiftr);
+}
+
+static
+int luaot_SHL(lua_State *L, StkId ra, TValue *v1, TValue *v2)
+{
+    op_bitwise_aux(L, luaV_shiftl);
+}
+
+#if 0
+static
+int luaot_(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+           StkId ra, TValue *v1, int c)
+{
+}
+#endif
+
