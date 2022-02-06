@@ -17,11 +17,11 @@ void println_goto_ret()
 {
     // This is the piece of code that is after the "ret" label.
     // It should be used in the places that do "goto ret;"
-    println("    if (ci->callstatus & CIST_FRESH)");
+    println("    if (ctx->ci->callstatus & CIST_FRESH)");
     println("        return NULL;  /* end this frame */");
     println("    else {");
-    println("        ci = ci->previous;");
-    println("        return ci;");
+    println("        ctx->ci = ctx->ci->previous;");
+    println("        return ctx->ci;");
     println("    }");
 }
 
@@ -370,41 +370,43 @@ void create_function(Proto *f)
             }
             case OP_CONCAT: {
                 println("    int n = GETARG_B(i);  /* number of elements to concatenate */");
-                println("    L->top = ra + n;  /* mark the end of concat operands */");
-                println("    ProtectNT(luaV_concat(L, n));");
-                println("    checkGC(L, L->top); /* 'luaV_concat' ensures correct top */");
+                println("    luaot_CONCAT(L, ctx, pc, ra, n);");
                 break;
             }
             case OP_CLOSE: {
-                println("Protect(luaF_close(L, ra, LUA_OK, 1));");
+                println("    luaot_CLOSE(L, ctx, pc, ra);");
                 break;
             }
             case OP_TBC: {
-                println("    /* create new to-be-closed upvalue */");
-                println("    halfProtect(luaF_newtbcupval(L, ra));");
+                println("    luaot_TBC(L, ctx, pc, ra);");
                 break;
             }
             case OP_JMP: {
+                // INLINED
                 println("    updatetrap(ctx->ci);");
                 println("    goto label_%02d;", jump_target(f, pc));//(!)
                 break;
             }
             case OP_EQ: {
-                println("    int cond;");
                 println("    TValue *rb = vRB(i);");
-                println("    Protect(cond = luaV_equalobj(L, s2v(ra), rb));");
+                println("    int cond = luaot_EQ(L, ctx, pc, ra, rb);");
                 println("    docondjump();");
                 break;
             }
             case OP_LT: {
-                println("    op_order(L, l_lti, LTnum, lessthanothers);");
+                println("    TValue *rb = vRB(i);");
+                println("    int cond = luaot_LT(L, ctx, pc, ra, rb);");
+                println("    docondjump();");
                 break;
             }
             case OP_LE: {
-                println("    op_order(L, l_lei, LEnum, lessequalothers);");
+                println("    TValue *rb = vRB(i);");
+                println("    int cond = luaot_LE(L, ctx, pc, ra, rb);");
+                println("    docondjump();");
                 break;
             }
             case OP_EQK: {
+                // This can be simply inlined
                 println("    TValue *rb = KB(i);");
                 println("    /* basic types do not use '__eq'; we can use raw equality */");
                 println("    int cond = luaV_equalobj(NULL, s2v(ra), rb);");
@@ -412,39 +414,48 @@ void create_function(Proto *f)
                 break;
             }
             case OP_EQI: {
-                println("    int cond;");
                 println("    int im = GETARG_sB(i);");
-                println("    if (ttisinteger(s2v(ra)))");
-                println("      cond = (ivalue(s2v(ra)) == im);");
-                println("    else if (ttisfloat(s2v(ra)))");
-                println("      cond = luai_numeq(fltvalue(s2v(ra)), cast_num(im));");
-                println("    else");
-                println("      cond = 0;  /* other types cannot be equal to a number */");
+                println("    int isf = GETARG_C(i);");
+                println("    int cond = luaot_EQI(L, ctx, pc, ra, im, isf);");
                 println("    docondjump();");
                 break;
             }
             case OP_LTI: {
-                println("    op_orderI(L, l_lti, luai_numlt, 0, TM_LT);");
+                println("    int im = GETARG_sB(i);");
+                println("    int isf = GETARG_C(i);");
+                println("    int cond = luaot_LTI(L, ctx, pc, ra, im, isf);");
+                println("    docondjump();");
                 break;
             }
             case OP_LEI: {
-                println("    op_orderI(L, l_lei, luai_numle, 0, TM_LE);");
+                println("    int im = GETARG_sB(i);");
+                println("    int isf = GETARG_C(i);");
+                println("    int cond = luaot_LEI(L, ctx, pc, ra, im, isf);");
+                println("    docondjump();");
                 break;
             }
             case OP_GTI: {
-                println("    op_orderI(L, l_gti, luai_numgt, 1, TM_LT);");
+                println("    int im = GETARG_sB(i);");
+                println("    int isf = GETARG_C(i);");
+                println("    int cond = luaot_GTI(L, ctx, pc, ra, im, isf);");
+                println("    docondjump();");
                 break;
             }
             case OP_GEI: {
-                println("    op_orderI(L, l_gei, luai_numge, 1, TM_LE);");
+                println("    int im = GETARG_sB(i);");
+                println("    int isf = GETARG_C(i);");
+                println("    int cond = luaot_GEI(L, ctx, pc, ra, im, isf);");
+                println("    docondjump();");
                 break;
             }
             case OP_TEST: {
+                // INLINED
                 println("    int cond = !l_isfalse(s2v(ra));");
                 println("    docondjump();");
                 break;
             }
             case OP_TESTSET: {
+                // INLINED
                 println("    TValue *rb = vRB(i);");
                 println("    if (l_isfalse(rb) == GETARG_k(i))");
                 println("      goto LUAOT_SKIP1;"); // (!)
@@ -455,20 +466,10 @@ void create_function(Proto *f)
                 break;
             }
             case OP_CALL: {
-                println("    CallInfo *newci;");
                 println("    int b = GETARG_B(i);");
                 println("    int nresults = GETARG_C(i) - 1;");
-                println("    if (b != 0)  /* fixed number of arguments? */");
-                println("        L->top = ra + b;  /* top signals number of arguments */");
-                println("    /* else previous instruction set top */");
-                println("    savepc(L);  /* in case of errors */");
-                println("    if ((newci = luaD_precall(L, ra, nresults)) == NULL)");
-                println("        updatetrap(ctx->ci);  /* C call; nothing else to be done */");
-                println("    else {");
-                println("        ctx->ci = newci;");
-                println("        ctx->ci->callstatus = 0;  /* call re-uses 'luaV_execute' */");
-                println("        return ctx->ci;");
-                println("    }");
+                println("    CallInfo *newci = luaot_CALL(L, ctx, pc, ra, b, nresults);");
+                println("    if (newci) return newci;");
                 break;
             }
             case OP_TAILCALL: {

@@ -123,6 +123,41 @@ typedef struct {
 }
 
 /*
+** Comparison
+*/
+ 
+#undef  op_order
+#define op_order(L,opi,opn,other) {  \
+  int cond;  \
+  if (ttisinteger(s2v(ra)) && ttisinteger(rb)) {  \
+    lua_Integer ia = ivalue(s2v(ra));  \
+    lua_Integer ib = ivalue(rb);  \
+    cond = opi(ia, ib);  \
+  }  \
+  else if (ttisnumber(s2v(ra)) && ttisnumber(rb))  \
+    cond = opn(s2v(ra), rb);  \
+  else  \
+    Protect(cond = other(L, s2v(ra), rb));  \
+  return cond; \
+}
+
+#undef  op_orderI
+#define op_orderI(L,opi,opf,inv,tm) {  \
+        int cond;  \
+        if (ttisinteger(s2v(ra)))  \
+          cond = opi(ivalue(s2v(ra)), im);  \
+        else if (ttisfloat(s2v(ra))) {  \
+          lua_Number fa = fltvalue(s2v(ra));  \
+          lua_Number fim = cast_num(im);  \
+          cond = opf(fa, fim);  \
+        }  \
+        else {  \
+          Protect(cond = luaT_callorderiTM(L, s2v(ra), im, inv, isf, tm));  \
+        }  \
+        return cond; \
+}
+
+/*
 ** some macros for common tasks in 'luaV_execute'
 */
 
@@ -734,4 +769,112 @@ void luaot_LEN(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
                StkId ra, TValue *rb)
 {
     Protect(luaV_objlen(L, ra, rb));
+}
+
+static
+void luaot_CONCAT(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                  StkId ra, int n)
+{
+    L->top = ra + n;  /* mark the end of concat operands */
+    ProtectNT(luaV_concat(L, n));
+    checkGC(L, L->top); /* 'luaV_concat' ensures correct top */
+}
+
+static
+void luaot_CLOSE(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                 StkId ra)
+{
+    Protect(luaF_close(L, ra, LUA_OK, 1));
+}
+
+static
+void luaot_TBC(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+               StkId ra)
+{
+    /* create new to-be-closed upvalue */
+    halfProtect(luaF_newtbcupval(L, ra));
+}
+
+static
+int luaot_EQ(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+              StkId ra, TValue *rb)
+{
+    int cond;
+    Protect(cond = luaV_equalobj(L, s2v(ra), rb));
+    return cond;
+}
+
+static
+int luaot_LT(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+             StkId ra, TValue *rb)
+{
+    op_order(L, l_lti, LTnum, lessthanothers);
+}
+
+static
+int luaot_LE(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+             StkId ra, TValue *rb)
+{
+    op_order(L, l_lei, LEnum, lessequalothers);
+}
+
+static
+int luaot_EQI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+              StkId ra, int im, int isf)
+{
+    int cond;
+    if (ttisinteger(s2v(ra)))
+      cond = (ivalue(s2v(ra)) == im);
+    else if (ttisfloat(s2v(ra)))
+      cond = luai_numeq(fltvalue(s2v(ra)), cast_num(im));
+    else
+      cond = 0;  /* other types cannot be equal to a number */
+    return cond;
+}
+
+static
+int luaot_LTI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+              StkId ra, int im, int isf)
+{
+    op_orderI(L, l_lti, luai_numlt, 0, TM_LT);
+}
+
+static
+int luaot_LEI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+              StkId ra, int im, int isf)
+{
+    op_orderI(L, l_lei, luai_numle, 0, TM_LE);
+}
+
+static
+int luaot_GTI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+              StkId ra, int im, int isf)
+{
+    op_orderI(L, l_gti, luai_numgt, 1, TM_LT);
+}
+
+static
+int luaot_GEI(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+              StkId ra, int im, int isf)
+{
+    op_orderI(L, l_gei, luai_numge, 1, TM_LE);
+}
+
+static
+CallInfo* luaot_CALL(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+               StkId ra, int b, int nresults)
+{
+    CallInfo *newci;
+    if (b != 0)  /* fixed number of arguments? */
+        L->top = ra + b;  /* top signals number of arguments */
+    /* else previous instruction set top */
+    savepc(L);  /* in case of errors */
+    if ((newci = luaD_precall(L, ra, nresults)) == NULL) {
+        updatetrap(ctx->ci);  /* C call; nothing else to be done */
+        return NULL;
+    } else {
+        ctx->ci = newci;
+        ctx->ci->callstatus = 0;  /* call re-uses 'luaV_execute' */
+        return ctx->ci;
+    }
 }
