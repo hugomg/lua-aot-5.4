@@ -39,12 +39,12 @@ void create_function(Proto *f)
     }
 
     println("static");
-    println("CallInfo *magic_implementation_%02d(lua_State *L, CallInfo *ci)", func_id);
+    println("CallInfo *magic_implementation_%02d(lua_State *L, CallInfo *ci0)", func_id);
     println("{");
     println("  LuaotExecuteState ctx_;");
     println("  LuaotExecuteState *ctx = &ctx_;");
     printnl();    
-    println("  ctx->ci = ci;");
+    println("  ctx->ci = ci0;");
     println("  ctx->trap = L->hookmask;");
     println("  ctx->cl = clLvalue(s2v(ctx->ci->func));");
     println("  ctx->k = ctx->cl->p->k;");
@@ -86,12 +86,6 @@ void create_function(Proto *f)
             continue;
         }
 
-        // While an instruction is executing, the program counter typically
-        // points towards the next instruction. There are some corner cases
-        // where the program counter getss adjusted mid-instruction, but I
-        // am not breaking anything because of those...
-        println("  pc = (code + %d);", pc+1);
-
         int next = pc + 1;
         println("  #undef  LUAOT_NEXT_JUMP");
         if (next < f->sizecode && GET_OPCODE(f->code[next]) == OP_JMP) {
@@ -105,6 +99,13 @@ void create_function(Proto *f)
         }
 
         println("  label_%02d: {", pc);
+
+        // While an instruction is executing, the program counter typically
+        // points towards the next instruction. There are some corner cases
+        // where the program counter getss adjusted mid-instruction, but I
+        // am not breaking anything because of those...
+        println("    pc = (code + %d);", pc+1);
+
         //println("    fprintf(stderr, \"OP=%%d\\n\", %d);", pc);
         println("    aot_vmfetch(0x%08x);", instr);
 
@@ -466,10 +467,24 @@ void create_function(Proto *f)
                 break;
             }
             case OP_CALL: {
+                //println("    int b = GETARG_B(i);");
+                //println("    int nresults = GETARG_C(i) - 1;");
+                //println("    CallInfo *newci = luaot_CALL(L, ctx, pc, ra, b, nresults);");
+                //println("    if (newci) return newci;");
+                println("    CallInfo *newci;");
                 println("    int b = GETARG_B(i);");
                 println("    int nresults = GETARG_C(i) - 1;");
-                println("    CallInfo *newci = luaot_CALL(L, ctx, pc, ra, b, nresults);");
-                println("    if (newci) return newci;");
+                println("    if (b != 0)  /* fixed number of arguments? */");
+                println("        L->top = ra + b;  /* top signals number of arguments */");
+                println("    /* else previous instruction set top */");
+                println("    savepc(L);  /* in case of errors */");
+                println("    if ((newci = luaD_precall(L, ra, nresults)) == NULL)");
+                println("        updatetrap(ctx->ci);  /* C call; nothing else to be done */");
+                println("    else {");
+                println("        ctx->ci = newci;");
+                println("        ctx->ci->callstatus = 0;  /* call re-uses 'luaV_execute' */");
+                println("        return ctx->ci;");
+                println("    }");
                 break;
             }
             case OP_TAILCALL: {
@@ -536,7 +551,7 @@ void create_function(Proto *f)
                 println("    }");
                 println("    else {  /* do the 'poscall' here */");
                 println("      int nres;");
-                println("      L->ci = ci->previous;  /* back to caller */");
+                println("      L->ci = ctx->ci->previous;  /* back to caller */");
                 println("      L->top = ctx->base - 1;");
                 println("      for (nres = ctx->ci->nresults; l_unlikely(nres > 0); nres--)");
                 println("        setnilvalue(s2v(L->top++));  /* all results are nil */");
