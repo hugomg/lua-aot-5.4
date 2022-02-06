@@ -649,9 +649,8 @@ void create_function(Proto *f)
                 break;
             }
             case OP_CLOSURE: {
-                println("    Proto *p = ctx->cl->p->p[GETARG_Bx(i)];");
-                println("    halfProtect(pushclosure(L, p, ctx->cl->upvals, ctx->base, ra));");
-                println("    checkGC(L, ra + 1);");
+                println("    int b = GETARG_Bx(i);");
+                println("    luaot_CLOSURE(L, ctx, pc, ra, b);");
                 break;
             }
             case OP_VARARG: {

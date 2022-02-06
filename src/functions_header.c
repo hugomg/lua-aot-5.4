@@ -880,6 +880,15 @@ CallInfo* luaot_CALL(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc
 }
 
 static
+void luaot_CLOSURE(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
+                   StkId ra, int b)
+{
+    Proto *p = ctx->cl->p->p[b];
+    halfProtect(pushclosure(L, p, ctx->cl->upvals, ctx->base, ra));
+    checkGC(L, ra + 1);
+}
+
+static
 void luaot_VARARG(lua_State *L, LuaotExecuteState *ctx, const Instruction *pc,
                   StkId ra, int n)
 {
