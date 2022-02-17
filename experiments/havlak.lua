@@ -1247,5 +1247,7 @@ end
 end -- object havlak
 
 return function(N)
-    havlak:inner_benchmark_loop(N)
+    if N > 0 then
+        havlak:inner_benchmark_loop(N)
+    end
 end

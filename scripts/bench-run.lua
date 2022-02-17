@@ -28,6 +28,14 @@ local benchs = {
     { name = "mandelbrot",   fast =  20, medium =    2000, slow =    4000 },
     { name = "nbody",        fast = 100, medium = 1000000, slow = 5000000 },
     { name = "spectralnorm", fast = 100, medium =    1000, slow =    4000 },
+    { name = "cd",           fast =   2, medium =     100, slow =     150 },
+    { name = "deltablue",    fast =   5, medium =   12000, slow =   20000 },
+    { name = "havlak",       fast =   0, medium =       1, slow =       1 },
+    { name = "json",         fast =   1, medium =     100, slow =     400 }, 
+    { name = "list",         fast =   5, medium =    2000, slow =    4000 },
+    { name = "permute",      fast =   1, medium =    1000, slow =    2000 }, -- slow should actually be 20000
+    { name = "richards",     fast =   1, medium =      30, slow =      80 },
+    { name = "towers",       fast =   2, medium =     600, slow =    2000 }, -- slow should be 6000
 }
 
 local impls = {
@@ -36,6 +44,8 @@ local impls = {
     { name = "lua", suffix = "",     interpreter = "../src/lua",    compile = false,                   },
     { name = "aot", suffix = "_aot", interpreter = "../src/lua",    compile = "../src/luaot"           },
     { name = "trm", suffix = "_trm", interpreter = "../src/lua",    compile = "../src/luaot-trampoline"},
+    { name = "fun", suffix = "_fun", interpreter = "../src/lua",    compile = "../src/luaot-functions" },
+    --{ name = "ctx", suffix = "_ctx", interpreter = "../src/lua",    compile = "../src/luaot-context" },
 }
 
 --

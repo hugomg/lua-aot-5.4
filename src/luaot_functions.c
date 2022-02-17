@@ -238,7 +238,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_ADDK: {
-                println("    luot_arithK(L, luaot_ADDK);");
+                println("    luaot_arithK(L, luaot_ADDK);");
                 break;
             }
             case OP_SUBK: {
