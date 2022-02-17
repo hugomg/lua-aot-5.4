@@ -45,7 +45,7 @@ local impls = {
     { name = "aot", suffix = "_aot", interpreter = "../src/lua",    compile = "../src/luaot"           },
     { name = "trm", suffix = "_trm", interpreter = "../src/lua",    compile = "../src/luaot-trampoline"},
     { name = "fun", suffix = "_fun", interpreter = "../src/lua",    compile = "../src/luaot-functions" },
-    --{ name = "ctx", suffix = "_ctx", interpreter = "../src/lua",    compile = "../src/luaot-context" },
+    { name = "ctx", suffix = "_ctx", interpreter = "../src/lua",    compile = "../src/luaot-context"   },
 }
 
 --

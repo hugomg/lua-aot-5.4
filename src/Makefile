@@ -52,8 +52,11 @@ AOT2_O=	luaot-trampoline.o
 AOT3_T=	luaot-functions
 AOT3_O=	luaot-functions.o
 
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O) $(AOT2_O) $(AOT3_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T) $(AOT2_T) $(AOT3_T)
+AOT4_T=	luaot-context
+AOT4_O=	luaot-context.o
+
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O) $(AOT2_O) $(AOT3_O) $(AOT4_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T) $(AOT2_T) $(AOT3_T) $(AOT4_T)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -83,6 +86,9 @@ $(AOT2_T): $(AOT2_O) $(LUA_A)
 	
 $(AOT3_T): $(AOT3_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(AOT3_O) $(LUA_A) $(LIBS)
+
+$(AOT4_T): $(AOT4_O) $(LUA_A)
+	$(CC) -o $@ $(LDFLAGS) $(AOT4_O) $(LUA_A) $(LIBS)
 
 test:
 	./$(LUA_T) -v
@@ -185,6 +191,10 @@ luaot-functions.o: luaot.c luaot_functions.c \
  lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
 	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_FUNCTIONS
 
+luaot-context.o: luaot.c luaot_context.c \
+ lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
+	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_FUNCTIONS
+	
 # DO NOT DELETE
 
 lapi.o: lapi.c lprefix.h lua.h luaconf.h lapi.h llimits.h lstate.h \
