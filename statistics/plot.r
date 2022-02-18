@@ -10,7 +10,15 @@ bench_codes <- c(
   "knucleotide",
   "mandelbrot",
   "nbody",
-  "spectralnorm"
+  "spectralnorm",
+  "cd",
+  "deltablue",
+  "havlak",
+  "json",
+  "list",
+  "permute",
+  "richards",
+  "towers"
 )
 
 bench_names <- c(
@@ -20,12 +28,22 @@ bench_names <- c(
   "K-Nucleotide",
   "Mandelbrot",
   "N-Body",
-  "Spectral Norm"
+  "Spectral Norm",
+  "CD",
+  "Deltablue",
+  "Havlak",
+  "Json",
+  "List",
+  "Permute",
+  "Richards",
+  "Hanoi Towers"
 )
 
-impl_codes <- c("lsw","lua","trm", "cor", "aot","jof", "jit")
-impl_used <- c("lua", "trm", "cor", "jit")
-impl_names <- c("Lua", "Trampoline", "LuaAOT","LuaJIT")
+impl_codes <- c("lua", "trm", "aot", "jit", "jof", "fun", "ctx")
+#impl_used <- c("lua", "trm", "aot", "jit", "fun", "ctx")
+#impl_names <- c("Lua", "Trampoline", "LuaAOT","LuaJIT", "Function", "Struct")
+impl_used <- c("lua", "aot", "jit")
+impl_names <- c("Lua", "LuaAOT","LuaJIT")
 
 data <- read_csv("times-slow.csv", col_types = cols(
     Benchmark = col_factor(bench_codes),

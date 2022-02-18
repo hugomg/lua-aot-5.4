@@ -1,17 +1,25 @@
 #!/usr/bin/lua
 
 local pretty_names = {
-    binarytrees  = "Binary Trees",
-    fannkuch     = "Fannkuch",
-    fasta        = "Fasta",
-    knucleotide  = "K-Nucleotide",
-    mandelbrot   = "Mandelbrot",
-    nbody        = "N-Body",
+    binarytrees = "Binary Trees",
+    fannkuch = "Fannkuch",
+    fasta = "Fasta",
+    knucleotide = "K-Nucleotide",
+    mandelbrot = "Mandelbrot",
+    nbody = "N-Body",
     spectralnorm = "Spectral Norm",
+    cd = "CD",
+    deltablue = "Deltablue",
+    havlak = "Havlak",
+    json = "Json",
+    list = "List",
+    permute = "Permute",
+    richards = "Richards",
+    towers = "Hanoi Towers",
 }
 
 local function parse_name(module)
-    local code, is_aot = string.match(module, "^(.*)(_cor)$")
+    local code, is_aot = string.match(module, "^(.*)(_aot)$")
     if is_aot then
         return code, "aot"
     else
@@ -20,7 +28,7 @@ local function parse_name(module)
 end
 
 local function pretty_name(module)
-    local code, aot = string.match(module, "^(.*)(_cor)$")
+    local code, aot = string.match(module, "^(.*)(_aot)$")
     local name = assert(pretty_names[code or module])
     if aot then
         return name .. " (AOT)"

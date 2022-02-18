@@ -91,8 +91,9 @@ for _, b in ipairs(benchs) do
     for _, s in ipairs(impls) do
         local mod = b.name .. s.suffix
         if s.compile and not exists(mod .. ".so") then
+            local flags = (s.name == 'fun') and " -fno-inline" or ""
             assert(run(s.compile.." %1.lua -o %2.c", b.name, mod))
-            assert(run("../scripts/compile %2.c",    b.name, mod))
+            assert(run("../scripts/compile %2.c"..flags,  b.name, mod))
         end
     end
 end
@@ -130,7 +131,7 @@ elseif mode == "perf" then
 
     for _, b in ipairs(benchs) do
         for _, impl in ipairs(impls) do
-            if impl.name == "lua" or impl.name == "cor" then
+            if impl.name == "lua" or impl.name == "aot" then
                 local cmd = bench_cmd(b, impl)
                 --print(string.format("RUN %s %s %s", b.name, impl.name, rep))
                 assert(run("LANG=C perf stat sh -c %1 2>&1", cmd))
