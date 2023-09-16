@@ -190,6 +190,13 @@ int main(int argc, char **argv)
       println("int main(int argc, char *argv[]) {");
       println(" lua_State *L = luaL_newstate();");
       println(" luaL_openlibs(L);");
+      println(" int i;");
+      println(" lua_createtable(L, argc + 1, 0);");
+      println(" for (i = 0; i < argc; i++) {");
+      println("   lua_pushstring(L, argv[i]);");
+      println("   lua_rawseti(L, -2, i);");
+      println(" }");
+      println(" lua_setglobal(L, \"arg\");");
       println(" AOT_LUAOPEN_NAME(L);");
       println("}");
     }
