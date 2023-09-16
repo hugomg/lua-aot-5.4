@@ -39,10 +39,18 @@ static FILE * output_file = NULL;
 static int nfunctions = 0;
 static TString **tmname;
 
+int executable = 0;
 static
 void usage()
 {
-    fprintf(stderr, "usage: %s input.lua -o output.c\n", program_name);
+    fprintf(stderr,
+          "usage: %s [options] [filename]"
+          "Available options are:"
+          "  -o name  output to file 'name'"
+          "  -m name  generate code with `name` function as main function"
+          "  -s       use  switches instead of gotos in generated code"
+          "  -e       add a main symbol for executables\n",
+          program_name);
 }
 
 static
@@ -100,6 +108,8 @@ static void doargs(int argc, char **argv)
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -m"); }
                 module_name = argv[i];
+            } else if (0 == strcmp(arg, "-e")) {
+                executable = 1;
             } else if (0 == strcmp(arg, "-o")) {
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -o"); }
@@ -176,6 +186,13 @@ int main(int argc, char **argv)
     #elif defined(LUAOT_USE_SWITCHES)
     println("#include \"trampoline_footer.c\"");
     #endif
+    if (executable) {
+      println("int main(int argc, char *argv[]) {");
+      println(" lua_State *L = luaL_newstate();");
+      println(" luaL_openlibs(L);");
+      println(" AOT_LUAOPEN_NAME(L);");
+      println("}");
+    }
 
 }
 
