@@ -198,6 +198,7 @@ int main(int argc, char **argv)
       println(" }");
       println(" lua_setglobal(L, \"arg\");");
       println(" AOT_LUAOPEN_NAME(L);");
+      println(" return 0;");
       println("}");
     }
 
