@@ -40,15 +40,17 @@ static int nfunctions = 0;
 static TString **tmname;
 
 int executable = 0;
+int install_internal_searcher = 0;
 static
 void usage()
 {
     fprintf(stderr,
-          "usage: %s [options] [filename]"
-          "Available options are:"
-          "  -o name  output to file 'name'"
-          "  -m name  generate code with `name` function as main function"
-          "  -s       use  switches instead of gotos in generated code"
+          "usage: %s [options] [filename]\n"
+          "Available options are:\n"
+          "  -o name  output to file 'name'\n"
+          "  -m name  generate code with `name` function as main function\n"
+          "  -s       use  switches instead of gotos in generated code\n"
+          "  -i       install internal searcher (POSIX only)\n"
           "  -e       add a main symbol for executables\n",
           program_name);
 }
@@ -114,6 +116,8 @@ static void doargs(int argc, char **argv)
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -o"); }
                 output_filename = argv[i];
+            } else if (0 == strcmp(arg, "-i")) {
+                install_internal_searcher = 1;
             } else {
                 fprintf(stderr, "unknown option %s\n", arg);
                 exit(1);
@@ -141,6 +145,7 @@ static char *get_module_name_from_filename(const char *);
 static void check_module_name(const char *);
 static void replace_dots(char *);
 static void print_functions();
+static void print_internal_searcher();
 static void print_source_code();
 
 int main(int argc, char **argv)
@@ -187,6 +192,10 @@ int main(int argc, char **argv)
     println("#include \"trampoline_footer.c\"");
     #endif
     if (executable) {
+      printnl();
+      if (install_internal_searcher)
+        print_internal_searcher();
+      printnl();
       println("int main(int argc, char *argv[]) {");
       println(" lua_State *L = luaL_newstate();");
       println(" luaL_openlibs(L);");
@@ -197,11 +206,23 @@ int main(int argc, char **argv)
       println("   lua_rawseti(L, -2, i);");
       println(" }");
       println(" lua_setglobal(L, \"arg\");");
-      println(" AOT_LUAOPEN_NAME(L);");
+      if (install_internal_searcher) {
+        println(" lua_getglobal(L, \"package\");");
+        println(" lua_getfield(L, -1, \"searchers\");");
+        println(" lua_pushcfunction(L, internal_searcher);");
+        println(" for (i = lua_rawlen(L, -2) + 1; i > 2; i--) {");
+        println("   lua_rawgeti(L, -2, i - 1);");
+        println("   lua_rawseti(L, -3, i);");
+        println(" }");
+        println(" lua_rawseti(L, -2, 2);");
+        println(" lua_pop(L, 2);");
+      }
+      println(" LUAOT_LUAOPEN_NAME(L);");
       println(" return 0;");
       println("}");
     }
 
+    return 0;
 }
 
 // Deduce the Lua module name given the file name
@@ -753,6 +774,59 @@ void print_functions(Proto *p)
     }
     println("  NULL");
     println("};");
+}
+
+/*
+static int internal_searcher(lua_State *lua)
+{
+  static void *self_handle;
+  self_handle = dlopen(NULL, RTLD_LAZY);
+  if (!self_handle) {
+    lua_pushstring(lua, dlerror());
+    return 1;
+  }
+
+  const char *name = lua_tostring(lua, 1);
+  char symname[512];
+  snprintf(symname, sizeof(symname), "luaopen_%s", name);
+  lua_CFunction sym = (lua_CFunction)dlsym(self_handle, symname);
+  if (!sym) {
+    lua_pushstring(lua, dlerror());
+    return 1;
+  }
+
+  lua_pushcfunction(lua, sym);
+
+  return 1;
+}
+*/
+
+static
+void print_internal_searcher()
+{
+    println("#include <dlfcn.h>");
+    println("static int internal_searcher(lua_State *lua)");
+    println("{");
+    println("  static void *self_handle;");
+    println("  self_handle = dlopen(NULL, RTLD_LAZY);");
+    println("  if (!self_handle) {");
+    println("    lua_pushstring(lua, dlerror());");
+    println("    return 1;");
+    println("  }");
+    printnl();
+    println("  const char *name = lua_tostring(lua, 1);");
+    println("  char symname[512];");
+    println("  snprintf(symname, sizeof(symname), \"luaopen_%%s\", name);");
+    println("  lua_CFunction sym = (lua_CFunction)dlsym(self_handle, symname);");
+    println("  if (!sym) {");
+    println("    lua_pushstring(lua, dlerror());");
+    println("    return 1;");
+    println("  }");
+    printnl();
+    println("  lua_pushcfunction(lua, sym);");
+    printnl();
+    println("  return 1;");
+    println("}");
 }
 
 static
