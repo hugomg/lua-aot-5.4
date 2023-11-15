@@ -776,31 +776,6 @@ void print_functions(Proto *p)
     println("};");
 }
 
-/*
-static int internal_searcher(lua_State *lua)
-{
-  static void *self_handle;
-  self_handle = dlopen(NULL, RTLD_LAZY);
-  if (!self_handle) {
-    lua_pushstring(lua, dlerror());
-    return 1;
-  }
-
-  const char *name = lua_tostring(lua, 1);
-  char symname[512];
-  snprintf(symname, sizeof(symname), "luaopen_%s", name);
-  lua_CFunction sym = (lua_CFunction)dlsym(self_handle, symname);
-  if (!sym) {
-    lua_pushstring(lua, dlerror());
-    return 1;
-  }
-
-  lua_pushcfunction(lua, sym);
-
-  return 1;
-}
-*/
-
 static
 void print_internal_searcher()
 {
