@@ -804,6 +804,12 @@ print_internal_searcher_windows()
     println("  const char *name = lua_tostring(lua, 1);");
     println("  char symname[512];");
     println("  snprintf(symname, sizeof(symname), \"luaopen_%%s\", name);");
+    println("  for (int i = 0; symname[i] != '\\0'; i++) {");
+    println("    if (symname[i] == '.') {");
+    println("      symname[i] = '_';");
+    println("    }");
+    println("  }");
+    printnl();
     println("  HMODULE self_handle = GetModuleHandle(NULL);");
     println("  if (!self_handle) {");
     println("    lua_pushstring(lua, \"could not get module handle\");");
@@ -838,6 +844,12 @@ void print_internal_searcher_posix()
     println("  const char *name = lua_tostring(lua, 1);");
     println("  char symname[512];");
     println("  snprintf(symname, sizeof(symname), \"luaopen_%%s\", name);");
+    println("  for (int i = 0; symname[i] != '\\0'; i++) {");
+    println("    if (symname[i] == '.') {");
+    println("      symname[i] = '_';");
+    println("    }");
+    println("  }");
+    printnl();
     println("  lua_CFunction sym = (lua_CFunction)dlsym(self_handle, symname);");
     println("  if (!sym) {");
     println("    lua_pushstring(lua, dlerror());");
