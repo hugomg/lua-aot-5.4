@@ -14,8 +14,7 @@ void bind_magic(Proto *f)
 }
 
 int LUAOT_LUAOPEN_NAME(lua_State *L) {
-
-    int ok = luaL_loadstring(L, LUAOT_MODULE_SOURCE_CODE);
+    int ok = luaL_loadbuffer(L, LUAOT_MODULE_SOURCE_CODE, sizeof(LUAOT_MODULE_SOURCE_CODE)-1, "AOT Compiled module \""LUAOT_MODULE_NAME"\"");
     switch (ok) {
       case LUA_OK:
         /* No errors */

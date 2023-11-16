@@ -199,6 +199,7 @@ int main(int argc, char **argv)
     printnl();
     print_source_code();
     printnl();
+    println("#define LUAOT_MODULE_NAME \"%s\"", module_name);
     println("#define LUAOT_LUAOPEN_NAME luaopen_%s", module_name);
     printnl();
     #if defined(LUAOT_USE_GOTOS)
@@ -234,7 +235,13 @@ int main(int argc, char **argv)
         println(" lua_rawseti(L, -2, 2);");
         println(" lua_pop(L, 2);");
       }
-      println(" LUAOT_LUAOPEN_NAME(L);");
+      println(" lua_pushcfunction(L, LUAOT_LUAOPEN_NAME);");
+      println("i = lua_pcall(L, 0, 0, 0);");
+      println(" if (i != LUA_OK) {");
+      println("   fprintf(stderr, \"%%s\\n\", lua_tostring(L, -1));");
+      println("   return 1;");
+      println(" }");
+      println("lua_close(L);");
       println(" return 0;");
       println("}");
     }
