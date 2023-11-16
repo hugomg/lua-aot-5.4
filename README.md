@@ -10,7 +10,7 @@ The performance gains depend on the kind of program being run. For numerical ben
 
 This is a modified version of the Lua interpreter so the process is the same you would use for compiling Lua. For full instructions, consult the doc/readme.html.
 ```bash
-make linux -j4
+make guess -j4
 ```
 # Usage
 
@@ -35,12 +35,18 @@ Example:
 ```bash
 ./src/luaot test.lua -o testcompiled.c -m luaopen_testfile # Compile test.lua to testcompiled.c with `luaopen_testfile` as the luaopen function
 ```
-### `-e` 
+### `-e`
 `-e` just tells the compiler to add a `main` symbol/function so the file can be quickly compiled to an executable like:
 ```bash
 ./src/luaot test.lua -o testcompiled.c -e # Compile test.lua to testcompiled.c and add a main func for compiling to executables
-gcc -o testexec testcompiled.c -llua5.4 -I/src # Compile testcompiled to an executable that will run the lua code
+gcc -o testexec testcompiled.c -llua5.4 -I./src # Compile testcompiled to an executable that will run the lua code
 ```
+### '-i'
+'-i' lets you install the internal package searcher to your file, so lua can search within the compiled binary to find packages to `require`
+```bash
+./src/luaot module.lua -o modulecompiled.c
+./src/luaot test.lua -o testcompiled.c -i posix # if you are compiling for windows, do `-i windows` instead
+gcc -o testexec modulecompiled.c testcompiled.c -llua5.4 -I./src # `testcompiled.c` will be able to access `modulecompiled.c`
 # Experiments
 
 If you are interested in reproducing the experiments from our paper, please consult the documentation in the `experiments` and `scripts` directory. Note that you must be inside the experiments directory when you run the scripts:
