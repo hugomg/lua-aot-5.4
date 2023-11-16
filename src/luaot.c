@@ -159,7 +159,8 @@ static char *get_module_name_from_filename(const char *);
 static void check_module_name(const char *);
 static void replace_dots(char *);
 static void print_functions();
-static void print_internal_searcher();
+static void print_internal_searcher_windows();
+static void print_internal_searcher_posix();
 static void print_source_code();
 
 int main(int argc, char **argv)
@@ -207,8 +208,10 @@ int main(int argc, char **argv)
     #endif
     if (executable) {
       printnl();
-      if (install_internal_searcher)
-        print_internal_searcher();
+      if (install_internal_searcher == INSTALL_INTERNAL_SEARCHER_POSIX)
+        print_internal_searcher_posix();
+      else if (install_internal_searcher == INSTALL_INTERNAL_SEARCHER_WINDOWS)
+        print_internal_searcher_windows();
       printnl();
       println("int main(int argc, char *argv[]) {");
       println(" lua_State *L = luaL_newstate();");
@@ -820,13 +823,8 @@ print_internal_searcher_windows()
 }
 
 static
-void print_internal_searcher()
+void print_internal_searcher_posix()
 {
-    if (install_internal_searcher == INSTALL_INTERNAL_SEARCHER_WINDOWS) {
-        print_internal_searcher_windows();
-        return;
-    }
-
     println("#include <dlfcn.h>");
     println("static int internal_searcher(lua_State *lua)");
     println("{");
