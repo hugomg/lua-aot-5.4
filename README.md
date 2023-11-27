@@ -41,12 +41,6 @@ Example:
 ./src/luaot test.lua -o testcompiled.c -e # Compile test.lua to testcompiled.c and add a main func for compiling to executables
 gcc -o testexec testcompiled.c -llua5.4 -I./src # Compile testcompiled to an executable that will run the lua code
 ```
-### '-i'
-'-i' lets you install the internal package searcher to your file, so lua can search within the compiled binary to find packages to `require`
-```bash
-./src/luaot module.lua -o modulecompiled.c
-./src/luaot test.lua -o testcompiled.c -i posix # if you are compiling for windows, do `-i windows` instead
-gcc -o testexec modulecompiled.c testcompiled.c -llua5.4 -I./src # `testcompiled.c` will be able to access `modulecompiled.c`
 # Experiments
 
 If you are interested in reproducing the experiments from our paper, please consult the documentation in the `experiments` and `scripts` directory. Note that you must be inside the experiments directory when you run the scripts:
