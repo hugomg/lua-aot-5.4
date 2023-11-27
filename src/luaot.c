@@ -40,13 +40,6 @@ static int nfunctions = 0;
 static TString **tmname;
 
 int executable = 0;
-
-enum {
-    INSTALL_INTERNAL_SEARCHER_NONE = 0,
-    INSTALL_INTERNAL_SEARCHER_POSIX = 1,
-    INSTALL_INTERNAL_SEARCHER_WINDOWS = 2
-} install_internal_searcher = INSTALL_INTERNAL_SEARCHER_NONE;
-
 static
 void usage()
 {
@@ -56,7 +49,6 @@ void usage()
           "  -o name            output to file 'name'\n"
           "  -m name            generate code with `name` function as main function\n"
           "  -s                 use  switches instead of gotos in generated code\n"
-          "  -i {posix,windows} install internal searcher\n"
           "  -e                 add a main symbol for executables\n",
           program_name);
 }
@@ -122,16 +114,6 @@ static void doargs(int argc, char **argv)
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -o"); }
                 output_filename = argv[i];
-            } else if (0 == strcmp(arg, "-i")) {
-                i++;
-                if (i >= argc) { fatal_error("missing argument for -i"); }
-                if (0 == strcmp(argv[i], "posix")) {
-                    install_internal_searcher = INSTALL_INTERNAL_SEARCHER_POSIX;
-                } else if (0 == strcmp(argv[i], "windows")) {
-                    install_internal_searcher = INSTALL_INTERNAL_SEARCHER_WINDOWS;
-                } else {
-                    fatal_error("invalid argument for -i (expected 'posix' or 'windows')");
-                }
             } else {
                 fprintf(stderr, "unknown option %s\n", arg);
                 exit(1);
@@ -159,8 +141,6 @@ static char *get_module_name_from_filename(const char *);
 static void check_module_name(const char *);
 static void replace_dots(char *);
 static void print_functions();
-static void print_internal_searcher_windows();
-static void print_internal_searcher_posix();
 static void print_source_code();
 
 int main(int argc, char **argv)
@@ -209,10 +189,6 @@ int main(int argc, char **argv)
     #endif
     if (executable) {
       printnl();
-      if (install_internal_searcher == INSTALL_INTERNAL_SEARCHER_POSIX)
-        print_internal_searcher_posix();
-      else if (install_internal_searcher == INSTALL_INTERNAL_SEARCHER_WINDOWS)
-        print_internal_searcher_windows();
       printnl();
       println("int main(int argc, char *argv[]) {");
       println(" lua_State *L = luaL_newstate();");
@@ -224,17 +200,6 @@ int main(int argc, char **argv)
       println("   lua_rawseti(L, -2, i);");
       println(" }");
       println(" lua_setglobal(L, \"arg\");");
-      if (install_internal_searcher) {
-        println(" lua_getglobal(L, \"package\");");
-        println(" lua_getfield(L, -1, \"searchers\");");
-        println(" lua_pushcfunction(L, internal_searcher);");
-        println(" for (i = lua_rawlen(L, -2) + 1; i > 2; i--) {");
-        println("   lua_rawgeti(L, -2, i - 1);");
-        println("   lua_rawseti(L, -3, i);");
-        println(" }");
-        println(" lua_rawseti(L, -2, 2);");
-        println(" lua_pop(L, 2);");
-      }
       println(" lua_pushcfunction(L, LUAOT_LUAOPEN_NAME);");
       println("i = lua_pcall(L, 0, 0, 0);");
       println(" if (i != LUA_OK) {");
@@ -798,75 +763,6 @@ void print_functions(Proto *p)
     }
     println("  NULL");
     println("};");
-}
-
-//This should all use built in liblua functions (see loadlib.c) but this will work for now
-
-static void
-print_internal_searcher_windows()
-{
-    println("#include <windows.h>");
-    println("static int internal_searcher(lua_State *lua)");
-    println("{");
-    println("  const char *name = lua_tostring(lua, 1);");
-    println("  char symname[512];");
-    println("  snprintf(symname, sizeof(symname), \"luaopen_%%s\", name);");
-    println("  for (int i = 0; symname[i] != '\\0'; i++) {");
-    println("    if (symname[i] == '.') {");
-    println("      symname[i] = '_';");
-    println("    }");
-    println("  }");
-    printnl();
-    println("  HMODULE self_handle = GetModuleHandle(NULL);");
-    println("  if (!self_handle) {");
-    println("    lua_pushstring(lua, \"could not get module handle\");");
-    println("    return 1;");
-    println("  }");
-    printnl();
-    println("  lua_CFunction sym = (lua_CFunction)GetProcAddress(self_handle, symname);");
-    println("  if (!sym) {");
-    println("    lua_pushstring(lua, \"could not get symbol address\");");
-    println("    return 1;");
-    println("  }");
-    printnl();
-    println("  lua_pushcfunction(lua, sym);");
-    printnl();
-    println("  return 1;");
-    println("}");
-}
-
-static
-void print_internal_searcher_posix()
-{
-    println("#include <dlfcn.h>");
-    println("static int internal_searcher(lua_State *lua)");
-    println("{");
-    println("  static void *self_handle;");
-    println("  self_handle = dlopen(NULL, RTLD_LAZY);");
-    println("  if (!self_handle) {");
-    println("    lua_pushstring(lua, dlerror());");
-    println("    return 1;");
-    println("  }");
-    printnl();
-    println("  const char *name = lua_tostring(lua, 1);");
-    println("  char symname[512];");
-    println("  snprintf(symname, sizeof(symname), \"luaopen_%%s\", name);");
-    println("  for (int i = 0; symname[i] != '\\0'; i++) {");
-    println("    if (symname[i] == '.') {");
-    println("      symname[i] = '_';");
-    println("    }");
-    println("  }");
-    printnl();
-    println("  lua_CFunction sym = (lua_CFunction)dlsym(self_handle, symname);");
-    println("  if (!sym) {");
-    println("    lua_pushstring(lua, dlerror());");
-    println("    return 1;");
-    println("  }");
-    printnl();
-    println("  lua_pushcfunction(lua, sym);");
-    printnl();
-    println("  return 1;");
-    println("}");
 }
 
 static
