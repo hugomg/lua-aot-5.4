@@ -39,7 +39,7 @@ Example:
 `-e` just tells the compiler to add a `main` symbol/function so the file can be quickly compiled to an executable like:
 ```bash
 ./src/luaot test.lua -o testcompiled.c -e # Compile test.lua to testcompiled.c and add a main func for compiling to executables
-gcc -o testexec testcompiled.c -llua5.4 -I./src # Compile testcompiled to an executable that will run the lua code
+gcc -o testexec testcompiled.c src/liblua.a -I./src -lm # Compile testcompiled to an executable that will run the lua code
 ```
 # Experiments
 
