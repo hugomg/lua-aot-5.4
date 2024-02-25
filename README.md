@@ -41,6 +41,12 @@ Example:
 ./src/luaot test.lua -o testcompiled.c -e # Compile test.lua to testcompiled.c and add a main func for compiling to executables
 gcc -o testexec testcompiled.c src/liblua.a -I./src -lm # Compile testcompiled to an executable that will run the lua code
 ```
+### `-w`
+`-w` also enables `-e` but furthermore adds a `WinMain` function, so you can link your lua program with the Windows subsystem and not have a console window pop up when you run it.
+```bash
+./src/luaot test.lua -o testcompiled.c -w # Compile test.lua to testcompiled.c and add a WinMain func for compiling to executables
+gcc -o testexec.exe testcompiled.c src/liblua.a -I./src -mwindows # Compile testcompiled to an executable that will run the lua code without a console window
+```
 # Experiments
 
 If you are interested in reproducing the experiments from our paper, please consult the documentation in the `experiments` and `scripts` directory. Note that you must be inside the experiments directory when you run the scripts:
