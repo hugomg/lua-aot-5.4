@@ -40,6 +40,8 @@ static int nfunctions = 0;
 static TString **tmname;
 
 int executable = 0;
+int use_winmain = 0;
+
 static
 void usage()
 {
@@ -49,7 +51,8 @@ void usage()
           "  -o name            output to file 'name'\n"
           "  -m name            generate code with `name` function as main function\n"
           "  -s                 use  switches instead of gotos in generated code\n"
-          "  -e                 add a main symbol for executables\n",
+          "  -e                 add a main symbol for executables\n"
+          "  -w                 add a WinMain symbol for consoleless executables on windows\n",
           program_name);
 }
 
@@ -110,6 +113,9 @@ static void doargs(int argc, char **argv)
                 module_name = argv[i];
             } else if (0 == strcmp(arg, "-e")) {
                 executable = 1;
+            } else if (0 == strcmp(arg, "-w")) {
+                executable = 1;
+                use_winmain = 1;
             } else if (0 == strcmp(arg, "-o")) {
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -o"); }
@@ -209,6 +215,17 @@ int main(int argc, char **argv)
       println("lua_close(L);");
       println(" return 0;");
       println("}");
+
+      if (use_winmain) {
+        printnl();
+        printnl();
+        println("#ifdef _WIN32");
+        println("#include <windows.h>");
+        println("int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {");
+        println("  return main(__argc, __argv);");
+        println("}");
+        println("#endif");
+      }
     }
 
     return 0;
