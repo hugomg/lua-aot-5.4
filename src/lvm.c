@@ -1179,7 +1179,7 @@ void luaV_finishOp (lua_State *L) {
 #define vmbreak		break
 
 
-static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
+static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci) {
   LClosure *cl;
   TValue *k;
   StkId base;
@@ -1942,7 +1942,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
 #ifndef LUAOT_IS_MODULE
 void luaV_execute (lua_State *L, CallInfo *ci) {
     do {
-        LClosure *cl = clLvalue(s2v(ci->func));
+        LClosure *cl = clLvalue(s2v(ci->func.p));
         if (cl->p->aot_implementation) {
             ci = cl->p->aot_implementation(L, ci);
         } else {

@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     if (luaL_loadfile(L, input_filename) != LUA_OK) {
         fatal_error(lua_tostring(L,-1));
     }
-    Proto *proto = getproto(s2v(L->top-1));
+    Proto *proto = getproto(s2v(L->top.p-1));
     tmname = G(L)->tmname;
 
     // Generate the file
@@ -726,13 +726,7 @@ void luaot_PrintOpcodeComment(Proto *f, int pc)
     print("\n");
 }
 
-#if defined(LUAOT_USE_GOTOS)
 #include "luaot_gotos.c"
-#elif defined(LUAOT_USE_SWITCHES)
-#include "luaot_switches.c"
-#else
-#error "Must define LUAOT_USE_GOTOS or LUAOT_USE_SWITCHES"
-#endif
 
 static
 void create_functions(Proto *p)

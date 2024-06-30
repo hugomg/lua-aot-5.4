@@ -14,6 +14,7 @@
 
 #undef  op_arithI
 #define op_arithI(L,iop,fop) {  \
+  StkId ra = RA(i);  \
   TValue *v1 = vRB(i);  \
   int imm = GETARG_sC(i);  \
   if (ttisinteger(v1)) {  \
@@ -38,6 +39,7 @@
 
 #undef op_arith_aux
 #define op_arith_aux(L,v1,v2,iop,fop) {  \
+  StkId ra = RA(i);  \
   if (ttisinteger(v1) && ttisinteger(v2)) {  \
     lua_Integer i1 = ivalue(v1); lua_Integer i2 = ivalue(v2);  \
     setivalue(s2v(ra), iop(L, i1, i2));  \
@@ -47,6 +49,7 @@
 
 #undef  op_bitwiseK
 #define op_bitwiseK(L,op) {  \
+  StkId ra = RA(i);  \
   TValue *v1 = vRB(i);  \
   TValue *v2 = KC(i);  \
   lua_Integer i1;  \
@@ -58,6 +61,7 @@
 
 #undef  op_bitwise
 #define op_bitwise(L,op) {  \
+  StkId ra = RA(i);  \
   TValue *v1 = vRB(i);  \
   TValue *v2 = vRC(i);  \
   lua_Integer i1; lua_Integer i2;  \
@@ -70,7 +74,7 @@
 //
 // These are the core macros for performing jumps.
 // Obviously, we have to reimplement them.
-// 
+//
 
 #undef dojump
 
@@ -99,7 +103,6 @@
     updatebase(ci);  /* correct stack */ \
   } \
   i = instr; \
-  ra = RA(i); /* WARNING: any stack reallocation invalidates 'ra' */ \
 }
 
 #undef  vmdispatch
