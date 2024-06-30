@@ -26,7 +26,7 @@ MYLIBS=
 MYOBJS=
 
 # Special flags for compiler modules; -Os reduces code size.
-CMCFLAGS= 
+CMCFLAGS=
 
 # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
 
@@ -43,8 +43,11 @@ LUA_O=	lua.o
 LUAC_T=	luac
 LUAC_O=	luac.o
 
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
+AOT_T=	luaot
+AOT_O=	luaot.o
+
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -156,7 +159,10 @@ lparser.o:
 lcode.o:
 	$(CC) $(CFLAGS) $(CMCFLAGS) -c lcode.c
 
-# DO NOT DELETE
+# LuaAOT has extra if-defs
+luaot.o: luaot.c luaot_gotos.c \
+ lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
+	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_GOTOS
 
 lapi.o: lapi.c lprefix.h lua.h luaconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h \
