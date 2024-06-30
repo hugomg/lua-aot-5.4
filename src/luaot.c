@@ -169,11 +169,7 @@ int main(int argc, char **argv)
     output_file = fopen(output_filename, "w");
     if (output_file == NULL) { fatal_error(strerror(errno)); }
 
-    #if defined(LUAOT_USE_GOTOS)
     println("#include \"luaot_header.c\"");
-    #elif defined(LUAOT_USE_SWITCHES)
-    println("#include \"trampoline_header.c\"");
-    #endif
     printnl();
     print_functions(proto);
     printnl();
@@ -182,11 +178,7 @@ int main(int argc, char **argv)
     println("#define LUAOT_MODULE_NAME \"%s\"", module_name);
     println("#define LUAOT_LUAOPEN_NAME luaopen_%s", module_name);
     printnl();
-    #if defined(LUAOT_USE_GOTOS)
     println("#include \"luaot_footer.c\"");
-    #elif defined(LUAOT_USE_SWITCHES)
-    println("#include \"trampoline_footer.c\"");
-    #endif
     if (executable) {
       printnl();
       printnl();
