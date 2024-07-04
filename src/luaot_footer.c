@@ -20,7 +20,8 @@ int LUAOT_LUAOPEN_NAME(lua_State *L) {
         /* No errors */
         break;
       case LUA_ERRSYNTAX:
-        fprintf(stderr, "syntax error in bundled source code.\n");
+        const char *msg = lua_tostring(L, -1);
+        fprintf(stderr, "syntax error in bundled source code: %s.\n", msg);
         exit(1);
         break;
       case LUA_ERRMEM:
