@@ -41,6 +41,12 @@ Example:
 ./src/luaot test.lua -o testcompiled.c -e # Compile test.lua to testcompiled.c and add a main func for compiling to executables
 gcc -o testexec testcompiled.c src/liblua.a -I./src -lm # Compile testcompiled to an executable that will run the lua code
 ```
+
+### `-b`, `-g`
+`-b` precompiles the lua source into bytecode before including it in the binary. By default, it strips symbols from the bytecode, but you can keep symbols with `-g`:
+```bash
+./src/luaot test.lua -o testcompiled.c -b -g # Compile test.lua to testcompiled.c with symbols
+```
 # Experiments
 
 If you are interested in reproducing the experiments from our paper, please consult the documentation in the `experiments` and `scripts` directory. Note that you must be inside the experiments directory when you run the scripts:
