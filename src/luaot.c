@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     if (luaL_loadfile(L, input_filename) != LUA_OK) {
         fatal_error(lua_tostring(L,-1));
     }
-    Proto *proto = getproto(s2v(L->top-1));
+    Proto *proto = getproto(s2v(L->top.p-1));
     tmname = G(L)->tmname;
 
     // Generate the file
@@ -169,11 +169,7 @@ int main(int argc, char **argv)
     output_file = fopen(output_filename, "w");
     if (output_file == NULL) { fatal_error(strerror(errno)); }
 
-    #if defined(LUAOT_USE_GOTOS)
     println("#include \"luaot_header.c\"");
-    #elif defined(LUAOT_USE_SWITCHES)
-    println("#include \"trampoline_header.c\"");
-    #endif
     printnl();
     print_functions(proto);
     printnl();
@@ -182,11 +178,7 @@ int main(int argc, char **argv)
     println("#define LUAOT_MODULE_NAME \"%s\"", module_name);
     println("#define LUAOT_LUAOPEN_NAME luaopen_%s", module_name);
     printnl();
-    #if defined(LUAOT_USE_GOTOS)
     println("#include \"luaot_footer.c\"");
-    #elif defined(LUAOT_USE_SWITCHES)
-    println("#include \"trampoline_footer.c\"");
-    #endif
     if (executable) {
       printnl();
       printnl();
@@ -734,13 +726,7 @@ void luaot_PrintOpcodeComment(Proto *f, int pc)
     print("\n");
 }
 
-#if defined(LUAOT_USE_GOTOS)
 #include "luaot_gotos.c"
-#elif defined(LUAOT_USE_SWITCHES)
-#include "luaot_switches.c"
-#else
-#error "Must define LUAOT_USE_GOTOS or LUAOT_USE_SWITCHES"
-#endif
 
 static
 void create_functions(Proto *p)

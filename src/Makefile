@@ -26,11 +26,11 @@ MYLIBS=
 MYOBJS=
 
 # Special flags for compiler modules; -Os reduces code size.
-CMCFLAGS= 
+CMCFLAGS=
 
 # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
 
-PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
+PLATS= guess aix bsd c89 freebsd generic ios linux linux-readline macosx mingw posix solaris
 
 LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o
@@ -46,11 +46,8 @@ LUAC_O=	luac.o
 AOT_T=	luaot
 AOT_O=	luaot.o
 
-AOT2_T=	luaot-trampoline
-AOT2_O=	luaot-trampoline.o
-
-ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O) $(AOT2_O)
-ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T) $(AOT2_T)
+ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O) $(AOT_O)
+ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(AOT_T)
 ALL_A= $(LUA_A)
 
 # Targets start here.
@@ -75,9 +72,6 @@ $(LUAC_T): $(LUAC_O) $(LUA_A)
 $(AOT_T): $(AOT_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(AOT_O) $(LUA_A) $(LIBS)
 
-$(AOT2_T): $(AOT2_O) $(LUA_A)
-	$(CC) -o $@ $(LDFLAGS) $(AOT2_O) $(LUA_A) $(LIBS)
-
 test:
 	./$(LUA_T) -v
 
@@ -91,7 +85,7 @@ echo:
 	@echo "PLAT= $(PLAT)"
 	@echo "CC= $(CC)"
 	@echo "CFLAGS= $(CFLAGS)"
-	@echo "LDFLAGS= $(SYSLDFLAGS)"
+	@echo "LDFLAGS= $(LDFLAGS)"
 	@echo "LIBS= $(LIBS)"
 	@echo "AR= $(AR)"
 	@echo "RANLIB= $(RANLIB)"
@@ -129,6 +123,9 @@ FreeBSD NetBSD OpenBSD freebsd:
 
 generic: $(ALL)
 
+ios:
+	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_IOS"
+
 Linux linux:	linux-noreadline
 
 linux-noreadline:
@@ -165,17 +162,14 @@ lparser.o:
 lcode.o:
 	$(CC) $(CFLAGS) $(CMCFLAGS) -c lcode.c
 
-# LuaAOT has extra if-defs
+# DO NOT DELETE
+
+#luaot.o: luaot.c luaot_gotos.c \
+# lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
 
 luaot.o: luaot.c luaot_gotos.c \
  lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
 	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_GOTOS
-
-luaot-trampoline.o: luaot.c luaot_switches.c \
- lua.h lauxlib.h ldebug.h lobject.h lopcodes.h lopnames.h lstate.h lundump.h
-	$(CC) $(CFLAGS) -c $< -o $@ -DLUAOT_USE_SWITCHES
-
-# DO NOT DELETE
 
 lapi.o: lapi.c lprefix.h lua.h luaconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h \

@@ -49,7 +49,7 @@ void create_function(Proto *f)
     println("  int trap;");
     printnl();
     println("  trap = L->hookmask;");
-    println("  cl = clLvalue(s2v(ci->func));");
+    println("  cl = clLvalue(s2v(ci->func.p));");
     println("  k = cl->p->k;");
     println("  pc = ci->u.l.savedpc;");
     println("  if (l_unlikely(trap)) {");
@@ -61,11 +61,10 @@ void create_function(Proto *f)
     println("    }");
     println("    ci->u.l.trap = 1;  /* assume trap is on, for now */");
     println("  }");
-    println("  base = ci->func + 1;");
+    println("  base = ci->func.p + 1;");
     println("  /* main loop of interpreter */");
     println("  Instruction *code = cl->p->code;"); // (!!!)
     println("  Instruction i;");
-    println("  StkId ra;");
     printnl();
 
     // If we are returning from another function, or resuming a coroutine,
@@ -107,25 +106,30 @@ void create_function(Proto *f)
 
         switch (op) {
             case OP_MOVE: {
+                println("    StkId ra = RA(i);");
                 println("    setobjs2s(L, ra, RB(i));");
                 break;
             }
             case OP_LOADI: {
+                println("    StkId ra = RA(i);");
                 println("    lua_Integer b = GETARG_sBx(i);");
                 println("    setivalue(s2v(ra), b);");
                 break;
             }
             case OP_LOADF: {
+                println("    StkId ra = RA(i);");
                 println("    int b = GETARG_sBx(i);");
                 println("    setfltvalue(s2v(ra), cast_num(b));");
                 break;
             }
             case OP_LOADK: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = k + GETARG_Bx(i);");
                 println("    setobj2s(L, ra, rb);");
                 break;
             }
             case OP_LOADKX: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb;");
                 println("    rb = k + GETARG_Ax(0x%08x);", f->code[pc+1]);
                 println("    setobj2s(L, ra, rb);");
@@ -133,19 +137,23 @@ void create_function(Proto *f)
                 break;
             }
             case OP_LOADFALSE: {
+                println("    StkId ra = RA(i);");
                 println("    setbfvalue(s2v(ra));");
                 break;
             }
             case OP_LFALSESKIP: {
+                println("    StkId ra = RA(i);");
                 println("    setbfvalue(s2v(ra));");
                 println("    goto LUAOT_SKIP1;"); //(!)
                 break;
             }
             case OP_LOADTRUE: {
+                println("    StkId ra = RA(i);");
                 println("    setbtvalue(s2v(ra));");
                 break;
             }
             case OP_LOADNIL: {
+                println("    StkId ra = RA(i);");
                 println("    int b = GETARG_B(i);");
                 println("    do {");
                 println("      setnilvalue(s2v(ra++));");
@@ -153,19 +161,22 @@ void create_function(Proto *f)
                 break;
             }
             case OP_GETUPVAL: {
+                println("    StkId ra = RA(i);");
                 println("    int b = GETARG_B(i);");
-                println("    setobj2s(L, ra, cl->upvals[b]->v);");
+                println("    setobj2s(L, ra, cl->upvals[b]->v.p);");
                 break;
             }
             case OP_SETUPVAL: {
+                println("    StkId ra = RA(i);");
                 println("    UpVal *uv = cl->upvals[GETARG_B(i)];");
-                println("    setobj(L, uv->v, s2v(ra));");
+                println("    setobj(L, uv->v.p, s2v(ra));");
                 println("    luaC_barrier(L, uv, s2v(ra));");
                 break;
             }
             case OP_GETTABUP: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
-                println("    TValue *upval = cl->upvals[GETARG_B(i)]->v;");
+                println("    TValue *upval = cl->upvals[GETARG_B(i)]->v.p;");
                 println("    TValue *rc = KC(i);");
                 println("    TString *key = tsvalue(rc);  /* key must be a string */");
                 println("    if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {");
@@ -176,6 +187,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_GETTABLE: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    TValue *rc = vRC(i);");
@@ -190,6 +202,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_GETI: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    int c = GETARG_C(i);");
@@ -204,6 +217,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_GETFIELD: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    TValue *rc = KC(i);");
@@ -217,7 +231,7 @@ void create_function(Proto *f)
             }
             case OP_SETTABUP: {
                 println("    const TValue *slot;");
-                println("    TValue *upval = cl->upvals[GETARG_A(i)]->v;");
+                println("    TValue *upval = cl->upvals[GETARG_A(i)]->v.p;");
                 println("    TValue *rb = KB(i);");
                 println("    TValue *rc = RKC(i);");
                 println("    TString *key = tsvalue(rb);  /* key must be a string */");
@@ -229,6 +243,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SETTABLE: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);  /* key (table is in 'ra') */");
                 println("    TValue *rc = RKC(i);  /* value */");
@@ -243,6 +258,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SETI: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    int c = GETARG_B(i);");
                 println("    TValue *rc = RKC(i);");
@@ -257,6 +273,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SETFIELD: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    TValue *rb = KB(i);");
                 println("    TValue *rc = RKC(i);");
@@ -269,6 +286,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_NEWTABLE: {
+                println("    StkId ra = RA(i);");
                 println("    int b = GETARG_B(i);  /* log2(hash size) + 1 */");
                 println("    int c = GETARG_C(i);  /* array size */");
                 println("    Table *t;");
@@ -278,7 +296,7 @@ void create_function(Proto *f)
                 println("    if (TESTARG_k(i))");
                 println("      c += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]);
                 println("    /* skip extra argument */"); // (!)
-                println("    L->top = ra + 1;  /* correct top in case of emergency GC */");
+                println("    L->top.p = ra + 1;  /* correct top in case of emergency GC */");
                 println("    t = luaH_new(L);  /* memory allocation */");
                 println("    sethvalue2s(L, ra, t);");
                 println("    if (b != 0 || c != 0)");
@@ -288,6 +306,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SELF: {
+                println("    StkId ra = RA(i);");
                 println("    const TValue *slot;");
                 println("    TValue *rb = vRB(i);");
                 println("    TValue *rc = RKC(i);");
@@ -317,6 +336,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_MODK: {
+                println("    savestate(L, ci);  /* in case of division by 0 */");
                 println("    op_arithK(L, luaV_mod, luaV_modf);");
                 break;
             }
@@ -329,6 +349,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_IDIVK: {
+                println("    savestate(L, ci);  /* in case of division by 0 */");
                 println("    op_arithK(L, luaV_idiv, luai_numidiv);");
                 break;
             }
@@ -345,6 +366,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SHRI: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = vRB(i);");
                 println("    int ic = GETARG_sC(i);");
                 println("    lua_Integer ib;");
@@ -355,6 +377,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_SHLI: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = vRB(i);");
                 println("    int ic = GETARG_sC(i);");
                 println("    lua_Integer ib;");
@@ -377,6 +400,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_MOD: {
+                println("    savestate(L, ci);  /* in case of division by 0 */");
                 println("    op_arith(L, luaV_mod, luaV_modf);");
                 break;
             }
@@ -389,6 +413,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_IDIV: {  /* floor division */
+                println("    savestate(L, ci);  /* in case of division by 0 */");
                 println("    op_arith(L, luaV_idiv, luai_numidiv);");
                 break;
             }
@@ -413,6 +438,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_MMBIN: {
+                println("    StkId ra = RA(i);");
                 println("    Instruction pi = 0x%08x; /* original arith. expression */", f->code[pc-1]);
                 println("    TValue *rb = vRB(i);");
                 println("    TMS tm = (TMS)GETARG_C(i);");
@@ -422,6 +448,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_MMBINI: {
+                println("    StkId ra = RA(i);");
                 println("    Instruction pi = 0x%0x;  /* original arith. expression */", f->code[pc-1]);
                 println("    int imm = GETARG_sB(i);");
                 println("    TMS tm = (TMS)GETARG_C(i);");
@@ -431,6 +458,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_MMBINK: {
+                println("    StkId ra = RA(i);");
                 println("    Instruction pi = 0x%08x;  /* original arith. expression */", f->code[pc-1]);
                 println("    TValue *imm = KB(i);");
                 println("    TMS tm = (TMS)GETARG_C(i);");
@@ -440,6 +468,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_UNM: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = vRB(i);");
                 println("    lua_Number nb;");
                 println("    if (ttisinteger(rb)) {");
@@ -454,6 +483,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_BNOT: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = vRB(i);");
                 println("    lua_Integer ib;");
                 println("    if (tointegerns(rb, &ib)) {");
@@ -464,6 +494,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_NOT: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = vRB(i);");
                 println("    if (l_isfalse(rb))");
                 println("      setbtvalue(s2v(ra));");
@@ -472,21 +503,25 @@ void create_function(Proto *f)
                 break;
             }
             case OP_LEN: {
+                println("    StkId ra = RA(i);");
                 println("    Protect(luaV_objlen(L, ra, vRB(i)));");
                 break;
             }
             case OP_CONCAT: {
+                println("    StkId ra = RA(i);");
                 println("    int n = GETARG_B(i);  /* number of elements to concatenate */");
-                println("    L->top = ra + n;  /* mark the end of concat operands */");
+                println("    L->top.p = ra + n;  /* mark the end of concat operands */");
                 println("    ProtectNT(luaV_concat(L, n));");
-                println("    checkGC(L, L->top); /* 'luaV_concat' ensures correct top */");
+                println("    checkGC(L, L->top.p); /* 'luaV_concat' ensures correct top */");
                 break;
             }
             case OP_CLOSE: {
+                println("    StkId ra = RA(i);");
                 println("Protect(luaF_close(L, ra, LUA_OK, 1));");
                 break;
             }
             case OP_TBC: {
+                println("    StkId ra = RA(i);");
                 println("    /* create new to-be-closed upvalue */");
                 println("    halfProtect(luaF_newtbcupval(L, ra));");
                 break;
@@ -497,6 +532,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_EQ: {
+                println("    StkId ra = RA(i);");
                 println("    int cond;");
                 println("    TValue *rb = vRB(i);");
                 println("    Protect(cond = luaV_equalobj(L, s2v(ra), rb));");
@@ -512,6 +548,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_EQK: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = KB(i);");
                 println("    /* basic types do not use '__eq'; we can use raw equality */");
                 println("    int cond = luaV_equalobj(NULL, s2v(ra), rb);");
@@ -519,6 +556,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_EQI: {
+                println("    StkId ra = RA(i);");
                 println("    int cond;");
                 println("    int im = GETARG_sB(i);");
                 println("    if (ttisinteger(s2v(ra)))");
@@ -547,11 +585,13 @@ void create_function(Proto *f)
                 break;
             }
             case OP_TEST: {
+                println("    StkId ra = RA(i);");
                 println("    int cond = !l_isfalse(s2v(ra));");
                 println("    docondjump();");
                 break;
             }
             case OP_TESTSET: {
+                println("    StkId ra = RA(i);");
                 println("    TValue *rb = vRB(i);");
                 println("    if (l_isfalse(rb) == GETARG_k(i))");
                 println("      goto LUAOT_SKIP1;"); // (!)
@@ -562,72 +602,70 @@ void create_function(Proto *f)
                 break;
             }
             case OP_CALL: {
+                println("    StkId ra = RA(i);");
                 println("    CallInfo *newci;");
                 println("    int b = GETARG_B(i);");
                 println("    int nresults = GETARG_C(i) - 1;");
                 println("    if (b != 0)  /* fixed number of arguments? */");
-                println("        L->top = ra + b;  /* top signals number of arguments */");
+                println("        L->top.p = ra + b;  /* top signals number of arguments */");
                 println("    /* else previous instruction set top */");
                 println("    savepc(L);  /* in case of errors */");
                 println("    if ((newci = luaD_precall(L, ra, nresults)) == NULL)");
                 println("        updatetrap(ci);  /* C call; nothing else to be done */");
                 println("    else {");
                 println("        ci = newci;");
-                println("        ci->callstatus = 0;  /* call re-uses 'luaV_execute' */");
                 println("        return ci;");
                 println("    }");
                 break;
             }
             case OP_TAILCALL: {
+                println("    StkId ra = RA(i);");
                 println("    int b = GETARG_B(i);  /* number of arguments + 1 (function) */");
+                println("    int n;  /* number of results when calling a C function */");
                 println("    int nparams1 = GETARG_C(i);");
                 println("    /* delta is virtual 'func' - real 'func' (vararg functions) */");
                 println("    int delta = (nparams1) ? ci->u.l.nextraargs + nparams1 : 0;");
                 println("    if (b != 0)");
-                println("      L->top = ra + b;");
+                println("      L->top.p = ra + b;");
                 println("    else  /* previous instruction set top */");
-                println("      b = cast_int(L->top - ra);");
+                println("      b = cast_int(L->top.p - ra);");
                 println("    savepc(ci);  /* several calls here can raise errors */");
+
+
                 println("    if (TESTARG_k(i)) {");
                 println("      luaF_closeupval(L, base);  /* close upvalues from current call */");
-                println("      lua_assert(L->tbclist < base);  /* no pending tbc variables */");
-                println("      lua_assert(base == ci->func + 1);");
+                println("      lua_assert(L->tbclist.p < base);  /* no pending tbc variables */");
+                println("      lua_assert(base == ci->func.p + 1);");
                 println("    }");
-                println("    while (!ttisfunction(s2v(ra))) {  /* not a function? */");
-                println("      luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */");
-                println("      b++;  /* there is now one extra argument */");
-                println("      checkstackGCp(L, 1, ra);");
-                println("    }");
-                println("    if (!ttisLclosure(s2v(ra))) {  /* C function? */");
-                println("      luaD_precall(L, ra, LUA_MULTRET);  /* call it */");
-                println("      updatetrap(ci);");
-                println("      updatestack(ci);  /* stack may have been relocated */");
-                println("      ci->func -= delta;  /* restore 'func' (if vararg) */");
-                println("      luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */");
+                println("    if ((n = luaD_pretailcall(L, ci, ra, b, delta)) < 0)  /* Lua function? */");
+                println("      return ci;  /* execute the callee */"); /*(!!!)*/
+                println("    else {  /* C function? */");
+                println("      ci->func.p -= delta;  /* restore 'func' (if vararg) */");
+                println("      luaD_poscall(L, ci, n);  /* finish caller */");
                 println("      updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
-                println_goto_ret(); // (!)
+                //println("      goto ret;  /* caller returns after the tail call */");
+                println_goto_ret();
                 println("    }");
-                println("    ci->func -= delta;  /* restore 'func' (if vararg) */");
-                println("    luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
-                println("    return ci;");
                 break;
             }
             case OP_RETURN: {
+                println("    StkId ra = RA(i);");
                 println("    int n = GETARG_B(i) - 1;  /* number of results */");
                 println("    int nparams1 = GETARG_C(i);");
                 println("    if (n < 0)  /* not fixed? */");
-                println("      n = cast_int(L->top - ra);  /* get what is available */");
+                println("      n = cast_int(L->top.p - ra);  /* get what is available */");
                 println("    savepc(ci);");
                 println("    if (TESTARG_k(i)) {  /* may there be open upvalues? */");
-                println("      if (L->top < ci->top)");
-                println("        L->top = ci->top;");
+                println("      ci->u2.nres = n;  /* save number of returns */");
+                println("      if (L->top.p < ci->top.p)");
+                println("        L->top.p = ci->top.p;");
                 println("      luaF_close(L, base, CLOSEKTOP, 1);");
                 println("      updatetrap(ci);");
                 println("      updatestack(ci);");
                 println("    }");
                 println("    if (nparams1)  /* vararg function? */");
-                println("      ci->func -= ci->u.l.nextraargs + nparams1;");
-                println("    L->top = ra + n;  /* set call for 'luaD_poscall' */");
+                println("      ci->func.p -= ci->u.l.nextraargs + nparams1;");
+                println("    L->top.p = ra + n;  /* set call for 'luaD_poscall' */");
                 println("    luaD_poscall(L, ci, n);");
                 println("    updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
                 println_goto_ret();
@@ -635,7 +673,8 @@ void create_function(Proto *f)
             }
             case OP_RETURN0: {
                 println("    if (l_unlikely(L->hookmask)) {");
-                println("      L->top = ra;");
+                println("      StkId ra = RA(i);");
+                println("      L->top.p = ra;");
                 println("      savepc(ci);");
                 println("      luaD_poscall(L, ci, 0);  /* no hurry... */");
                 println("      trap = 1;");
@@ -643,16 +682,17 @@ void create_function(Proto *f)
                 println("    else {  /* do the 'poscall' here */");
                 println("      int nres;");
                 println("      L->ci = ci->previous;  /* back to caller */");
-                println("      L->top = base - 1;");
+                println("      L->top.p = base - 1;");
                 println("      for (nres = ci->nresults; l_unlikely(nres > 0); nres--)");
-                println("        setnilvalue(s2v(L->top++));  /* all results are nil */");
+                println("        setnilvalue(s2v(L->top.p++));  /* all results are nil */");
                 println("    }");
                 println_goto_ret();
                 break;
             }
             case OP_RETURN1: {
                 println("    if (l_unlikely(L->hookmask)) {");
-                println("      L->top = ra + 1;");
+                println("      StkId ra = RA(i);");
+                println("      L->top.p = ra + 1;");
                 println("      savepc(ci);");
                 println("      luaD_poscall(L, ci, 1);  /* no hurry... */");
                 println("      trap = 1;");
@@ -661,18 +701,20 @@ void create_function(Proto *f)
                 println("      int nres = ci->nresults;");
                 println("      L->ci = ci->previous;  /* back to caller */");
                 println("      if (nres == 0)");
-                println("        L->top = base - 1;  /* asked for no results */");
+                println("        L->top.p = base - 1;  /* asked for no results */");
                 println("      else {");
+                println("        StkId ra = RA(i);");
                 println("        setobjs2s(L, base - 1, ra);  /* at least this result */");
-                println("        L->top = base;");
+                println("        L->top.p = base;");
                 println("        for (; l_unlikely(nres > 1); nres--)");
-                println("          setnilvalue(s2v(L->top++));");
+                println("          setnilvalue(s2v(L->top.p++));");
                 println("      }");
                 println("    }");
                 println_goto_ret();
                 break;
             }
             case OP_FORLOOP: {
+                println("    StkId ra = RA(i);");
                 println("    if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */");
                 println("      lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));");
                 println("      if (count > 0) {  /* still more iterations? */");
@@ -691,6 +733,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_FORPREP: {
+                println("    StkId ra = RA(i);");
                 println("    savestate(L, ci);  /* in case of errors */");
                 println("    if (forprep(L, ra))");
                 println("      goto label_%02d; /* skip the loop */", ((pc+1) + GETARG_Bx(instr) + 1)); //(!)
@@ -703,6 +746,7 @@ void create_function(Proto *f)
                 break;
             }
             case OP_TFORCALL: {
+                println("    StkId ra = RA(i);");
                 println("    /* 'ra' has the iterator function, 'ra + 1' has the state,");
                 println("       'ra + 2' has the control variable, and 'ra + 3' has the");
                 println("       to-be-closed variable. The call will use the stack after");
@@ -710,13 +754,14 @@ void create_function(Proto *f)
                 println("    */");
                 println("    /* push function, state, and control variable */");
                 println("    memcpy(ra + 4, ra, 3 * sizeof(*ra));");
-                println("    L->top = ra + 4 + 3;");
+                println("    L->top.p = ra + 4 + 3;");
                 println("    ProtectNT(luaD_call(L, ra + 4, GETARG_C(i)));  /* do the call */");
                 println("    updatestack(ci);  /* stack may have changed */");
                 // (!) Going to the next instruction is a no-op
                 break;
             }
             case OP_TFORLOOP: {
+                println("    StkId ra = RA(i);");
                 println("    if (!ttisnil(s2v(ra + 4))) {  /* continue loop? */");
                 println("      setobjs2s(L, ra + 2, ra + 4);  /* save control variable */");
                 println("      goto label_%02d; /* jump back */", ((pc+1) - GETARG_Bx(instr))); //(!)
@@ -730,37 +775,40 @@ void create_function(Proto *f)
                 // Sometimes, the last += GETARG_Ax" line would overflow and the C compiler would naturally
                 // complain (even though the offending line was never executed).
                 int has_extra_arg = TESTARG_k(instr);
-                println("        int n = GETARG_B(i);");
-                println("        unsigned int last = GETARG_C(i);");
-                println("        Table *h = hvalue(s2v(ra));");
-                println("        if (n == 0)");
-                println("          n = cast_int(L->top - ra) - 1;  /* get up to the top */");
-                println("        else");
-                println("          L->top = ci->top;  /* correct top in case of emergency GC */");
-                println("        last += n;");
-                if (has_extra_arg) {
-                 println("        last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]); // (!)
+                println("    StkId ra = RA(i);");
+                println("    int n = GETARG_B(i);");
+                println("    unsigned int last = GETARG_C(i);");
+                println("    Table *h = hvalue(s2v(ra));");
+                println("    if (n == 0)");
+                println("      n = cast_int(L->top.p - ra) - 1;  /* get up to the top */");
+                println("    else");
+                println("      L->top.p = ci->top.p;  /* correct top in case of emergency GC */");
+                println("    last += n;");
+                if (has_extra_arg){
+                    println("    last += GETARG_Ax(0x%08x) * (MAXARG_C + 1);", f->code[pc+1]); // (!)
                 }
-                println("        if (last > luaH_realasize(h))  /* needs more space? */");
-                println("          luaH_resizearray(L, h, last);  /* preallocate it at once */");
-                println("        for (; n > 0; n--) {");
-                println("          TValue *val = s2v(ra + n);");
-                println("          setobj2t(L, &h->array[last - 1], val);");
-                println("          last--;");
-                println("          luaC_barrierback(L, obj2gco(h), val);");
-                println("        }");
+                println("    if (last > luaH_realasize(h))  /* needs more space? */");
+                println("      luaH_resizearray(L, h, last);  /* preallocate it at once */");
+                println("    for (; n > 0; n--) {");
+                println("      TValue *val = s2v(ra + n);");
+                println("      setobj2t(L, &h->array[last - 1], val);");
+                println("      last--;");
+                println("      luaC_barrierback(L, obj2gco(h), val);");
+                println("    }");
                 if (has_extra_arg) {
-                 println("        goto LUAOT_SKIP1;"); // (!)
+                    println("    goto LUAOT_SKIP1;"); // (!)
                 }
                 break;
             }
             case OP_CLOSURE: {
+                println("    StkId ra = RA(i);");
                 println("    Proto *p = cl->p->p[GETARG_Bx(i)];");
                 println("    halfProtect(pushclosure(L, p, cl->upvals, base, ra));");
                 println("    checkGC(L, ra + 1);");
                 break;
             }
             case OP_VARARG: {
+                println("    StkId ra = RA(i);");
                 println("    int n = GETARG_C(i) - 1;  /* required results */");
                 println("    Protect(luaT_getvarargs(L, ci, ra, n));");
                 break;

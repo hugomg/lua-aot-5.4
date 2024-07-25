@@ -32,7 +32,7 @@ For a complete introduction to Lua programming, see the book
 
 <P>
 <SMALL>
-Copyright &copy; 2019 Lua.org, PUC-Rio.
+Copyright &copy; 2020&ndash;2023 Lua.org, PUC-Rio.
 Freely available under the terms of the
 <A HREF="http://www.lua.org/license.html">Lua license</A>.
 </SMALL>
@@ -85,6 +85,8 @@ Freely available under the terms of the
 <LI><A HREF="manual.html#3.4.9">3.4.9 &ndash; Table Constructors</A>
 <LI><A HREF="manual.html#3.4.10">3.4.10 &ndash; Function Calls</A>
 <LI><A HREF="manual.html#3.4.11">3.4.11 &ndash; Function Definitions</A>
+<LI><A HREF="manual.html#3.4.12">3.4.12 &ndash; Lists of expressions, multiple results, and adjustment<A>
+
 </UL>
 <LI><A HREF="manual.html#3.5">3.5 &ndash; Visibility Rules</A>
 </UL>
@@ -92,14 +94,20 @@ Freely available under the terms of the
 <LI><A HREF="manual.html#4">4 &ndash; The Application Program Interface</A>
 <UL>
 <LI><A HREF="manual.html#4.1">4.1 &ndash; The Stack</A>
-<LI><A HREF="manual.html#4.2">4.2 &ndash; Stack Size</A>
-<LI><A HREF="manual.html#4.3">4.3 &ndash; Valid and Acceptable Indices</A>
-<LI><A HREF="manual.html#4.4">4.4 &ndash; C Closures</A>
-<LI><A HREF="manual.html#4.5">4.5 &ndash; Registry</A>
-<LI><A HREF="manual.html#4.6">4.6 &ndash; Error Handling in C</A>
-<LI><A HREF="manual.html#4.7">4.7 &ndash; Handling Yields in C</A>
-<LI><A HREF="manual.html#4.8">4.8 &ndash; Functions and Types</A>
-<LI><A HREF="manual.html#4.9">4.9 &ndash; The Debug Interface</A>
+<UL>
+<LI><A HREF="manual.html#4.1.1">4.1.1 &ndash; Stack Size</A>
+<LI><A HREF="manual.html#4.1.2">4.1.2 &ndash; Valid and Acceptable Indices</A>
+<LI><A HREF="manual.html#4.1.3">4.1.3 &ndash; Pointers to strings</A>
+</UL>
+<LI><A HREF="manual.html#4.2">4.2 &ndash; C Closures</A>
+<LI><A HREF="manual.html#4.3">4.3 &ndash; Registry</A>
+<LI><A HREF="manual.html#4.4">4.4 &ndash; Error Handling in C</A>
+<UL>
+<LI><A HREF="manual.html#4.4.1">4.4.1 &ndash; Status Codes</A>
+</UL>
+<LI><A HREF="manual.html#4.5">4.5 &ndash; Handling Yields in C</A>
+<LI><A HREF="manual.html#4.6">4.6 &ndash; Functions and Types</A>
+<LI><A HREF="manual.html#4.7">4.7 &ndash; The Debug Interface</A>
 </UL>
 <P>
 <LI><A HREF="manual.html#5">5 &ndash; The Auxiliary Library</A>
@@ -192,7 +200,6 @@ Freely available under the terms of the
 <A HREF="manual.html#pdf-debug.getregistry">debug.getregistry</A><BR>
 <A HREF="manual.html#pdf-debug.getupvalue">debug.getupvalue</A><BR>
 <A HREF="manual.html#pdf-debug.getuservalue">debug.getuservalue</A><BR>
-<A HREF="manual.html#pdf-debug.setcstacklimit">debug.setcstacklimit</A><BR>
 <A HREF="manual.html#pdf-debug.sethook">debug.sethook</A><BR>
 <A HREF="manual.html#pdf-debug.setlocal">debug.setlocal</A><BR>
 <A HREF="manual.html#pdf-debug.setmetatable">debug.setmetatable</A><BR>
@@ -391,6 +398,7 @@ Freely available under the terms of the
 <A HREF="manual.html#lua_callk">lua_callk</A><BR>
 <A HREF="manual.html#lua_checkstack">lua_checkstack</A><BR>
 <A HREF="manual.html#lua_close">lua_close</A><BR>
+<A HREF="manual.html#lua_closeslot">lua_closeslot</A><BR>
 <A HREF="manual.html#lua_compare">lua_compare</A><BR>
 <A HREF="manual.html#lua_concat">lua_concat</A><BR>
 <A HREF="manual.html#lua_copy">lua_copy</A><BR>
@@ -470,7 +478,6 @@ Freely available under the terms of the
 <A HREF="manual.html#lua_resume">lua_resume</A><BR>
 <A HREF="manual.html#lua_rotate">lua_rotate</A><BR>
 <A HREF="manual.html#lua_setallocf">lua_setallocf</A><BR>
-<A HREF="manual.html#lua_setcstacklimit">lua_setcstacklimit</A><BR>
 <A HREF="manual.html#lua_setfield">lua_setfield</A><BR>
 <A HREF="manual.html#lua_setglobal">lua_setglobal</A><BR>
 <A HREF="manual.html#lua_sethook">lua_sethook</A><BR>
@@ -529,6 +536,7 @@ Freely available under the terms of the
 <A HREF="manual.html#luaL_buffinit">luaL_buffinit</A><BR>
 <A HREF="manual.html#luaL_buffinitsize">luaL_buffinitsize</A><BR>
 <A HREF="manual.html#luaL_bufflen">luaL_bufflen</A><BR>
+<A HREF="manual.html#luaL_buffsub">luaL_buffsub</A><BR>
 <A HREF="manual.html#luaL_callmeta">luaL_callmeta</A><BR>
 <A HREF="manual.html#luaL_checkany">luaL_checkany</A><BR>
 <A HREF="manual.html#luaL_checkinteger">luaL_checkinteger</A><BR>
@@ -567,6 +575,7 @@ Freely available under the terms of the
 <A HREF="manual.html#luaL_optstring">luaL_optstring</A><BR>
 <A HREF="manual.html#luaL_prepbuffer">luaL_prepbuffer</A><BR>
 <A HREF="manual.html#luaL_prepbuffsize">luaL_prepbuffsize</A><BR>
+<A HREF="manual.html#luaL_pushfail">luaL_pushfail</A><BR>
 <A HREF="manual.html#luaL_pushresult">luaL_pushresult</A><BR>
 <A HREF="manual.html#luaL_pushresultsize">luaL_pushresultsize</A><BR>
 <A HREF="manual.html#luaL_ref">luaL_ref</A><BR>
@@ -606,7 +615,7 @@ Freely available under the terms of the
 <A HREF="manual.html#pdf-LUA_HOOKLINE">LUA_HOOKLINE</A><BR>
 <A HREF="manual.html#pdf-LUA_HOOKRET">LUA_HOOKRET</A><BR>
 <A HREF="manual.html#pdf-LUA_HOOKTAILCALL">LUA_HOOKTAILCALL</A><BR>
-<A HREF="manual.html#pdf-LUAL_BUFFERSIZE">LUAL_BUFFERSIZE</A><BR>
+<A HREF="manual.html#pdf-LUA_LOADED_TABLE">LUA_LOADED_TABLE</A><BR>
 <A HREF="manual.html#pdf-LUA_MASKCALL">LUA_MASKCALL</A><BR>
 <A HREF="manual.html#pdf-LUA_MASKCOUNT">LUA_MASKCOUNT</A><BR>
 <A HREF="manual.html#pdf-LUA_MASKLINE">LUA_MASKLINE</A><BR>
@@ -634,6 +643,7 @@ Freely available under the terms of the
 <A HREF="manual.html#pdf-LUA_OPSHR">LUA_OPSHR</A><BR>
 <A HREF="manual.html#pdf-LUA_OPSUB">LUA_OPSUB</A><BR>
 <A HREF="manual.html#pdf-LUA_OPUNM">LUA_OPUNM</A><BR>
+<A HREF="manual.html#pdf-LUA_PRELOAD_TABLE">LUA_PRELOAD_TABLE</A><BR>
 <A HREF="manual.html#pdf-LUA_REFNIL">LUA_REFNIL</A><BR>
 <A HREF="manual.html#pdf-LUA_REGISTRYINDEX">LUA_REGISTRYINDEX</A><BR>
 <A HREF="manual.html#pdf-LUA_RIDX_GLOBALS">LUA_RIDX_GLOBALS</A><BR>
@@ -650,6 +660,7 @@ Freely available under the terms of the
 <A HREF="manual.html#pdf-LUA_TUSERDATA">LUA_TUSERDATA</A><BR>
 <A HREF="manual.html#pdf-LUA_USE_APICHECK">LUA_USE_APICHECK</A><BR>
 <A HREF="manual.html#pdf-LUA_YIELD">LUA_YIELD</A><BR>
+<A HREF="manual.html#pdf-LUAL_BUFFERSIZE">LUAL_BUFFERSIZE</A><BR>
 
 </TD>
 </TR>
@@ -657,10 +668,10 @@ Freely available under the terms of the
 
 <P CLASS="footer">
 Last update:
-Thu Oct  3 17:35:42 UTC 2019
+Sat Apr  1 17:57:05 UTC 2023
 </P>
 <!--
-Last change: revised for Lua 5.4.0 (beta)
+Last change: revised for Lua 5.4.5
 -->
 
 </BODY>
